@@ -1,0 +1,16 @@
+# Maven
+SLAMS/maven/
+
+# Maven build output
+SLAMS/target/
+
+# Java compiled files
+*.class
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Environment / secrets
+.env

@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLAMS - Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#0F766E',
+                        brandDark: '#0B5E58',
+                        brandLight: '#E6F4F1',
+
+                        success: '#059669',
+                        successLight: '#ECFDF5',
+
+                        warning: '#D97706',
+                        warningLight: '#FFF7ED',
+
+                        danger: '#DC2626',
+                        dangerLight: '#FEF2F2',
+
+                        page: '#F8FAFC',
+                        surface: '#FFFFFF',
+                        line: '#E2E8F0',
+
+                        textMain: '#0F172A',
+                        textSoft: '#334155',
+                        textMuted: '#64748B',
+                        textFaint: '#94A3B8'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        soft: '0 10px 30px -12px rgba(15, 23, 42, 0.12)',
+                        card: '0 10px 24px -14px rgba(15, 23, 42, 0.14)',
+                        brand: '0 10px 24px -12px rgba(15, 118, 110, 0.28)',
+                        danger: '0 10px 24px -12px rgba(220, 38, 38, 0.24)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            color: #0F172A;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-card-hover {
+            transition: all 0.22s ease-in-out;
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-3px);
+            border-color: rgba(15, 118, 110, 0.18);
+            box-shadow: 0 16px 32px -18px rgba(15, 23, 42, 0.16);
+        }
+
+        .input-focus:focus {
+            border-color: #0F766E !important;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-12 relative overflow-x-hidden bg-page">
+
+<div id="toastContainer" class="fixed top-6 right-6 z-50 flex flex-col space-y-4 max-w-sm w-full"></div>
+
+<header class="bg-surface/95 backdrop-blur sticky top-0 z-40 px-6 py-4 border-b border-line shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-2xl bg-brandLight border border-brand/10 flex items-center justify-center text-brand text-lg shadow-sm">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight text-textMain">SLAMS</h1>
+                <p class="text-[10px] text-textMuted uppercase tracking-[0.22em] -mt-0.5">Management Hub</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <div class="text-right hidden sm:block">
+                <p class="text-xs font-semibold text-textSoft" th:text="${currentUser.fullName}">John Doe</p>
+
+                <span th:if="${currentUser.role.name() == 'ROLE_ADMIN'}"
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold bg-dangerLight border border-danger/15 text-danger tracking-wide">
+                    ADMIN
+                </span>
+
+                <span th:if="${currentUser.role.name() == 'ROLE_MANAGER'}"
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold bg-brandLight border border-brand/15 text-brand tracking-wide">
+                    MANAGER
+                </span>
+
+                <span th:if="${currentUser.role.name() == 'ROLE_EMPLOYEE'}"
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold bg-successLight border border-success/15 text-success tracking-wide">
+                    EMPLOYEE
+                </span>
+            </div>
+
+            <a href="/logout"
+               class="w-10 h-10 rounded-xl bg-slate-50 hover:bg-dangerLight border border-line flex items-center justify-center text-textMuted hover:text-danger hover:border-danger/20 transition-all duration-200 shadow-sm"
+               title="Logout">
+                <i class="fa-solid fa-right-from-bracket text-xs"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 mt-8">
+
+    <!-- ================= EMPLOYEE VIEW ================= -->
+    <div th:if="${currentUser.role.name() == 'ROLE_EMPLOYEE'}" class="space-y-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex flex-col justify-between md:col-span-2 relative overflow-hidden">
+                <div class="absolute inset-y-0 right-0 w-36 bg-gradient-to-l from-brandLight/80 to-transparent"></div>
+                <div class="absolute top-4 right-5 opacity-10 text-7xl text-brand">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+
+                <div class="relative z-10">
+                    <h2 class="text-xl font-bold tracking-tight mb-1 text-textMain">
+                        Welcome, <span th:text="${currentUser.fullName.split(' ')[0]}">John</span>
+                    </h2>
+                    <p class="text-xs text-textMuted max-w-lg">
+                        Review your attendance activity, manage leave requests, and keep track of your day from one place.
+                    </p>
+                </div>
+
+                <div class="relative z-10 mt-5 flex items-center space-x-2 text-[10px] text-textMuted">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand/60 opacity-70"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
+                    </span>
+                    <span>Employee workspace active</span>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Casual Leaves</span>
+                    <h3 class="text-2xl font-bold mt-1 text-textMain" th:text="${leaveBalance.casualLeave}">12</h3>
+                    <p class="text-[10px] text-textMuted mt-1">Days remaining</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-brandLight border border-brand/10 flex items-center justify-center text-brand text-base">
+                    <i class="fa-solid fa-umbrella-beach"></i>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Sick Leaves</span>
+                    <h3 class="text-2xl font-bold mt-1 text-textMain" th:text="${leaveBalance.sickLeave}">15</h3>
+                    <p class="text-[10px] text-textMuted mt-1">Days remaining</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-successLight border border-success/10 flex items-center justify-center text-success text-base">
+                    <i class="fa-solid fa-briefcase-medical"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-1 flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand via-brand/70 to-brand/30"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold">Attendance Punch</span>
+                        <span id="liveClock" class="text-xs font-semibold text-textMuted">00:00:00 AM</span>
+                    </div>
+
+                    <div id="punchStatusContainer" class="text-center py-6">
+                        <div th:if="${todayAttendance == null}">
+                            <div class="w-16 h-16 rounded-full bg-slate-50 border border-line flex items-center justify-center text-textMuted text-2xl mx-auto mb-3 animate-pulse">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <h4 class="text-sm font-semibold text-textMain">Not Clocked In</h4>
+                            <p class="text-[10px] text-textMuted mt-1">Mark your check-in status for today</p>
+                        </div>
+
+                        <div th:if="${todayAttendance != null && todayAttendance.checkOutTime == null}">
+                            <div class="w-16 h-16 rounded-full bg-successLight border border-success/20 flex items-center justify-center text-success text-2xl mx-auto mb-3">
+                                <i class="fa-solid fa-business-time"></i>
+                            </div>
+                            <h4 class="text-sm font-semibold text-success">Shift Started</h4>
+                            <p class="text-[10px] text-textMuted mt-1"
+                               th:text="'Checked-in at: ' + ${todayAttendance.checkInTime}">
+                                09:00 AM
+                            </p>
+                            <span th:if="${todayAttendance.status.name() == 'LATE'}"
+                                  class="mt-2 inline-block px-2.5 py-1 rounded-full bg-warningLight border border-warning/20 text-warning text-[9px] font-bold tracking-wide">
+                                LATE CHECK-IN
+                            </span>
+                        </div>
+
+                        <div th:if="${todayAttendance != null && todayAttendance.checkOutTime != null}">
+                            <div class="w-16 h-16 rounded-full bg-brandLight border border-brand/15 flex items-center justify-center text-brand text-2xl mx-auto mb-3">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <h4 class="text-sm font-semibold text-brand">Day Completed</h4>
+                            <p class="text-[10px] text-textMuted mt-1"
+                               th:text="'Worked: ' + ${todayAttendance.workingHours} + ' hrs'">
+                                8.5 hrs
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button th:if="${todayAttendance == null}"
+                            onclick="performPunch('checkin')"
+                            class="w-full py-3 bg-brand hover:bg-brandDark text-white text-xs font-bold rounded-2xl shadow-brand transition-all duration-200 flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                        <span>Clock In</span>
+                    </button>
+
+                    <button th:if="${todayAttendance != null && todayAttendance.checkOutTime == null}"
+                            onclick="performPunch('checkout')"
+                            class="w-full py-3 bg-danger hover:bg-red-700 text-white shadow-danger text-xs font-semibold rounded-2xl transition-all duration-200 flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                        <span>Clock Out</span>
+                    </button>
+
+                    <button th:if="${todayAttendance != null && todayAttendance.checkOutTime != null}"
+                            disabled
+                            class="w-full py-3 bg-slate-50 border border-line text-textFaint text-xs font-semibold rounded-2xl flex items-center justify-center space-x-1.5 cursor-not-allowed">
+                        <i class="fa-solid fa-lock text-xs"></i>
+                        <span>Shift Completed</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-2 flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold mb-4 block">Apply for Leave</span>
+
+                    <form id="leaveApplyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Leave Type</label>
+                            <select id="leaveType" name="leaveType" required
+                                    class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none transition-all input-focus">
+                                <option value="CASUAL">Casual Leave</option>
+                                <option value="SICK">Sick Leave</option>
+                                <option value="EARNED">Earned Leave</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Start Date</label>
+                            <input type="date" id="startDate" name="startDate" required
+                                   class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none transition-all input-focus">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-textMuted font-semibold mb-1.5">End Date</label>
+                            <input type="date" id="endDate" name="endDate" required
+                                   class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none transition-all input-focus">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Reason</label>
+                            <textarea id="reason" name="reason" rows="2" required
+                                      class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none transition-all input-focus placeholder:text-slate-400"
+                                      placeholder="Explain your reason for leave application..."></textarea>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <button type="submit"
+                                    class="w-full py-3 bg-brand hover:bg-brandDark text-white text-xs font-bold rounded-xl shadow-brand transition-all duration-200 flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-paper-plane text-xs"></i>
+                                <span>Submit Request</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-surface border border-line shadow-card rounded-3xl p-6 overflow-hidden">
+            <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block mb-4">Leave History</span>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-textSoft">
+                    <thead class="text-[10px] text-textMuted uppercase bg-slate-50">
+                    <tr>
+                        <th class="px-5 py-3 rounded-l-xl">Type</th>
+                        <th class="px-5 py-3">Duration</th>
+                        <th class="px-5 py-3">Reason</th>
+                        <th class="px-5 py-3">Applied On</th>
+                        <th class="px-5 py-3">Status</th>
+                        <th class="px-5 py-3 rounded-r-xl">Note</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-line">
+                    <tr th:each="request : ${leaves}" class="hover:bg-slate-50/80 transition-colors">
+                        <td class="px-5 py-3 font-semibold text-textMain" th:text="${request.leaveType}">CASUAL</td>
+                        <td class="px-5 py-3 text-textSoft">
+                            <span th:text="${request.startDate}">2026-06-01</span> to
+                            <span th:text="${request.endDate}">2026-06-03</span>
+                        </td>
+                        <td class="px-5 py-3 truncate max-w-xs" th:text="${request.reason}">Personal work</td>
+                        <td class="px-5 py-3 text-[10px]" th:text="${#temporals.format(request.appliedAt, 'yyyy-MM-dd HH:mm')}">2026-05-30</td>
+                        <td class="px-5 py-3">
+                                <span th:if="${request.status.name() == 'PENDING'}"
+                                      class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-warningLight border border-warning/20 text-warning">
+                                    PENDING
+                                </span>
+                            <span th:if="${request.status.name() == 'APPROVED'}"
+                                  class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-successLight border border-success/20 text-success">
+                                    APPROVED
+                                </span>
+                            <span th:if="${request.status.name() == 'REJECTED'}"
+                                  class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-dangerLight border border-danger/20 text-danger">
+                                    REJECTED
+                                </span>
+                        </td>
+                        <td class="px-5 py-3 text-[10px]">
+                            <span th:if="${request.status.name() == 'APPROVED'}"
+                                  class="text-textMuted"
+                                  th:text="'By ' + ${request.approvedBy}">
+                                Approved by Admin
+                            </span>
+                            <span th:if="${request.status.name() == 'REJECTED'}"
+                                  class="text-danger/80"
+                                  th:text="'Reason: ' + ${request.rejectionReason}">
+                                Reason note
+                            </span>
+                            <span th:if="${request.status.name() == 'PENDING'}" class="text-slate-400">-</span>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(leaves)}">
+                        <td colspan="6" class="px-5 py-6 text-center text-slate-400">No records found.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MANAGER VIEW ================= -->
+    <div th:if="${currentUser.role.name() == 'ROLE_MANAGER'}" class="space-y-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Team Headcount</span>
+                    <h3 class="text-2xl font-bold mt-1 text-textMain" th:text="${teamEmployeesCount != null ? teamEmployeesCount : 0}">0</h3>
+                    <p class="text-[10px] text-textMuted mt-1">Reporting employees</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-brandLight border border-brand/10 flex items-center justify-center text-brand text-base">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Checked In</span>
+                    <h3 class="text-2xl font-bold mt-1 text-success" th:text="${teamCheckedInCount != null ? teamCheckedInCount : 0}">0</h3>
+                    <p class="text-[10px] text-textMuted mt-1" th:text="${(teamLateCount != null ? teamLateCount : 0) + ' late check-ins'}">0 late</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-successLight border border-success/10 flex items-center justify-center text-success text-base">
+                    <i class="fa-solid fa-business-time"></i>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Attendance Score</span>
+                    <h3 class="text-2xl font-bold mt-1 text-textMain" th:text="${(teamAttendancePercentage != null ? teamAttendancePercentage : 0) + '%'}">0%</h3>
+                    <p class="text-[10px] text-textMuted mt-1" th:text="${(teamAbsentCount != null ? teamAbsentCount : 0) + ' absent'}">0 absent</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-line flex items-center justify-center text-textMuted text-base">
+                    <i class="fa-solid fa-chart-simple"></i>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Pending Reviews</span>
+                    <h3 class="text-2xl font-bold mt-1 text-warning" th:text="${teamPendingLeavesCount != null ? teamPendingLeavesCount : 0}">0</h3>
+                    <p class="text-[10px] text-textMuted mt-1">Team leave requests</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-warningLight border border-warning/10 flex items-center justify-center text-warning text-base">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block">Team Leave Approval Workflow</span>
+                    <span class="px-2.5 py-1 rounded-full bg-brandLight border border-brand/15 text-brand text-[9px] font-bold">MANAGER</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-textSoft">
+                        <thead class="text-[10px] text-textMuted uppercase bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 rounded-l-xl">Employee</th>
+                            <th class="px-4 py-3">Type</th>
+                            <th class="px-4 py-3">Dates</th>
+                            <th class="px-4 py-3">Reason</th>
+                            <th class="px-4 py-3 rounded-r-xl text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-line">
+                        <tr th:each="req : ${teamPendingLeaves}" th:id="'leave-row-' + ${req.id}" class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-4 py-3 font-semibold text-textMain" th:text="${req.user.fullName}">Jane Smith</td>
+                            <td class="px-4 py-3 text-xs font-medium text-textSoft" th:text="${req.leaveType}">SICK</td>
+                            <td class="px-4 py-3 text-[10px] text-textSoft">
+                                <span th:text="${req.startDate}">2026-06-01</span> to <span th:text="${req.endDate}">2026-06-02</span>
+                            </td>
+                            <td class="px-4 py-3 text-[10px] truncate max-w-[150px]" th:text="${req.reason}">Medical checkup</td>
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex items-center justify-center space-x-1.5">
+                                    <button th:onclick="'decideLeave(' + ${req.id} + ', \'APPROVED\')'"
+                                            class="px-2.5 py-1.5 bg-successLight hover:bg-green-100 text-success border border-success/20 rounded-lg text-[10px] font-semibold transition-colors"
+                                            title="Approve">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    <button th:onclick="'openRejectModal(' + ${req.id} + ')'"
+                                            class="px-2.5 py-1.5 bg-dangerLight hover:bg-red-100 text-danger border border-danger/20 rounded-lg text-[10px] font-semibold transition-colors"
+                                            title="Reject">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${teamPendingLeaves == null || #lists.isEmpty(teamPendingLeaves)}">
+                            <td colspan="5" class="px-4 py-6 text-center text-slate-400">No team requests pending.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-1 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold">Team Management</span>
+                        <span class="px-2.5 py-1 rounded-full bg-brandLight border border-brand/15 text-brand text-[8px] font-bold tracking-wide">
+                            TEAM VIEW
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="rounded-2xl border border-line bg-slate-50 p-4">
+                            <p class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Manager Controls</p>
+                            <p class="text-xs text-textSoft mt-2 leading-5">
+                                Review team attendance, approve or reject leave requests, and monitor reporting employees from one place.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="rounded-2xl border border-line p-4 bg-white">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Team Members</p>
+                                <p class="text-xl font-bold text-textMain mt-1" th:text="${teamEmployeesCount != null ? teamEmployeesCount : 0}">0</p>
+                            </div>
+                            <div class="rounded-2xl border border-line p-4 bg-white">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Pending Leaves</p>
+                                <p class="text-xl font-bold text-brand mt-1" th:text="${teamPendingLeavesCount != null ? teamPendingLeavesCount : 0}">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button"
+                        disabled
+                        class="w-full mt-5 py-3 bg-slate-100 border border-line text-slate-400 font-bold rounded-xl text-xs cursor-not-allowed">
+                    <i class="fa-solid fa-lock mr-1 text-xs"></i> Employee Creation Restricted
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-2">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block mb-4">Today's Team Activity</span>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-textSoft">
+                        <thead class="text-[10px] text-textMuted uppercase bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 rounded-l-xl">Employee</th>
+                            <th class="px-4 py-3">Clock In</th>
+                            <th class="px-4 py-3">Clock Out</th>
+                            <th class="px-4 py-3">Hours Worked</th>
+                            <th class="px-4 py-3 rounded-r-xl">Status</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-line">
+                        <tr th:each="log : ${teamTodayLogs}" class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-4 py-3 font-semibold text-textMain" th:text="${log.user.fullName}">John Doe</td>
+                            <td class="px-4 py-3 text-[10px]" th:text="${log.checkInTime}">09:00 AM</td>
+                            <td class="px-4 py-3 text-[10px]" th:text="${log.checkOutTime != null ? log.checkOutTime : '-'}">-</td>
+                            <td class="px-4 py-3 text-[10px]" th:text="${log.workingHours != null ? log.workingHours + ' hrs' : '-'}">-</td>
+                            <td class="px-4 py-3">
+                                <span th:if="${log.status.name() == 'PRESENT'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-successLight border border-success/20 text-success">
+                                    PRESENT
+                                </span>
+                                <span th:if="${log.status.name() == 'LATE'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-warningLight border border-warning/20 text-warning">
+                                    LATE
+                                </span>
+                                <span th:if="${log.status.name() == 'HALF_DAY'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-orange-50 border border-orange-200 text-orange-700">
+                                    HALF DAY
+                                </span>
+                                <span th:if="${log.status.name() == 'ABSENT'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-dangerLight border border-danger/20 text-danger">
+                                    ABSENT
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${teamTodayLogs == null || #lists.isEmpty(teamTodayLogs)}">
+                            <td colspan="5" class="px-4 py-6 text-center text-slate-400">No team activity logged today.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-1">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block mb-4">Team Directory</span>
+                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                    <div th:each="emp : ${teamMembers}" class="flex items-center space-x-3 p-3 bg-slate-50 rounded-2xl border border-line">
+                        <div class="w-9 h-9 rounded-xl bg-brandLight border border-brand/10 flex items-center justify-center text-[10px] font-bold text-brand">
+                            <span th:text="${#strings.substring(emp.fullName, 0, 1)}">J</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-textMain truncate" th:text="${emp.fullName}">Jane Doe</p>
+                            <p class="text-[10px] text-textMuted truncate" th:text="${emp.email}">jane@slams.com</p>
+                        </div>
+                    </div>
+
+                    <div th:if="${teamMembers == null || #lists.isEmpty(teamMembers)}" class="text-center py-6 text-slate-400 text-xs font-medium">
+                        No team members found.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ADMIN VIEW ================= -->
+    <div th:if="${currentUser.role.name() == 'ROLE_ADMIN'}" class="space-y-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Total Headcount</span>
+                    <h3 class="text-2xl font-bold mt-1 text-textMain" th:text="${totalEmployees}">0</h3>
+                    <p class="text-[10px] text-textMuted mt-1">Active staff</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-brandLight border border-brand/10 flex items-center justify-center text-brand text-base">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Active Roster</span>
+                    <h3 class="text-2xl font-bold mt-1 text-success" th:text="${checkedInCount}">0</h3>
+                    <p class="text-[10px] text-textMuted mt-1" th:text="${lateCount} + ' late check-ins'">0 late</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-successLight border border-success/10 flex items-center justify-center text-success text-base">
+                    <i class="fa-solid fa-business-time"></i>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Roster Score</span>
+                    <h3 class="text-2xl font-bold mt-1 text-textMain" th:text="${attendancePercentage} + '%'">0%</h3>
+                    <p class="text-[10px] text-textMuted mt-1" th:text="${absentCount} + ' absent'">0 absent</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-line flex items-center justify-center text-textMuted text-base">
+                    <i class="fa-solid fa-chart-simple"></i>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Pending Reviews</span>
+                    <h3 class="text-2xl font-bold mt-1 text-warning" th:text="${pendingLeavesCount}">0</h3>
+                    <p class="text-[10px] text-textMuted mt-1">Leaves awaiting reply</p>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-warningLight border border-warning/10 flex items-center justify-center text-warning text-base">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-2">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block mb-4">Leave Approval Workflow</span>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-textSoft">
+                        <thead class="text-[10px] text-textMuted uppercase bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 rounded-l-xl">Employee</th>
+                            <th class="px-4 py-3">Type</th>
+                            <th class="px-4 py-3">Dates</th>
+                            <th class="px-4 py-3">Reason</th>
+                            <th class="px-4 py-3 rounded-r-xl text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-line">
+                        <tr th:each="req : ${pendingLeaves}" th:id="'leave-row-' + ${req.id}" class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-4 py-3 font-semibold text-textMain" th:text="${req.user.fullName}">Jane Smith</td>
+                            <td class="px-4 py-3 text-xs font-medium text-textSoft" th:text="${req.leaveType}">SICK</td>
+                            <td class="px-4 py-3 text-[10px] text-textSoft">
+                                <span th:text="${req.startDate}">2026-06-01</span> to <span th:text="${req.endDate}">2026-06-02</span>
+                            </td>
+                            <td class="px-4 py-3 text-[10px] truncate max-w-[150px]" th:text="${req.reason}">Medical checkup</td>
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex items-center justify-center space-x-1.5">
+                                    <button th:onclick="'decideLeave(' + ${req.id} + ', \'APPROVED\')'"
+                                            class="px-2.5 py-1.5 bg-successLight hover:bg-green-100 text-success border border-success/20 rounded-lg text-[10px] font-semibold transition-colors"
+                                            title="Approve">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    <button th:onclick="'openRejectModal(' + ${req.id} + ')'"
+                                            class="px-2.5 py-1.5 bg-dangerLight hover:bg-red-100 text-danger border border-danger/20 rounded-lg text-[10px] font-semibold transition-colors"
+                                            title="Reject">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(pendingLeaves)}">
+                            <td colspan="5" class="px-4 py-6 text-center text-slate-400">No requests pending.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-1 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold">Employee Management</span>
+                        <span class="px-2.5 py-1 rounded-full bg-dangerLight border border-danger/15 text-danger text-[8px] font-bold tracking-wide">
+                            ADMIN
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="rounded-2xl border border-line bg-slate-50 p-4">
+                            <p class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Admin Controls</p>
+                            <p class="text-xs text-textSoft mt-2 leading-5">
+                                Add employees, assign department and reporting manager, and activate or deactivate employee accounts from one place.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="rounded-2xl border border-line p-4 bg-white">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Employees</p>
+                                <p id="adminEmployeeCount" class="text-xl font-bold text-textMain mt-1">0</p>
+                            </div>
+                            <div class="rounded-2xl border border-line p-4 bg-white">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-textMuted font-semibold">Managers</p>
+                                <p id="adminManagerCount" class="text-xl font-bold text-brand mt-1">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button"
+                        onclick="openAddEmployeeModal()"
+                        class="w-full mt-5 py-3 bg-brand hover:bg-brandDark text-white font-bold rounded-xl text-xs shadow-brand transition-all duration-200">
+                    <i class="fa-solid fa-user-plus mr-1 text-xs"></i> Add Employee
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-surface border border-line shadow-card rounded-3xl p-6 overflow-hidden">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block">Employee Directory Management</span>
+                    <h3 class="text-lg font-bold text-textMain mt-1">Organization Employees</h3>
+                    <p class="text-xs text-textMuted mt-1">Manage employee accounts, department mapping, and account status.</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="loadAdminEmployees()"
+                            class="px-4 py-2.5 rounded-xl border border-line bg-white hover:bg-slate-50 text-textSoft text-xs font-semibold transition-colors">
+                        <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                    </button>
+                    <button onclick="openAddEmployeeModal()"
+                            class="px-4 py-2.5 rounded-xl bg-brand hover:bg-brandDark text-white text-xs font-bold shadow-brand transition-colors">
+                        <i class="fa-solid fa-user-plus mr-1"></i> Add Employee
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-textSoft">
+                    <thead class="text-[10px] text-textMuted uppercase bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 rounded-l-xl">Employee</th>
+                        <th class="px-4 py-3">Role</th>
+                        <th class="px-4 py-3">Department</th>
+                        <th class="px-4 py-3">Manager</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Work Mode</th>
+                        <th class="px-4 py-3 rounded-r-xl text-center">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="adminEmployeesTableBody" class="divide-y divide-line">
+                    <tr>
+                        <td colspan="7" class="px-4 py-6 text-center text-slate-400">Loading employees...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-2">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block mb-4">Today's Roster Activity</span>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-textSoft">
+                        <thead class="text-[10px] text-textMuted uppercase bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 rounded-l-xl">Employee</th>
+                            <th class="px-4 py-3">Clock In</th>
+                            <th class="px-4 py-3">Clock Out</th>
+                            <th class="px-4 py-3">Hours Worked</th>
+                            <th class="px-4 py-3 rounded-r-xl">Status</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-line">
+                        <tr th:each="log : ${todayLogs}" class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-4 py-3 font-semibold text-textMain" th:text="${log.user.fullName}">John Doe</td>
+                            <td class="px-4 py-3 text-[10px]" th:text="${log.checkInTime}">09:00 AM</td>
+                            <td class="px-4 py-3 text-[10px]" th:text="${log.checkOutTime != null ? log.checkOutTime : '-'}">-</td>
+                            <td class="px-4 py-3 text-[10px]" th:text="${log.workingHours != null ? log.workingHours + ' hrs' : '-'}">-</td>
+                            <td class="px-4 py-3">
+                                <span th:if="${log.status.name() == 'PRESENT'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-successLight border border-success/20 text-success">
+                                    PRESENT
+                                </span>
+                                <span th:if="${log.status.name() == 'LATE'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-warningLight border border-warning/20 text-warning">
+                                    LATE
+                                </span>
+                                <span th:if="${log.status.name() == 'HALF_DAY'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-orange-50 border border-orange-200 text-orange-700">
+                                    HALF DAY
+                                </span>
+                                <span th:if="${log.status.name() == 'ABSENT'}"
+                                      class="px-2.5 py-1 rounded-full text-[8px] font-bold bg-dangerLight border border-danger/20 text-danger">
+                                    ABSENT
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(todayLogs)}">
+                            <td colspan="5" class="px-4 py-6 text-center text-slate-400">No activity logged today.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-line shadow-card p-6 rounded-3xl lg:col-span-1">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-textMuted font-bold block mb-4">Staff Directory</span>
+                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                    <div th:each="emp : ${employees}" class="flex items-center space-x-3 p-3 bg-slate-50 rounded-2xl border border-line">
+                        <div class="w-9 h-9 rounded-xl bg-brandLight border border-brand/10 flex items-center justify-center text-[10px] font-bold text-brand">
+                            <span th:text="${#strings.substring(emp.fullName, 0, 1)}">J</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-textMain truncate" th:text="${emp.fullName}">Jane Doe</p>
+                            <p class="text-[10px] text-textMuted truncate" th:text="${emp.email}">jane@slams.com</p>
+                        </div>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(employees)}" class="text-center py-6 text-slate-400 text-xs font-medium">
+                        No employees loaded.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Reject Leave Modal -->
+<div id="rejectModal" class="hidden fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface border border-line w-full max-w-sm rounded-3xl shadow-soft overflow-hidden p-6 relative">
+        <h3 class="text-base font-bold mb-1 text-danger">Reject Application</h3>
+        <p class="text-[10px] text-textMuted mb-4">
+            Please specify a reason for rejecting this leave request. This will be logged and sent to the employee.
+        </p>
+
+        <input type="hidden" id="rejectLeaveId">
+
+        <textarea id="rejectionReasonText" rows="3" required
+                  class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-xs text-textSoft outline-none transition-all input-focus placeholder:text-slate-400 mb-3"
+                  placeholder="e.g. Schedule conflicts with core project release date..."></textarea>
+
+        <div class="flex items-center justify-end space-x-2">
+            <button onclick="closeRejectModal()"
+                    class="px-3.5 py-1.5 bg-surface border border-slate-300 text-textSoft hover:bg-slate-50 rounded-lg text-xs transition-colors">
+                Cancel
+            </button>
+            <button onclick="submitRejection()"
+                    class="px-3.5 py-1.5 bg-danger hover:bg-red-700 text-white shadow-danger rounded-lg text-xs font-semibold transition-colors">
+                Confirm Rejection
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Employee Modal -->
+<div id="addEmployeeModal" class="hidden fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface border border-line w-full max-w-4xl rounded-3xl shadow-soft overflow-hidden">
+        <div class="px-6 py-5 border-b border-line flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-bold text-textMain">Add Employee</h3>
+                <p class="text-xs text-textMuted mt-1">Create a new employee / manager account with department mapping.</p>
+            </div>
+            <button onclick="closeAddEmployeeModal()"
+                    class="w-10 h-10 rounded-xl border border-line hover:bg-slate-50 text-textMuted transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="adminEmployeeCreateForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[75vh] overflow-y-auto">
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Full Name</label>
+                <input type="text" id="empFullName" required
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus"
+                       placeholder="John Doe">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Username</label>
+                <input type="text" id="empUsername" required
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus"
+                       placeholder="john.doe">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Email</label>
+                <input type="email" id="empEmail" required
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus"
+                       placeholder="john@slams.com">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Password</label>
+                <input type="password" id="empPassword" required
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus"
+                       placeholder="••••••••">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Employee ID</label>
+                <input type="text" id="empEmployeeId"
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus"
+                       placeholder="EMP-101">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Designation</label>
+                <input type="text" id="empDesignation"
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus"
+                       placeholder="Software Engineer">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Phone Number</label>
+                <input type="text" id="empPhone"
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus"
+                       placeholder="9876543210">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Joining Date</label>
+                <input type="date" id="empJoiningDate"
+                       class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus">
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Role</label>
+                <select id="empRole" required
+                        class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus">
+                    <option value="ROLE_EMPLOYEE">Employee</option>
+                    <option value="ROLE_MANAGER">Manager</option>
+                    <option value="ROLE_ADMIN">Admin</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Work Mode</label>
+                <select id="empWorkMode"
+                        class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus">
+                    <option value="WFO">WFO</option>
+                    <option value="WFH">WFH</option>
+                    <option value="HYBRID">HYBRID</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Status</label>
+                <select id="empStatus"
+                        class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus">
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="PROBATION">PROBATION</option>
+                    <option value="NOTICE_PERIOD">NOTICE_PERIOD</option>
+                    <option value="INACTIVE">INACTIVE</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Department</label>
+                <select id="empDepartment"
+                        class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus">
+                    <option value="">Select Department</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-textMuted font-semibold mb-1.5">Reporting Manager</label>
+                <select id="empReportingManager"
+                        class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus">
+                    <option value="">Select Manager</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-2 flex items-center justify-end gap-3 pt-2">
+                <button type="button" onclick="closeAddEmployeeModal()"
+                        class="px-4 py-2.5 rounded-xl border border-line bg-white hover:bg-slate-50 text-textSoft text-xs font-semibold transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-5 py-2.5 rounded-xl bg-brand hover:bg-brandDark text-white text-xs font-bold shadow-brand transition-colors">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i> Create Employee
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const clockEl = document.getElementById('liveClock');
+        if (clockEl) {
+            const now = new Date();
+            clockEl.textContent = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function showToast(title, msg, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `bg-white border border-line p-4 rounded-2xl shadow-soft flex items-start space-x-3 border-l-4 transform translate-x-12 opacity-0 transition-all duration-300 ${
+            type === 'success' ? 'border-l-success' : 'border-l-danger'
+        }`;
+
+        toast.innerHTML = `
+            <div class="${type === 'success' ? 'text-success' : 'text-danger'} text-base mt-0.5">
+                <i class="${type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'}"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h5 class="text-xs font-bold text-textMain">${title}</h5>
+                <p class="text-[10px] text-textMuted mt-0.5">${msg}</p>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.remove('translate-x-12', 'opacity-0');
+        }, 10);
+
+        setTimeout(() => {
+            toast.classList.add('translate-x-12', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    async function performPunch(type) {
+        const endpoint = `/api/attendance/${type}`;
+        const method = type === 'checkin' ? 'POST' : 'PUT';
+
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                showToast('Success', `Attendance ${type === 'checkin' ? 'Clocked-In' : 'Clocked-Out'} successfully!`);
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                const text = await response.text();
+                let errMsg = text;
+                try {
+                    const json = JSON.parse(text);
+                    errMsg = json.error || json.message || text;
+                } catch (e) {}
+                showToast('Error', errMsg, 'error');
+            }
+        } catch (err) {
+            showToast('Error', 'Connection failure. Try again.', 'error');
+        }
+    }
+
+    const leaveForm = document.getElementById('leaveApplyForm');
+    if (leaveForm) {
+        leaveForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const payload = {
+                leaveType: document.getElementById('leaveType').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                reason: document.getElementById('reason').value
+            };
+
+            try {
+                const response = await fetch('/api/leaves/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showToast('Request Submitted', 'Your leave request is submitted and pending review.');
+                    leaveForm.reset();
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    const text = await response.text();
+                    let msg = 'Failed to submit request.';
+                    try {
+                        const json = JSON.parse(text);
+                        msg = json.error || json.message || msg;
+                    } catch (e) {
+                        if (text) msg = text;
+                    }
+                    showToast('Application Error', msg, 'error');
+                }
+            } catch(e) {
+                showToast('Error', 'Connection failure.', 'error');
+            }
+        });
+    }
+
+    async function decideLeave(requestId, status, rejectionReason = '') {
+        let url = `/api/leaves/${requestId}/status?status=${status}`;
+        if (rejectionReason) {
+            url += `&rejectionReason=${encodeURIComponent(rejectionReason)}`;
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                showToast('Workflow Updated', `Leave request has been marked as ${status}.`);
+                const row = document.getElementById(`leave-row-${requestId}`);
+                if (row) {
+                    row.classList.add('transition-opacity', 'opacity-0');
+                    setTimeout(() => row.remove(), 300);
+                }
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                const text = await response.text();
+                let errMsg = text;
+                try {
+                    const json = JSON.parse(text);
+                    errMsg = json.error || json.message || text;
+                } catch(e) {}
+                showToast('Action Failed', errMsg, 'error');
+            }
+        } catch(e) {
+            showToast('Error', 'Connection failed.', 'error');
+        }
+    }
+
+    function openRejectModal(id) {
+        document.getElementById('rejectLeaveId').value = id;
+        document.getElementById('rejectionReasonText').value = '';
+        document.getElementById('rejectModal').classList.remove('hidden');
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').classList.add('hidden');
+    }
+
+    function submitRejection() {
+        const id = document.getElementById('rejectLeaveId').value;
+        const reason = document.getElementById('rejectionReasonText').value.trim();
+        if (!reason) {
+            showToast('Validation Error', 'Please input a reason for rejection.', 'error');
+            return;
+        }
+        closeRejectModal();
+        decideLeave(id, 'REJECTED', reason);
+    }
+
+    let adminEmployeesCache = [];
+    let adminManagersCache = [];
+    let adminDepartmentsCache = [];
+
+    function roleBadge(role) {
+        if (role === 'ROLE_ADMIN') {
+            return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-dangerLight border border-danger/20 text-danger">ADMIN</span>`;
+        }
+        if (role === 'ROLE_MANAGER') {
+            return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-brandLight border border-brand/20 text-brand">MANAGER</span>`;
+        }
+        return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-successLight border border-success/20 text-success">EMPLOYEE</span>`;
+    }
+
+    function statusBadge(status) {
+        if (status === 'ACTIVE') {
+            return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-successLight border border-success/20 text-success">ACTIVE</span>`;
+        }
+        if (status === 'PROBATION') {
+            return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-warningLight border border-warning/20 text-warning">PROBATION</span>`;
+        }
+        if (status === 'NOTICE_PERIOD') {
+            return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-orange-50 border border-orange-200 text-orange-700">NOTICE</span>`;
+        }
+        return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-slate-100 border border-line text-slate-500">${status ?? 'N/A'}</span>`;
+    }
+
+    function workModeBadge(mode) {
+        if (!mode) return `<span class="text-slate-400">-</span>`;
+        const styleMap = {
+            WFO: 'bg-brandLight border-brand/20 text-brand',
+            WFH: 'bg-sky-50 border-sky-200 text-sky-700',
+            HYBRID: 'bg-violet-50 border-violet-200 text-violet-700'
+        };
+        const cls = styleMap[mode] || 'bg-slate-100 border-line text-slate-500';
+        return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold border ${cls}">${mode}</span>`;
+    }
+
+    function renderAdminEmployeesTable(employees) {
+        const tbody = document.getElementById('adminEmployeesTableBody');
+        if (!tbody) return;
+
+        if (!employees || employees.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-4 py-6 text-center text-slate-400">No employees found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = employees.map(emp => {
+            const isActive = emp.status === 'ACTIVE' || emp.status === 'PROBATION' || emp.status === 'NOTICE_PERIOD';
+            const safeName = (emp.fullName || 'Employee').replace(/'/g, "\\'");
+            const actionButton = isActive
+                ? `<button onclick="deactivateEmployee(${emp.id}, '${safeName}')" class="px-3 py-1.5 bg-dangerLight hover:bg-red-100 text-danger border border-danger/20 rounded-lg text-[10px] font-semibold transition-colors">Deactivate</button>`
+                : `<button onclick="reactivateEmployee(${emp.id}, '${safeName}')" class="px-3 py-1.5 bg-successLight hover:bg-green-100 text-success border border-success/20 rounded-lg text-[10px] font-semibold transition-colors">Reactivate</button>`;
+
+            return `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="px-4 py-3">
+                        <div class="flex flex-col">
+                            <span class="font-semibold text-textMain">${emp.fullName || '-'}</span>
+                            <span class="text-[10px] text-textMuted">${emp.employeeId || '-'} • ${emp.email || '-'}</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">${roleBadge(emp.role)}</td>
+                    <td class="px-4 py-3 text-[11px]">${emp.departmentName || '-'}</td>
+                    <td class="px-4 py-3 text-[11px]">${emp.reportingManagerName || '-'}</td>
+                    <td class="px-4 py-3">${statusBadge(emp.status)}</td>
+                    <td class="px-4 py-3">${workModeBadge(emp.workMode)}</td>
+                    <td class="px-4 py-3 text-center">${actionButton}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function loadAdminEmployees() {
+        const tbody = document.getElementById('adminEmployeesTableBody');
+        if (!tbody) return;
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="px-4 py-6 text-center text-slate-400">Loading employees...</td>
+            </tr>
+        `;
+
+        try {
+            const response = await fetch('/api/admin/employees');
+            if (!response.ok) throw new Error('Failed to fetch employees');
+
+            const employees = await response.json();
+            adminEmployeesCache = employees || [];
+            renderAdminEmployeesTable(adminEmployeesCache);
+
+            const employeeCountEl = document.getElementById('adminEmployeeCount');
+            if (employeeCountEl) {
+                employeeCountEl.textContent = adminEmployeesCache.length;
+            }
+        } catch (e) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-4 py-6 text-center text-danger">Failed to load employees.</td>
+                </tr>
+            `;
+            showToast('Load Failed', 'Unable to load employee list.', 'error');
+        }
+    }
+
+    async function loadAdminManagers() {
+        const managerSelect = document.getElementById('empReportingManager');
+        const managerCountEl = document.getElementById('adminManagerCount');
+
+        try {
+            const response = await fetch('/api/admin/managers');
+            if (!response.ok) throw new Error('Failed to fetch managers');
+
+            const managers = await response.json();
+            adminManagersCache = managers || [];
+
+            if (managerSelect) {
+                managerSelect.innerHTML = `<option value="">Select Manager</option>`;
+                adminManagersCache.forEach(manager => {
+                    managerSelect.innerHTML += `<option value="${manager.id}">${manager.fullName} (${manager.employeeId || manager.username || 'Manager'})</option>`;
+                });
+            }
+
+            if (managerCountEl) {
+                managerCountEl.textContent = adminManagersCache.length;
+            }
+        } catch (e) {
+            showToast('Load Failed', 'Unable to load managers.', 'error');
+        }
+    }
+
+    async function loadAdminDepartments() {
+        const departmentSelect = document.getElementById('empDepartment');
+
+        try {
+            const response = await fetch('/api/admin/departments/active');
+            if (!response.ok) throw new Error('Failed to fetch departments');
+
+            const departments = await response.json();
+            adminDepartmentsCache = departments || [];
+
+            if (departmentSelect) {
+                departmentSelect.innerHTML = `<option value="">Select Department</option>`;
+                adminDepartmentsCache.forEach(dept => {
+                    departmentSelect.innerHTML += `<option value="${dept.id}">${dept.name}${dept.code ? ' (' + dept.code + ')' : ''}</option>`;
+                });
+            }
+        } catch (e) {
+            showToast('Load Failed', 'Unable to load departments.', 'error');
+        }
+    }
+
+    function openAddEmployeeModal() {
+        const modal = document.getElementById('addEmployeeModal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        loadAdminManagers();
+        loadAdminDepartments();
+    }
+
+    function closeAddEmployeeModal() {
+        const modal = document.getElementById('addEmployeeModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+    }
+
+    async function deactivateEmployee(userId, fullName) {
+        if (!confirm(`Deactivate ${fullName}?`)) return;
+
+        try {
+            const response = await fetch(`/api/admin/employees/${userId}/deactivate`, {
+                method: 'PUT'
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Failed to deactivate employee');
+            }
+
+            showToast('Employee Updated', `${fullName} has been deactivated.`);
+            await loadAdminEmployees();
+        } catch (e) {
+            showToast('Action Failed', e.message || 'Unable to deactivate employee.', 'error');
+        }
+    }
+
+    async function reactivateEmployee(userId, fullName) {
+        if (!confirm(`Reactivate ${fullName}?`)) return;
+
+        try {
+            const response = await fetch(`/api/admin/employees/${userId}/reactivate`, {
+                method: 'PUT'
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Failed to reactivate employee');
+            }
+
+            showToast('Employee Updated', `${fullName} has been reactivated.`);
+            await loadAdminEmployees();
+        } catch (e) {
+            showToast('Action Failed', e.message || 'Unable to reactivate employee.', 'error');
+        }
+    }
+
+    const adminEmployeeCreateForm = document.getElementById('adminEmployeeCreateForm');
+    if (adminEmployeeCreateForm) {
+        adminEmployeeCreateForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const payload = {
+                username: document.getElementById('empUsername').value.trim(),
+                fullName: document.getElementById('empFullName').value.trim(),
+                email: document.getElementById('empEmail').value.trim(),
+                password: document.getElementById('empPassword').value,
+                role: document.getElementById('empRole').value,
+
+                employeeId: document.getElementById('empEmployeeId').value.trim() || null,
+                designation: document.getElementById('empDesignation').value.trim() || null,
+                phoneNumber: document.getElementById('empPhone').value.trim() || null,
+                joiningDate: document.getElementById('empJoiningDate').value || null,
+                workMode: document.getElementById('empWorkMode').value || null,
+                status: document.getElementById('empStatus').value || null,
+                departmentId: document.getElementById('empDepartment').value || null,
+                reportingManagerId: document.getElementById('empReportingManager').value || null
+            };
+
+            try {
+                const response = await fetch('/api/admin/employees', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showToast('User Created', `Employee ${payload.fullName} has been registered.`);
+                    adminEmployeeCreateForm.reset();
+                    closeAddEmployeeModal();
+                    await loadAdminEmployees();
+                    await loadAdminManagers();
+                } else {
+                    const text = await response.text();
+                    let msg = text || 'Failed to create employee';
+                    try {
+                        const json = JSON.parse(text);
+                        msg = json.error || json.message || msg;
+                    } catch (e) {}
+                    showToast('Registration Error', msg, 'error');
+                }
+            } catch (e) {
+                showToast('Error', 'Connection failure.', 'error');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('adminEmployeesTableBody')) {
+            loadAdminEmployees();
+            loadAdminManagers();
+            loadAdminDepartments();
+        }
+    });
+</script>
+
+</body>
+</html>
