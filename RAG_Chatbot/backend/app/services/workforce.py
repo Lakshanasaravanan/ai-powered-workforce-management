@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from datetime import date, time
 from typing import Protocol
 
-from app.schemas.workforce import AttendancePeriod, AttendanceSummary, EmployeeProfile, LeaveBalance
+from app.schemas.workforce import AttendancePeriod, AttendanceSummary, AttendanceRecord, AttendanceRegularizationExecutionResponse, EmployeeProfile, LeaveBalance, LeaveExecutionResponse
 
 
 class WorkforceProviderError(RuntimeError):
@@ -41,6 +42,12 @@ class WorkforceProvider(Protocol):
     def get_leave_balance(self, employee_id: str, request_id: str | None = None) -> LeaveBalance: ...
 
     def get_attendance_summary(self, employee_id: str, period: AttendancePeriod, request_id: str | None = None) -> AttendanceSummary: ...
+    def get_attendance_records(self, employee_id: str, request_id: str | None = None) -> list[AttendanceRecord]: ...
+
+
+class WorkforceActionProvider(Protocol):
+    def request_leave(self, employee_id: str, idempotency_key: str, leave_type: str, start_date: date, end_date: date, reason: str, request_id: str | None = None) -> LeaveExecutionResponse: ...
+    def regularize_attendance(self, employee_id: str, idempotency_key: str, attendance_id: int, requested_in_time: time, requested_out_time: time | None, reason: str, request_id: str | None = None) -> AttendanceRegularizationExecutionResponse: ...
 
 
 class MockWorkforceProvider:
@@ -72,3 +79,13 @@ class MockWorkforceProvider:
         if period in {AttendancePeriod.CURRENT_MONTH, AttendancePeriod.SLAMS_AGGREGATE}:
             return AttendanceSummary(period=period, scheduled_days=20, present_days=18, leave_days=2)
         return AttendanceSummary(period=period, scheduled_days=22, present_days=20, leave_days=2)
+
+    def get_attendance_records(self, employee_id: str, request_id: str | None = None) -> list[AttendanceRecord]:
+        self._require_known_employee(employee_id)
+        return [AttendanceRecord(attendance_id=1001, attendance_date=date.today(), check_in_time=time(9), check_out_time=time(17), status="PRESENT")]
+
+    def request_leave(self, *args, **kwargs):
+        raise WorkforceBusinessError("Workforce action execution is unavailable in mock mode")
+
+    def regularize_attendance(self, *args, **kwargs):
+        raise WorkforceBusinessError("Workforce action execution is unavailable in mock mode")

@@ -92,8 +92,8 @@ def test_policy_tool_delegates_and_preserves_sources():
     ("Show my profile", "get_my_profile"),
     ("Show my leave balance", "get_my_leave_balance"),
     ("Show my attendance summary", "get_my_attendance_summary"),
-    ("Apply leave from 2026-02-03 to 2026-02-04", "request_leave"),
-    ("Regularize attendance for 2026-02-03", "regularize_attendance"),
+    ("Apply CASUAL leave from 2026-02-03 to 2026-02-04 because of travel", "request_leave"),
+    ("Regularize attendance record 10 at 09:00 because of a missed check-in", "regularize_attendance"),
 ])
 def test_planner_supported_routes(message, tool_name):
     plan = DeterministicPlanner().plan(message)
@@ -109,13 +109,14 @@ def test_ambiguous_action_requires_clarification():
 def test_action_proposals_create_bound_pending_actions_without_mutation():
     agent = make_agent()
     current = context()
-    leave = agent.respond("Apply leave from 2026-02-03 to 2026-02-04", current)
-    attendance = agent.respond("Regularize attendance for 2026-02-03", current)
+    leave = agent.respond("Apply CASUAL leave from 2026-02-03 to 2026-02-04 because of travel", current)
+    attendance = agent.respond("Regularize attendance record 10 at 09:00 because of a missed check-in", current)
     assert leave.status is attendance.status is AgentStatus.CONFIRMATION_REQUIRED
     assert leave.pending_action and leave.pending_action.tool_name == "request_leave"
     assert attendance.pending_action and attendance.pending_action.tool_name == "regularize_attendance"
     assert leave.pending_action.status.value == "pending_confirmation"
     assert "employee_id" not in leave.pending_action.sanitized_arguments
+    assert "reason" not in leave.pending_action.sanitized_arguments
 
 
 def test_malformed_action_dates_are_rejected():
@@ -127,12 +128,11 @@ def test_malformed_action_dates_are_rejected():
 
 def test_confirmation_is_one_time_and_never_executes_a_mutation():
     agent, current = make_agent(), context()
-    proposal = agent.respond("Apply leave from 2026-02-03 to 2026-02-04", current)
+    proposal = agent.respond("Apply CASUAL leave from 2026-02-03 to 2026-02-04 because of travel", current)
     action = proposal.pending_action
     assert action is not None
     confirmed = agent.confirm(ConfirmationRequest(action_id=action.action_id, conversation_id=current.conversation_id), current)
-    assert confirmed.status is AgentStatus.CONFIRMED_NOT_EXECUTED
-    assert "not enabled" in confirmed.answer
+    assert confirmed.status is AgentStatus.ERROR
     replay = agent.confirm(ConfirmationRequest(action_id=action.action_id, conversation_id=current.conversation_id), current)
     assert replay.status is AgentStatus.ERROR
     with pytest.raises(ValidationError):
@@ -144,7 +144,7 @@ def test_confirmation_rejects_unknown_expired_employee_and_conversation_mismatch
     unknown = agent.confirm(ConfirmationRequest(action_id=uuid4(), conversation_id=current.conversation_id), current)
     assert unknown.status is AgentStatus.ERROR
 
-    proposal = agent.respond("Apply leave from 2026-02-03 to 2026-02-04", current).pending_action
+    proposal = agent.respond("Apply CASUAL leave from 2026-02-03 to 2026-02-04 because of travel", current).pending_action
     assert proposal is not None
     other_employee = context("EMP002", current.conversation_id)
     assert agent.confirm(ConfirmationRequest(action_id=proposal.action_id, conversation_id=current.conversation_id), other_employee).status is AgentStatus.ERROR
@@ -153,7 +153,7 @@ def test_confirmation_rejects_unknown_expired_employee_and_conversation_mismatch
 
     expired_agent = make_agent(PendingActionStore(ttl=timedelta(seconds=-1)))
     expired_context = context()
-    expired = expired_agent.respond("Apply leave from 2026-02-03 to 2026-02-04", expired_context).pending_action
+    expired = expired_agent.respond("Apply CASUAL leave from 2026-02-03 to 2026-02-04 because of travel", expired_context).pending_action
     assert expired is not None
     assert expired_agent.confirm(ConfirmationRequest(action_id=expired.action_id, conversation_id=expired_context.conversation_id), expired_context).status is AgentStatus.ERROR
 

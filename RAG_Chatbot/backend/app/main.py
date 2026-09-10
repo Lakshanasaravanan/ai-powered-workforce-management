@@ -26,7 +26,7 @@ from app.services.workforce import MockWorkforceProvider
 from app.tools.actions import RegularizeAttendanceTool, RequestLeaveTool
 from app.tools.rag_tool import PolicyAnswerTool
 from app.tools.registry import ToolRegistry
-from app.tools.workforce import GetMyAttendanceSummaryTool, GetMyLeaveBalanceTool, GetMyProfileTool
+from app.tools.workforce import GetMyAttendanceRecordsTool, GetMyAttendanceSummaryTool, GetMyLeaveBalanceTool, GetMyProfileTool
 
 
 logger = logging.getLogger("agentic_rag.request")
@@ -47,10 +47,12 @@ async def lifespan(_: FastAPI):
             GetMyProfileTool(workforce),
             GetMyLeaveBalanceTool(workforce),
             GetMyAttendanceSummaryTool(workforce),
+            GetMyAttendanceRecordsTool(workforce),
             RequestLeaveTool(pending_actions),
             RegularizeAttendanceTool(pending_actions),
         ]),
         pending_actions=pending_actions,
+        action_provider=workforce,
     )
     logger.info("application_started")
     yield

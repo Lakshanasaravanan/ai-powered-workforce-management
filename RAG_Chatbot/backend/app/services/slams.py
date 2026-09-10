@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from uuid import uuid4
 
@@ -11,7 +11,7 @@ import jwt
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from app.core.config import Settings
-from app.schemas.workforce import AttendancePeriod, AttendanceSummary, EmployeeProfile, LeaveBalance
+from app.schemas.workforce import AttendancePeriod, AttendanceSummary, AttendanceRecord, AttendanceRegularizationExecutionResponse, EmployeeProfile, LeaveBalance, LeaveExecutionResponse
 from app.services.workforce import (
     WorkforceBusinessError,
     WorkforceContractError,
@@ -74,6 +74,23 @@ class _SLAMSAttendanceAnalytics(BaseModel):
     absentCount: int
     totalDays: int
 
+class _SLAMSAttendance(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: int
+    date: date
+    checkInTime: time | None = None
+    checkOutTime: time | None = None
+    status: str
+    workingHours: float | None = None
+
+class _SLAMSLeaveExecution(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    leaveRequestId: int; status: str; leaveType: str; startDate: date; endDate: date; appliedAt: datetime; idempotentReplay: bool
+
+class _SLAMSRegularizationExecution(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    regularizationRequestId: int; attendanceId: int; requestedInTime: time; requestedOutTime: time | None = None; status: str; requestedAt: datetime; idempotentReplay: bool
+
 
 class SLAMSClient:
     """Reusable synchronous HTTP client with safe failures and bounded read retries."""
@@ -120,6 +137,34 @@ class SLAMSClient:
             raise WorkforceContractError("Workforce service returned an invalid response") from exc
         if not isinstance(payload, dict):
             raise WorkforceContractError("Workforce service returned an invalid response")
+        return payload
+
+    def post_json(self, path: str, employee_id: str, idempotency_key: str, payload: dict[str, Any], request_id: str | None) -> dict[str, Any]:
+        headers = {"Authorization": f"Bearer {self._signer.sign(employee_id)}", "Idempotency-Key": idempotency_key}
+        if request_id: headers["X-Request-ID"] = request_id
+        response: httpx.Response | None = None
+        for attempt in range(2):
+            try: response = self._client.post(path, headers=headers, json=payload)
+            except (httpx.TimeoutException, httpx.TransportError) as exc:
+                if attempt == 0: continue
+                raise WorkforceUnavailable("Workforce service is temporarily unavailable") from exc
+            if response.status_code not in self._TRANSIENT_STATUS_CODES or attempt == 1: break
+        assert response is not None
+        self._raise_for_status(response.status_code)
+        try: body = response.json()
+        except ValueError as exc: raise WorkforceContractError("Workforce service returned an invalid response") from exc
+        if not isinstance(body, dict): raise WorkforceContractError("Workforce service returned an invalid response")
+        return body
+
+    def get_list(self, path: str, employee_id: str, request_id: str | None) -> list[dict[str, Any]]:
+        headers = {"Authorization": f"Bearer {self._signer.sign(employee_id)}"}
+        if request_id: headers["X-Request-ID"] = request_id
+        try: response = self._client.get(path, headers=headers)
+        except (httpx.TimeoutException, httpx.TransportError) as exc: raise WorkforceUnavailable("Workforce service is temporarily unavailable") from exc
+        self._raise_for_status(response.status_code)
+        try: payload = response.json()
+        except ValueError as exc: raise WorkforceContractError("Workforce service returned an invalid response") from exc
+        if not isinstance(payload, list) or not all(isinstance(item, dict) for item in payload): raise WorkforceContractError("Workforce service returned an invalid response")
         return payload
 
     @staticmethod
@@ -210,3 +255,20 @@ class SLAMSWorkforceProvider:
             absent_days=analytics.absentCount,
             synthetic_data=False,
         )
+
+    def get_attendance_records(self, employee_id: str, request_id: str | None = None) -> list[AttendanceRecord]:
+        try: records = [_SLAMSAttendance.model_validate(item) for item in self._client.get_list("/api/attendance/my", employee_id, request_id)]
+        except ValidationError as exc: raise WorkforceContractError("Workforce service returned an unexpected response") from exc
+        return [AttendanceRecord(attendance_id=item.id, attendance_date=item.date, check_in_time=item.checkInTime, check_out_time=item.checkOutTime, status=item.status, working_hours=item.workingHours, synthetic_data=False) for item in records]
+
+    def request_leave(self, employee_id: str, idempotency_key: str, leave_type: str, start_date: date, end_date: date, reason: str, request_id: str | None = None) -> LeaveExecutionResponse:
+        result = self._validated(_SLAMSLeaveExecution, self._client.post_json("/api/leaves/apply", employee_id, idempotency_key, {"leaveType": leave_type, "startDate": start_date.isoformat(), "endDate": end_date.isoformat(), "reason": reason}, request_id))
+        assert isinstance(result, _SLAMSLeaveExecution)
+        return LeaveExecutionResponse(leave_request_id=result.leaveRequestId, status=result.status, leave_type=result.leaveType, start_date=result.startDate, end_date=result.endDate, applied_at=result.appliedAt, idempotent_replay=result.idempotentReplay)
+
+    def regularize_attendance(self, employee_id: str, idempotency_key: str, attendance_id: int, requested_in_time: time, requested_out_time: time | None, reason: str, request_id: str | None = None) -> AttendanceRegularizationExecutionResponse:
+        body = {"attendanceId": attendance_id, "requestedInTime": requested_in_time.isoformat(), "reason": reason}
+        if requested_out_time is not None: body["requestedOutTime"] = requested_out_time.isoformat()
+        result = self._validated(_SLAMSRegularizationExecution, self._client.post_json("/api/attendance/regularize", employee_id, idempotency_key, body, request_id))
+        assert isinstance(result, _SLAMSRegularizationExecution)
+        return AttendanceRegularizationExecutionResponse(regularization_request_id=result.regularizationRequestId, attendance_id=result.attendanceId, requested_in_time=result.requestedInTime, requested_out_time=result.requestedOutTime, status=result.status, requested_at=result.requestedAt, idempotent_replay=result.idempotentReplay)

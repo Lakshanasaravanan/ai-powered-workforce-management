@@ -16,7 +16,7 @@ class AgentStatus(StrEnum):
     COMPLETED = "completed"
     CLARIFICATION_REQUIRED = "clarification_required"
     CONFIRMATION_REQUIRED = "confirmation_required"
-    CONFIRMED_NOT_EXECUTED = "confirmed_not_executed"
+    SUCCEEDED = "succeeded"
     ERROR = "error"
 
 
@@ -34,7 +34,9 @@ class ToolPermission(StrEnum):
 
 class PendingActionStatus(StrEnum):
     PENDING_CONFIRMATION = "pending_confirmation"
-    CONFIRMED_NOT_EXECUTED = "confirmed_not_executed"
+    EXECUTING = "executing"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
     EXPIRED = "expired"
 
 
@@ -64,6 +66,7 @@ class PendingAction(BaseModel):
     employee_id: str
     conversation_id: UUID
     tool_name: str
+    execution_arguments: dict[str, Any]
     sanitized_arguments: dict[str, Any]
     created_at: datetime
     expires_at: datetime
