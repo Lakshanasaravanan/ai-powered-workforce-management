@@ -61,7 +61,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         User registered = userService.registerUser(request);
         return ResponseEntity.ok("User registered successfully with ID: " + registered.getId());

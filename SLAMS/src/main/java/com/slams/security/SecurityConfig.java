@@ -24,12 +24,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final DelegationAuthenticationFilter delegationAuthenticationFilter;
+    private final RequestIdFilter requestIdFilter;
+    private final ApiErrorWriter apiErrorWriter;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthFilter,
+            DelegationAuthenticationFilter delegationAuthenticationFilter,
+            RequestIdFilter requestIdFilter,
+            ApiErrorWriter apiErrorWriter
+    ) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.delegationAuthenticationFilter = delegationAuthenticationFilter;
+        this.requestIdFilter = requestIdFilter;
+        this.apiErrorWriter = apiErrorWriter;
     }
 
     @Bean
@@ -84,13 +95,17 @@ public class SecurityConfig {
                     boolean isApiRequest = uri.startsWith("/api/");
 
                     if (isApiRequest) {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        apiErrorWriter.write(request, response, org.springframework.http.HttpStatus.UNAUTHORIZED,
+                                "UNAUTHENTICATED", "Authentication is required");
                     } else if (isHtmlRequest) {
                         response.sendRedirect("/login");
                     } else {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                     }
-                }))
+                })
+                        .accessDeniedHandler((request, response, exception) ->
+                                apiErrorWriter.write(request, response, org.springframework.http.HttpStatus.FORBIDDEN,
+                                        "FORBIDDEN", "You are not permitted to access this resource")))
 
                 // Logout clears JWT cookie
                 .logout(logout -> logout
@@ -110,7 +125,10 @@ public class SecurityConfig {
 
                 .authenticationProvider(authenticationProvider(userDetailsService))
 
-                // JWT filter BEFORE UsernamePasswordAuthenticationFilter
+                // Registration order is intentional: request ID, RS256 delegation, then normal HS256 JWT.
+                // All are positioned before Spring's standard username/password filter.
+                .addFilterBefore(requestIdFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(delegationAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

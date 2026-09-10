@@ -118,6 +118,11 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<User> findByEmployeeId(String employeeId) {
+        return userRepository.findByEmployeeId(employeeId);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }

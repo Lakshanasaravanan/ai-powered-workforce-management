@@ -1,6 +1,7 @@
 package com.slams.controller;
 
 import com.slams.model.*;
+import com.slams.dto.AttendanceAnalyticsResponse;
 import com.slams.repository.AttendanceRepository;
 import com.slams.repository.LeaveRequestRepository;
 import com.slams.repository.UserRepository;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class ViewController {
@@ -81,8 +81,13 @@ public class ViewController {
         model.addAttribute("leaves",
                 leaveService.getMyLeaves(user.getUsername()));
 
-        Map<String, Object> analytics = attendanceService.getAttendanceAnalytics(user.getUsername());
-        model.addAllAttributes(analytics);
+        AttendanceAnalyticsResponse analytics = attendanceService.getAttendanceAnalytics(user.getUsername());
+        model.addAttribute("attendancePercentage", analytics.attendancePercentage());
+        model.addAttribute("presentCount", analytics.presentCount());
+        model.addAttribute("lateCount", analytics.lateCount());
+        model.addAttribute("halfDayCount", analytics.halfDayCount());
+        model.addAttribute("absentCount", analytics.absentCount());
+        model.addAttribute("totalDays", analytics.totalDays());
     }
 
     private void loadManagerDashboard(Model model, User manager) {

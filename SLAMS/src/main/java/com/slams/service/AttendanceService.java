@@ -1,6 +1,7 @@
 package com.slams.service;
 
 import com.slams.dto.RegularizationRequest;
+import com.slams.dto.AttendanceAnalyticsResponse;
 import com.slams.model.*;
 import com.slams.repository.AttendanceRegularizationRepository;
 import com.slams.repository.AttendanceRepository;
@@ -109,18 +110,12 @@ public class AttendanceService {
         return attendanceRepository.findAll();
     }
 
-    public Map<String, Object> getAttendanceAnalytics(String username) {
+    public AttendanceAnalyticsResponse getAttendanceAnalytics(String username) {
         List<Attendance> list = getMyAttendance(username);
-        Map<String, Object> stats = new HashMap<>();
 
         long total = list.size();
         if (total == 0) {
-            stats.put("attendancePercentage", 100.0);
-            stats.put("presentCount", 0L);
-            stats.put("lateCount", 0L);
-            stats.put("halfDayCount", 0L);
-            stats.put("absentCount", 0L);
-            return stats;
+            return new AttendanceAnalyticsResponse(100.0, 0L, 0L, 0L, 0L, 0L);
         }
 
         long present = list.stream().filter(a -> a.getStatus() == AttendanceStatus.PRESENT).count();
@@ -131,14 +126,7 @@ public class AttendanceService {
         double score = present + late + (halfDay * 0.5);
         double percentage = Math.round((score / total) * 100.0 * 100.0) / 100.0;
 
-        stats.put("attendancePercentage", percentage);
-        stats.put("presentCount", present);
-        stats.put("lateCount", late);
-        stats.put("halfDayCount", halfDay);
-        stats.put("absentCount", absent);
-        stats.put("totalDays", total);
-
-        return stats;
+        return new AttendanceAnalyticsResponse(percentage, present, late, halfDay, absent, total);
     }
 
     @Transactional
