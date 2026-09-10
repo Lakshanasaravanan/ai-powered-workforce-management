@@ -126,7 +126,7 @@ def test_malformed_action_dates_are_rejected():
         )
 
 
-def test_confirmation_is_one_time_and_never_executes_a_mutation():
+def test_mock_mode_confirmation_is_one_time_and_fails_without_mutation():
     agent, current = make_agent(), context()
     proposal = agent.respond("Apply CASUAL leave from 2026-02-03 to 2026-02-04 because of travel", current)
     action = proposal.pending_action

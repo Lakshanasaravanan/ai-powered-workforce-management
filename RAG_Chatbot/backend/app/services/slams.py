@@ -159,8 +159,14 @@ class SLAMSClient:
     def get_list(self, path: str, employee_id: str, request_id: str | None) -> list[dict[str, Any]]:
         headers = {"Authorization": f"Bearer {self._signer.sign(employee_id)}"}
         if request_id: headers["X-Request-ID"] = request_id
-        try: response = self._client.get(path, headers=headers)
-        except (httpx.TimeoutException, httpx.TransportError) as exc: raise WorkforceUnavailable("Workforce service is temporarily unavailable") from exc
+        response: httpx.Response | None = None
+        for attempt in range(2):
+            try: response = self._client.get(path, headers=headers)
+            except (httpx.TimeoutException, httpx.TransportError) as exc:
+                if attempt == 0: continue
+                raise WorkforceUnavailable("Workforce service is temporarily unavailable") from exc
+            if response.status_code not in self._TRANSIENT_STATUS_CODES or attempt == 1: break
+        assert response is not None
         self._raise_for_status(response.status_code)
         try: payload = response.json()
         except ValueError as exc: raise WorkforceContractError("Workforce service returned an invalid response") from exc
