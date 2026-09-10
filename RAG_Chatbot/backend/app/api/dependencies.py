@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.config import Settings, get_settings
@@ -22,3 +22,10 @@ def get_current_user(
 
 
 CurrentUser = Annotated[AuthenticatedUser, Depends(get_current_user)]
+
+
+def get_rag_service(request: Request):
+    return request.app.state.rag_service
+
+
+RAGServiceDependency = Annotated[object, Depends(get_rag_service)]

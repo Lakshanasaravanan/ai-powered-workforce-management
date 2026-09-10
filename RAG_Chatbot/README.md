@@ -8,9 +8,11 @@ Phase 1 provides a FastAPI foundation, development JWT authentication, request-s
 
 ## Local setup
 
+Use Python 3.13 for local development and indexing. This matches the Docker image and the verified FAISS runtime; the local FAISS wheel has not been reliable under Python 3.14 on macOS arm64.
+
 ```bash
 cd RAG_Chatbot
-python -m venv .venv
+python3.13 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env
 .venv/bin/uvicorn app.main:app --app-dir backend --reload
@@ -34,6 +36,17 @@ curl -X POST http://localhost:8000/api/v1/auth/token \
 ```
 
 Use the returned access token as a bearer token when calling `/api/v1/chat`.
+
+## Index company policy PDFs
+
+Indexing is an explicit offline operation; chat requests never process PDFs or build vectors.
+
+```bash
+cd RAG_Chatbot
+PYTHONPATH=backend backend/.venv/bin/python -m app.rag.ingestion
+```
+
+The command reads `data/documents/`, writes an ignored local FAISS baseline under `data/vectorstore/`, and reports document/page/chunk counts plus embedding dimension. Configure chunk sizes and retrieval limits with the `RAG_*` environment variables in `.env.example`.
 
 ## Tests
 

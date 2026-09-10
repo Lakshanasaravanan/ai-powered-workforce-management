@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.schemas.rag import SourceCitation
+
 
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=6000)
@@ -21,3 +23,4 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     conversation_id: UUID
+    sources: list[SourceCitation] = Field(default_factory=list)

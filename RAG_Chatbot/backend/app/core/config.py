@@ -34,6 +34,13 @@ class Settings(BaseSettings):
     qdrant_api_key: SecretStr | None = None
     redis_url: str | None = None
 
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+    rag_chunk_size: int = Field(default=450, ge=64, le=4096)
+    rag_chunk_overlap: int = Field(default=60, ge=0, le=1024)
+    rag_min_chunk_tokens: int = Field(default=24, ge=1, le=1024)
+    rag_retrieval_top_k: int = Field(default=5, ge=1, le=50)
+    rag_max_context_tokens: int = Field(default=1800, ge=128, le=16000)
+
     jwt_secret_key: SecretStr | None = None
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = Field(default=60, ge=1, le=1440)
@@ -44,6 +51,10 @@ class Settings(BaseSettings):
     def require_secret_in_non_development(self) -> "Settings":
         if self.environment in {"staging", "production"} and self.jwt_secret_key is None:
             raise ValueError("JWT_SECRET_KEY must be configured outside development and test")
+        if self.rag_chunk_overlap >= self.rag_chunk_size:
+            raise ValueError("RAG_CHUNK_OVERLAP must be smaller than RAG_CHUNK_SIZE")
+        if self.rag_min_chunk_tokens > self.rag_chunk_size:
+            raise ValueError("RAG_MIN_CHUNK_TOKENS must not exceed RAG_CHUNK_SIZE")
         return self
 
     @property

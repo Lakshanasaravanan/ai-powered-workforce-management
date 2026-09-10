@@ -16,6 +16,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.api.routes import auth, chat, health
 from app.core.config import get_settings
 from app.core.logging import configure_logging, request_id_context
+from app.rag.ingestion import VECTOR_STORE_DIR
+from app.rag.service import RAGServiceError, create_rag_service
 
 
 logger = logging.getLogger("agentic_rag.request")
@@ -25,6 +27,7 @@ logger = logging.getLogger("agentic_rag.request")
 async def lifespan(_: FastAPI):
     settings = get_settings()
     configure_logging(settings.log_level)
+    app.state.rag_service = create_rag_service(settings, VECTOR_STORE_DIR)
     logger.info("application_started")
     yield
     logger.info("application_stopped")
@@ -106,6 +109,20 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
             "error": {
                 "code": "http_error",
                 "message": detail,
+                "request_id": request_id_context.get(),
+            }
+        },
+    )
+
+
+@app.exception_handler(RAGServiceError)
+async def rag_service_exception_handler(request: Request, exc: RAGServiceError) -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={
+            "error": {
+                "code": "rag_service_unavailable",
+                "message": "The policy assistant is temporarily unavailable. Please try again later.",
                 "request_id": request_id_context.get(),
             }
         },

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from uuid import UUID
 
+from app.rag.service import RAGServiceError
+from app.schemas.rag import RAGAnswer, SourceCitation
+
 
 def test_health(client):
     response = client.get("/health")
@@ -34,10 +37,19 @@ def test_chat_requires_authenticated_identity(client):
 
 
 def test_chat_placeholder_and_conversation_id(client, auth_headers):
+    class NoEvidenceRAGService:
+        def answer(self, question):
+            return RAGAnswer(
+                answer="The available company knowledge does not contain enough information to answer that question.",
+                sources=[],
+            )
+
+    client.app.state.rag_service = NoEvidenceRAGService()
     response = client.post("/api/v1/chat", json={"message": "Hello"}, headers=auth_headers)
     assert response.status_code == 200
     payload = response.json()
-    assert "foundation is ready" in payload["answer"]
+    assert "does not contain enough information" in payload["answer"]
+    assert payload["sources"] == []
     assert UUID(payload["conversation_id"])
 
 
@@ -49,6 +61,14 @@ def test_chat_validation_is_structured(client, auth_headers):
 
 
 def test_mock_authentication_issues_and_verifies_token(client):
+    class NoEvidenceRAGService:
+        def answer(self, question):
+            return RAGAnswer(
+                answer="The available company knowledge does not contain enough information to answer that question.",
+                sources=[],
+            )
+
+    client.app.state.rag_service = NoEvidenceRAGService()
     token_response = client.post(
         "/api/v1/auth/token", json={"username": "emp002", "password": "demo-emp002"}
     )
@@ -65,3 +85,28 @@ def test_invalid_mock_credentials_are_rejected(client):
     response = client.post("/api/v1/auth/token", json={"username": "EMP001", "password": "wrong"})
     assert response.status_code == 401
     assert response.json()["error"]["message"] == "Invalid credentials"
+
+
+def test_chat_returns_mocked_rag_answer_and_citations(client, auth_headers):
+    class MockRAGService:
+        def answer(self, question):
+            return RAGAnswer(
+                answer="Medical leave is available under the leave policy.",
+                sources=[SourceCitation(document="XYZ_Leave_Attendance_Policy.pdf", page=4, section="Medical Leave")],
+            )
+
+    client.app.state.rag_service = MockRAGService()
+    response = client.post("/api/v1/chat", json={"message": "What is medical leave?"}, headers=auth_headers)
+    assert response.status_code == 200
+    assert response.json()["sources"] == [{"document": "XYZ_Leave_Attendance_Policy.pdf", "page": 4, "section": "Medical Leave", "subsection": None}]
+
+
+def test_chat_returns_safe_service_error(client, auth_headers):
+    class FailingRAGService:
+        def answer(self, question):
+            raise RAGServiceError("provider failure")
+
+    client.app.state.rag_service = FailingRAGService()
+    response = client.post("/api/v1/chat", json={"message": "What is medical leave?"}, headers=auth_headers)
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "rag_service_unavailable"
