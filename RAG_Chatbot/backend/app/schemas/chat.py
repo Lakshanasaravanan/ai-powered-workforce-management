@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.schemas.rag import SourceCitation
+from app.schemas.agent import AgentResponse
 
 
 class ChatRequest(BaseModel):
@@ -20,7 +20,5 @@ class ChatRequest(BaseModel):
         return value
 
 
-class ChatResponse(BaseModel):
-    answer: str
-    conversation_id: UUID
-    sources: list[SourceCitation] = Field(default_factory=list)
+class ChatResponse(AgentResponse):
+    """Backward-compatible chat response with Phase 4 agent fields."""

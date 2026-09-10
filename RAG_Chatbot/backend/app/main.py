@@ -13,11 +13,19 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.agents.planner import DeterministicPlanner
+from app.agents.service import AgentService
 from app.api.routes import auth, chat, health
 from app.core.config import get_settings
 from app.core.logging import configure_logging, request_id_context
 from app.rag.ingestion import VECTOR_STORE_DIR
 from app.rag.service import RAGServiceError, create_rag_service
+from app.services.pending_actions import PendingActionStore
+from app.services.workforce import MockWorkforceProvider
+from app.tools.actions import RegularizeAttendanceTool, RequestLeaveTool
+from app.tools.rag_tool import PolicyAnswerTool
+from app.tools.registry import ToolRegistry
+from app.tools.workforce import GetMyAttendanceSummaryTool, GetMyLeaveBalanceTool, GetMyProfileTool
 
 
 logger = logging.getLogger("agentic_rag.request")
@@ -28,6 +36,20 @@ async def lifespan(_: FastAPI):
     settings = get_settings()
     configure_logging(settings.log_level)
     app.state.rag_service = create_rag_service(settings, VECTOR_STORE_DIR)
+    workforce = MockWorkforceProvider()
+    pending_actions = PendingActionStore()
+    app.state.agent_service = AgentService(
+        planner=DeterministicPlanner(),
+        registry=ToolRegistry([
+            PolicyAnswerTool(app.state.rag_service),
+            GetMyProfileTool(workforce),
+            GetMyLeaveBalanceTool(workforce),
+            GetMyAttendanceSummaryTool(workforce),
+            RequestLeaveTool(pending_actions),
+            RegularizeAttendanceTool(pending_actions),
+        ]),
+        pending_actions=pending_actions,
+    )
     logger.info("application_started")
     yield
     logger.info("application_stopped")

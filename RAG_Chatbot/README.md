@@ -2,6 +2,23 @@
 
 This directory contains the standalone AI-assistant service for the Workforce Management Platform. It does not access the `SLAMS` database; future workforce integration will use authenticated REST clients.
 
+## Phase 4 agent safety foundation
+
+`POST /api/v1/chat` now builds an immutable server-side execution context from the verified JWT, request ID, and conversation ID. `AgentService` uses a small deterministic planner that can only propose a server-registered tool invocation; `ToolRegistry` validates strict Pydantic inputs, enforces the employee self-service permission boundary, executes the tool, and emits safe audit metadata.
+
+Available Phase 4 tools are policy answers through the existing RAG service, plus synthetic read-only `get_my_profile`, `get_my_leave_balance`, and `get_my_attendance_summary` tools. The mock workforce provider is in-memory, uses clearly fictional data, and makes no database, network, or `SLAMS` calls. Workforce identity is always derived from the authenticated context, never from a chat message or tool input.
+
+Leave requests and attendance regularization are proposal-only. They produce a short-lived, employee- and conversation-bound pending action. `POST /api/v1/chat/confirm` accepts only the opaque action ID and conversation ID. A valid confirmation transitions it to `confirmed_not_executed` and explicitly reports that no workforce action was performed. It does not submit leave, modify attendance, or call an external system.
+
+Example behavior:
+
+- `Show my leave balance` returns a synthetic read-only balance.
+- `What is the medical leave policy?` delegates to RAG and preserves citations.
+- `Apply leave from 2026-02-03 to 2026-02-04` returns `confirmation_required` and a pending action.
+- Confirming that action returns `confirmed_not_executed`; no mutation occurs.
+
+Phase 4 deliberately excludes real SLAMS integration, database access, workforce mutations, manager/admin workflows, Redis, persistent conversations, production SSO, Qdrant, frontend work, and autonomous multi-step actions.
+
 ## Retrieval architecture
 
 Policy retrieval defaults to BGE dense search, bounded to `RAG_RETRIEVAL_CANDIDATE_K` (default 30) and reduced to final `RAG_RETRIEVAL_TOP_K` (default 5) before context assembly. This is the current baseline because a manual, synthetic document-level evaluation set showed better retrieval quality and latency than the hybrid variants. BM25 plus Reciprocal Rank Fusion (RRF), and cross-encoder reranking, are available as explicit opt-ins through `RAG_HYBRID_ENABLED=true` and `RAG_RERANK_ENABLED=true`.

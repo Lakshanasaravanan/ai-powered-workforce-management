@@ -6,6 +6,11 @@ from app.rag.service import RAGServiceError
 from app.schemas.rag import RAGAnswer, SourceCitation
 
 
+def set_policy_rag_service(client, service) -> None:
+    """Replace only the RAG dependency inside the initialized policy tool."""
+    client.app.state.agent_service.registry._tools["policy_answer"].rag_service = service
+
+
 def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200
@@ -44,7 +49,7 @@ def test_chat_placeholder_and_conversation_id(client, auth_headers):
                 sources=[],
             )
 
-    client.app.state.rag_service = NoEvidenceRAGService()
+    set_policy_rag_service(client, NoEvidenceRAGService())
     response = client.post("/api/v1/chat", json={"message": "Hello"}, headers=auth_headers)
     assert response.status_code == 200
     payload = response.json()
@@ -68,7 +73,7 @@ def test_mock_authentication_issues_and_verifies_token(client):
                 sources=[],
             )
 
-    client.app.state.rag_service = NoEvidenceRAGService()
+    set_policy_rag_service(client, NoEvidenceRAGService())
     token_response = client.post(
         "/api/v1/auth/token", json={"username": "emp002", "password": "demo-emp002"}
     )
@@ -95,7 +100,7 @@ def test_chat_returns_mocked_rag_answer_and_citations(client, auth_headers):
                 sources=[SourceCitation(document="XYZ_Leave_Attendance_Policy.pdf", page=4, section="Medical Leave")],
             )
 
-    client.app.state.rag_service = MockRAGService()
+    set_policy_rag_service(client, MockRAGService())
     response = client.post("/api/v1/chat", json={"message": "What is medical leave?"}, headers=auth_headers)
     assert response.status_code == 200
     assert response.json()["sources"] == [{"document": "XYZ_Leave_Attendance_Policy.pdf", "page": 4, "section": "Medical Leave", "subsection": None}]
@@ -106,7 +111,7 @@ def test_chat_returns_safe_service_error(client, auth_headers):
         def answer(self, question):
             raise RAGServiceError("provider failure")
 
-    client.app.state.rag_service = FailingRAGService()
+    set_policy_rag_service(client, FailingRAGService())
     response = client.post("/api/v1/chat", json={"message": "What is medical leave?"}, headers=auth_headers)
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "rag_service_unavailable"

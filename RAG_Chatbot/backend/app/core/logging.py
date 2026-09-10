@@ -23,7 +23,13 @@ class JsonFormatter(logging.Formatter):
         request_id = request_id_context.get()
         if request_id:
             payload["request_id"] = request_id
-        for field in ("endpoint", "method", "status", "latency_ms"):
+        # This allowlist intentionally excludes request bodies, credentials, tool arguments,
+        # provider payloads, and retrieved text while retaining safe operational audit data.
+        for field in (
+            "endpoint", "method", "status", "latency_ms", "conversation_id", "employee_id",
+            "tool_name", "tool_category", "result_status", "duration_ms", "error_code",
+            "pending_action_id", "tool_error_code",
+        ):
             value = getattr(record, field, None)
             if value is not None:
                 payload[field] = value

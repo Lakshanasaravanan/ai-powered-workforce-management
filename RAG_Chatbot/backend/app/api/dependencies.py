@@ -29,3 +29,10 @@ def get_rag_service(request: Request):
 
 
 RAGServiceDependency = Annotated[object, Depends(get_rag_service)]
+
+
+def get_agent_service(request: Request):
+    return request.app.state.agent_service
+
+
+AgentServiceDependency = Annotated[object, Depends(get_agent_service)]
