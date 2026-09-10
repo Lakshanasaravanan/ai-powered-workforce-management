@@ -1,6 +1,8 @@
 package com.slams.service;
 
 import com.slams.model.*;
+import com.slams.exception.BusinessRuleConflictException;
+import com.slams.exception.ResourceNotFoundException;
 import com.slams.repository.LeaveBalanceRepository;
 import com.slams.repository.LeaveRequestRepository;
 import com.slams.repository.UserRepository;
@@ -44,27 +46,27 @@ public class LeaveService {
     @Transactional
     public LeaveRequest applyLeave(String username, LeaveType leaveType, LocalDate startDate, LocalDate endDate, String reason) {
         if (startDate.isAfter(endDate)) {
-            throw new RuntimeException("Start date cannot be after end date.");
+            throw new BusinessRuleConflictException("Start date cannot be after end date.");
         }
         if (startDate.isBefore(LocalDate.now())) {
-            throw new RuntimeException("Cannot apply leave for past dates.");
+            throw new BusinessRuleConflictException("Cannot apply leave for past dates.");
         }
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee is unavailable"));
 
         int duration = calculateWorkingDays(startDate, endDate);
         if (duration == 0) {
-            throw new RuntimeException("Cannot apply leave for weekends only.");
+            throw new BusinessRuleConflictException("Cannot apply leave for weekends only.");
         }
 
         LeaveBalance balance = leaveBalanceRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Leave balance record not found for user: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("Leave balance is unavailable"));
 
         // Validate leave balance
         int currentBalance = getBalanceForType(balance, leaveType);
         if (currentBalance < duration) {
-            throw new RuntimeException("Insufficient " + leaveType + " leave balance. Required: " + duration + ", Available: " + currentBalance);
+            throw new BusinessRuleConflictException("Insufficient leave balance");
         }
 
         LeaveRequest request = LeaveRequest.builder()
@@ -83,14 +85,14 @@ public class LeaveService {
     @Transactional
     public LeaveRequest updateStatus(Long requestId, LeaveStatus status, String managerUsername, String rejectionReason) {
         LeaveRequest request = leaveRequestRepository.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Leave request not found with ID: " + requestId));
+                .orElseThrow(() -> new ResourceNotFoundException("Leave request is unavailable"));
 
         if (request.getStatus() != LeaveStatus.PENDING) {
-            throw new RuntimeException("Can only approve or reject pending leave requests.");
+            throw new BusinessRuleConflictException("Only pending leave requests can be updated");
         }
 
         User manager = userRepository.findByUsername(managerUsername)
-                .orElseThrow(() -> new RuntimeException("Manager not found: " + managerUsername));
+                .orElseThrow(() -> new ResourceNotFoundException("Manager is unavailable"));
 
         request.setStatus(status);
         request.setApprovedBy(manager.getFullName());
@@ -98,7 +100,7 @@ public class LeaveService {
         if (status == LeaveStatus.APPROVED) {
             int duration = calculateWorkingDays(request.getStartDate(), request.getEndDate());
             LeaveBalance balance = leaveBalanceRepository.findByUserId(request.getUser().getId())
-                    .orElseThrow(() -> new RuntimeException("Leave balance record not found."));
+                    .orElseThrow(() -> new ResourceNotFoundException("Leave balance is unavailable"));
 
             // Deduct the leaves from the balance
             deductLeaves(balance, request.getLeaveType(), duration);
@@ -139,7 +141,7 @@ public class LeaveService {
 
     public LeaveBalance getLeaveBalance(String username) {
         return leaveBalanceRepository.findByUserUsername(username)
-                .orElseThrow(() -> new RuntimeException("Leave balance not found for: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("Leave balance is unavailable"));
     }
 
     private int getBalanceForType(LeaveBalance balance, LeaveType type) {
