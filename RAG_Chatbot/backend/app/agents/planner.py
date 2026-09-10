@@ -40,7 +40,7 @@ class DeterministicPlanner:
         if "leave balance" in normalized or "leave remaining" in normalized:
             return Plan(invocation=ToolInvocation(tool_name="get_my_leave_balance"))
         if "attendance" in normalized and any(term in normalized for term in ("summary", "show", "my attendance")):
-            period = AttendancePeriod.LAST_30_DAYS if "30" in normalized else AttendancePeriod.CURRENT_MONTH
+            period = AttendancePeriod.LAST_30_DAYS if "30" in normalized else AttendancePeriod.SLAMS_AGGREGATE
             return Plan(invocation=ToolInvocation(tool_name="get_my_attendance_summary", arguments={"period": period.value}))
         if "profile" in normalized or "my details" in normalized:
             return Plan(invocation=ToolInvocation(tool_name="get_my_profile"))

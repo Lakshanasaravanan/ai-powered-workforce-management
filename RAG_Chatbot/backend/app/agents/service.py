@@ -39,11 +39,12 @@ class AgentService:
     @staticmethod
     def _read_answer(result) -> str:
         if isinstance(result, EmployeeProfile):
-            return f"Your synthetic profile is {result.display_name} in {result.department}."
+            department = result.department or "an unspecified department"
+            return f"Your profile is {result.display_name} in {department}."
         if isinstance(result, LeaveBalance):
-            return f"Your synthetic leave balance is {result.annual_days_remaining:g} annual and {result.sick_days_remaining:g} sick days remaining."
+            return f"Your leave balance is {result.annual_days_remaining:g} annual and {result.sick_days_remaining:g} sick days remaining."
         if isinstance(result, AttendanceSummary):
-            return f"Your synthetic attendance summary for {result.period.value}: {result.present_days} present, {result.leave_days} leave, out of {result.scheduled_days} scheduled days."
+            return f"Your attendance summary for {result.period.value}: {result.present_days} present, {result.leave_days} leave, out of {result.scheduled_days} scheduled days."
         return "Your requested information is available."
 
     def respond(self, message: str, context: ExecutionContext) -> AgentResponse:

@@ -50,6 +50,15 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = Field(default=60, ge=1, le=1440)
 
+    slams_enabled: bool = False
+    slams_base_url: AnyHttpUrl | None = None
+    slams_connect_timeout_seconds: float = Field(default=2.0, gt=0, le=30)
+    slams_read_timeout_seconds: float = Field(default=5.0, gt=0, le=60)
+    slams_delegation_issuer: str | None = None
+    slams_delegation_audience: str | None = None
+    slams_delegation_private_key: SecretStr | None = None
+    slams_delegation_token_ttl_seconds: int = Field(default=300, ge=30, le=900)
+
     _ephemeral_jwt_secret: str | None = None
 
     @model_validator(mode="after")
@@ -62,6 +71,21 @@ class Settings(BaseSettings):
             raise ValueError("RAG_MIN_CHUNK_TOKENS must not exceed RAG_CHUNK_SIZE")
         if self.rag_retrieval_candidate_k < self.rag_retrieval_top_k:
             raise ValueError("RAG_RETRIEVAL_CANDIDATE_K must be at least RAG_RETRIEVAL_TOP_K")
+        if self.slams_enabled:
+            required = {
+                "SLAMS_BASE_URL": self.slams_base_url,
+                "SLAMS_DELEGATION_ISSUER": self.slams_delegation_issuer,
+                "SLAMS_DELEGATION_AUDIENCE": self.slams_delegation_audience,
+                "SLAMS_DELEGATION_PRIVATE_KEY": self.slams_delegation_private_key,
+            }
+            missing = [
+                name
+                for name, value in required.items()
+                if value is None
+                or not (value.get_secret_value() if isinstance(value, SecretStr) else str(value)).strip()
+            ]
+            if missing:
+                raise ValueError(f"SLAMS integration is enabled but required configuration is missing: {', '.join(missing)}")
         return self
 
     @property

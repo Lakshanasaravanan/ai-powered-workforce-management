@@ -11,12 +11,36 @@ class WorkforceProviderError(RuntimeError):
     """Safe provider failure; no backend implementation details are exposed."""
 
 
+class WorkforceUnauthorized(WorkforceProviderError):
+    code = "workforce_unauthorized"
+
+
+class WorkforceForbidden(WorkforceProviderError):
+    code = "workforce_forbidden"
+
+
+class WorkforceNotFound(WorkforceProviderError):
+    code = "workforce_not_found"
+
+
+class WorkforceUnavailable(WorkforceProviderError):
+    code = "workforce_unavailable"
+
+
+class WorkforceContractError(WorkforceProviderError):
+    code = "workforce_contract_error"
+
+
+class WorkforceBusinessError(WorkforceProviderError):
+    code = "workforce_business_error"
+
+
 class WorkforceProvider(Protocol):
-    def get_profile(self, employee_id: str) -> EmployeeProfile: ...
+    def get_profile(self, employee_id: str, request_id: str | None = None) -> EmployeeProfile: ...
 
-    def get_leave_balance(self, employee_id: str) -> LeaveBalance: ...
+    def get_leave_balance(self, employee_id: str, request_id: str | None = None) -> LeaveBalance: ...
 
-    def get_attendance_summary(self, employee_id: str, period: AttendancePeriod) -> AttendanceSummary: ...
+    def get_attendance_summary(self, employee_id: str, period: AttendancePeriod, request_id: str | None = None) -> AttendanceSummary: ...
 
 
 class MockWorkforceProvider:
@@ -35,16 +59,16 @@ class MockWorkforceProvider:
         if employee_id not in self._profiles:
             raise WorkforceProviderError("Synthetic workforce record is unavailable")
 
-    def get_profile(self, employee_id: str) -> EmployeeProfile:
+    def get_profile(self, employee_id: str, request_id: str | None = None) -> EmployeeProfile:
         self._require_known_employee(employee_id)
         return self._profiles[employee_id]
 
-    def get_leave_balance(self, employee_id: str) -> LeaveBalance:
+    def get_leave_balance(self, employee_id: str, request_id: str | None = None) -> LeaveBalance:
         self._require_known_employee(employee_id)
         return self._leave_balances[employee_id]
 
-    def get_attendance_summary(self, employee_id: str, period: AttendancePeriod) -> AttendanceSummary:
+    def get_attendance_summary(self, employee_id: str, period: AttendancePeriod, request_id: str | None = None) -> AttendanceSummary:
         self._require_known_employee(employee_id)
-        if period is AttendancePeriod.CURRENT_MONTH:
+        if period in {AttendancePeriod.CURRENT_MONTH, AttendancePeriod.SLAMS_AGGREGATE}:
             return AttendanceSummary(period=period, scheduled_days=20, present_days=18, leave_days=2)
         return AttendanceSummary(period=period, scheduled_days=22, present_days=20, leave_days=2)

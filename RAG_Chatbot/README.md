@@ -6,7 +6,7 @@ This directory contains the standalone AI-assistant service for the Workforce Ma
 
 `POST /api/v1/chat` now builds an immutable server-side execution context from the verified JWT, request ID, and conversation ID. `AgentService` uses a small deterministic planner that can only propose a server-registered tool invocation; `ToolRegistry` validates strict Pydantic inputs, enforces the employee self-service permission boundary, executes the tool, and emits safe audit metadata.
 
-Available Phase 4 tools are policy answers through the existing RAG service, plus synthetic read-only `get_my_profile`, `get_my_leave_balance`, and `get_my_attendance_summary` tools. The mock workforce provider is in-memory, uses clearly fictional data, and makes no database, network, or `SLAMS` calls. Workforce identity is always derived from the authenticated context, never from a chat message or tool input.
+Available tools are policy answers through the existing RAG service, plus read-only `get_my_profile`, `get_my_leave_balance`, and `get_my_attendance_summary` tools. Workforce identity is always derived from the authenticated context, never from a chat message or tool input.
 
 Leave requests and attendance regularization are proposal-only. They produce a short-lived, employee- and conversation-bound pending action. `POST /api/v1/chat/confirm` accepts only the opaque action ID and conversation ID. A valid confirmation transitions it to `confirmed_not_executed` and explicitly reports that no workforce action was performed. It does not submit leave, modify attendance, or call an external system.
 
@@ -17,7 +17,17 @@ Example behavior:
 - `Apply leave from 2026-02-03 to 2026-02-04` returns `confirmation_required` and a pending action.
 - Confirming that action returns `confirmed_not_executed`; no mutation occurs.
 
-Phase 4 deliberately excludes real SLAMS integration, database access, workforce mutations, manager/admin workflows, Redis, persistent conversations, production SSO, Qdrant, frontend work, and autonomous multi-step actions.
+## Phase 5B SLAMS read-only integration
+
+SLAMS integration is disabled by default. When enabled, the Python service uses a process-reused synchronous `httpx.Client` and a short-lived RS256 delegation JWT for each self-service read. The token contains only issuer, audience, employee subject/ID, issue/expiry times, a unique ID, and `token_type=delegation`; it contains no role claims. Python obtains the employee ID exclusively from `ExecutionContext`. SLAMS verifies the signature, resolves that employee and their authorities independently, and exposes only its principal-bound endpoints.
+
+The Python private signing key is supplied through `SLAMS_DELEGATION_PRIVATE_KEY` at runtime and is never logged or committed. SLAMS receives only the corresponding public verification key. The client propagates `X-Request-ID`, maps safe response DTOs, never logs headers/tokens/payloads, retries one time only for connection/timeouts and 502/503/504 reads, and does not retry authentication or business failures.
+
+Set `SLAMS_ENABLED=true` only when every `SLAMS_*` setting in `.env.example` is configured. Startup selects `SLAMSWorkforceProvider` in that mode; it never falls back to synthetic mock data if SLAMS is unavailable. With integration disabled, `MockWorkforceProvider` remains the explicit development-only source of clearly fictional data.
+
+Supported real reads are profile, leave balance, and SLAMS attendance analytics. SLAMS analytics is aggregate history rather than a date-filtered API, so Python exposes it as `slams_aggregate` and rejects `current_month` and `last_30_days` instead of fabricating filtered data. It preserves casual, sick, and earned leave categories; its aggregate attendance model separately reports late, half-day, and absent counts. No leave request or attendance regularization execution is enabled: proposals and confirmation remain `confirmed_not_executed`.
+
+Phase 5B deliberately excludes SLAMS database access, workforce mutations, manager/admin workflows, Redis, persistent conversations, production SSO, Qdrant, frontend work, and autonomous multi-step actions.
 
 ## Retrieval architecture
 
@@ -38,6 +48,8 @@ cp .env.example .env
 ```
 
 Set a unique `JWT_SECRET_KEY` before any non-development deployment. In development, an ephemeral process-local signing key is used only if no key is configured; readiness reports this as a warning.
+
+For local SLAMS read-only integration, create a temporary RSA keypair outside the repository. Give the private key to `SLAMS_DELEGATION_PRIVATE_KEY` and configure the matching public key in SLAMS through its `SLAMS_DELEGATION_PUBLIC_KEY` environment setting. Do not store either key in `.env.example`, source control, or logs. `/ready` remains available for policy RAG even when SLAMS is unavailable; workforce reads return a safe error rather than synthetic data in enabled mode.
 
 ## API
 
@@ -79,3 +91,5 @@ The manually reviewed document-level fixture is at `backend/data/evaluation/retr
 cd RAG_Chatbot
 PYTHONPATH=backend .venv/bin/pytest backend/tests -q
 ```
+
+The suite includes offline `httpx.MockTransport` coverage for RS256 delegation claims, self-service employee binding, SLAMS response mapping, error mapping, and retry behavior. SLAMS has its own Maven integration suite for delegation verification.

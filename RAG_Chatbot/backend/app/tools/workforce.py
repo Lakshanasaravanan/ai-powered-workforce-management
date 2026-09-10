@@ -17,37 +17,37 @@ class EmptyInput(BaseModel):
 
 class AttendanceSummaryInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    period: AttendancePeriod = AttendancePeriod.CURRENT_MONTH
+    period: AttendancePeriod = AttendancePeriod.SLAMS_AGGREGATE
 
 
 class GetMyProfileTool(Tool):
-    spec = ToolSpec(name="get_my_profile", description="Read the authenticated employee's synthetic profile.", category=ToolCategory.SELF_READ, permission=ToolPermission.SELF_READ)
+    spec = ToolSpec(name="get_my_profile", description="Read the authenticated employee's profile.", category=ToolCategory.SELF_READ, permission=ToolPermission.SELF_READ)
     input_model = EmptyInput
 
     def __init__(self, provider: WorkforceProvider) -> None:
         self.provider = provider
 
     def execute(self, context: ExecutionContext, tool_input: EmptyInput) -> EmployeeProfile:
-        return self.provider.get_profile(context.employee_id)
+        return self.provider.get_profile(context.employee_id, context.request_id)
 
 
 class GetMyLeaveBalanceTool(Tool):
-    spec = ToolSpec(name="get_my_leave_balance", description="Read the authenticated employee's synthetic leave balance.", category=ToolCategory.SELF_READ, permission=ToolPermission.SELF_READ)
+    spec = ToolSpec(name="get_my_leave_balance", description="Read the authenticated employee's leave balance.", category=ToolCategory.SELF_READ, permission=ToolPermission.SELF_READ)
     input_model = EmptyInput
 
     def __init__(self, provider: WorkforceProvider) -> None:
         self.provider = provider
 
     def execute(self, context: ExecutionContext, tool_input: EmptyInput) -> LeaveBalance:
-        return self.provider.get_leave_balance(context.employee_id)
+        return self.provider.get_leave_balance(context.employee_id, context.request_id)
 
 
 class GetMyAttendanceSummaryTool(Tool):
-    spec = ToolSpec(name="get_my_attendance_summary", description="Read the authenticated employee's synthetic attendance summary.", category=ToolCategory.SELF_READ, permission=ToolPermission.SELF_READ)
+    spec = ToolSpec(name="get_my_attendance_summary", description="Read the authenticated employee's attendance summary.", category=ToolCategory.SELF_READ, permission=ToolPermission.SELF_READ)
     input_model = AttendanceSummaryInput
 
     def __init__(self, provider: WorkforceProvider) -> None:
         self.provider = provider
 
     def execute(self, context: ExecutionContext, tool_input: AttendanceSummaryInput) -> AttendanceSummary:
-        return self.provider.get_attendance_summary(context.employee_id, tool_input.period)
+        return self.provider.get_attendance_summary(context.employee_id, tool_input.period, context.request_id)

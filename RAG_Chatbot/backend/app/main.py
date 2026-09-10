@@ -21,6 +21,7 @@ from app.core.logging import configure_logging, request_id_context
 from app.rag.ingestion import VECTOR_STORE_DIR
 from app.rag.service import RAGServiceError, create_rag_service
 from app.services.pending_actions import PendingActionStore
+from app.services.slams import SLAMSWorkforceProvider
 from app.services.workforce import MockWorkforceProvider
 from app.tools.actions import RegularizeAttendanceTool, RequestLeaveTool
 from app.tools.rag_tool import PolicyAnswerTool
@@ -36,7 +37,8 @@ async def lifespan(_: FastAPI):
     settings = get_settings()
     configure_logging(settings.log_level)
     app.state.rag_service = create_rag_service(settings, VECTOR_STORE_DIR)
-    workforce = MockWorkforceProvider()
+    workforce = SLAMSWorkforceProvider.from_settings(settings) if settings.slams_enabled else MockWorkforceProvider()
+    app.state.workforce_provider = workforce
     pending_actions = PendingActionStore()
     app.state.agent_service = AgentService(
         planner=DeterministicPlanner(),
@@ -52,6 +54,9 @@ async def lifespan(_: FastAPI):
     )
     logger.info("application_started")
     yield
+    close = getattr(workforce, "close", None)
+    if close is not None:
+        close()
     logger.info("application_stopped")
 
 
