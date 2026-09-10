@@ -26,7 +26,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessRuleConflictException.class)
     public ResponseEntity<ApiErrorResponse> handleConflict(BusinessRuleConflictException ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error(request, "BUSINESS_RULE_CONFLICT", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error(request, ex.getCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(MutationRequestValidationException.class)
+    public ResponseEntity<ApiErrorResponse> handleMutationValidation(MutationRequestValidationException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(error(request, ex.getCode(), ex.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

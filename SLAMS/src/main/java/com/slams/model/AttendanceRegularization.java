@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "attendance_regularizations")
@@ -37,4 +38,7 @@ public class AttendanceRegularization {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approved_by_id")
     private User approvedBy;
+
+    @Column(nullable = false)
+    private LocalDateTime requestedAt;
 }
