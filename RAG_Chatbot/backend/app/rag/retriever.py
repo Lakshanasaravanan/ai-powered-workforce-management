@@ -1,7 +1,7 @@
 """Dense retrieval backed only by the VectorStore interface."""
 
 from app.rag.embeddings import EmbeddingService
-from app.schemas.rag import RetrievedChunk
+from app.schemas.rag import MetadataFilter, RetrievedChunk
 from app.services.vector_store import VectorStore
 
 
@@ -11,12 +11,20 @@ class DenseRetriever:
         self.embeddings = embeddings
         self.top_k = top_k
 
-    def retrieve(self, query: str, top_k: int | None = None) -> list[RetrievedChunk]:
+    def retrieve(
+        self, query: str, top_k: int | None = None, metadata_filter: MetadataFilter | None = None
+    ) -> list[RetrievedChunk]:
         if not query.strip() or self.vector_store.count() == 0:
             return []
+        return self.retrieve_vector(self.embeddings.encode([query])[0], top_k, metadata_filter)
+
+    def retrieve_vector(
+        self, query_vector, top_k: int | None = None, metadata_filter: MetadataFilter | None = None
+    ) -> list[RetrievedChunk]:
+        if self.vector_store.count() == 0:
+            return []
         limit = top_k or self.top_k
-        query_vector = self.embeddings.encode([query])
-        candidates = self.vector_store.search(query_vector[0], min(self.vector_store.count(), limit * 5))
+        candidates = self.vector_store.search(query_vector, min(self.vector_store.count(), limit * 5), metadata_filter)
         unique: list[RetrievedChunk] = []
         seen_content: set[str] = set()
         for candidate in candidates:

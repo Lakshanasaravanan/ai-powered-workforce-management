@@ -1,0 +1,14 @@
+[
+  {"id":"leave-direct","query":"What is the leave policy?","category":"direct","expected_sources":["XYZ_Leave_Attendance_Policy.pdf","XYZ_Employee_Policies.pdf"]},
+  {"id":"medical-leave","query":"What is the medical leave policy?","category":"leave","expected_sources":["XYZ_Leave_Attendance_Policy.pdf","XYZ_Employee_Policies.pdf"]},
+  {"id":"attendance-rules","query":"What are the attendance rules?","category":"attendance","expected_sources":["XYZ_Leave_Attendance_Policy.pdf","XYZ_Employee_Policies.pdf"]},
+  {"id":"clock-in","query":"How should attendance clock-in be handled?","category":"attendance","expected_sources":["XYZ_Leave_Attendance_Policy.pdf"]},
+  {"id":"conduct","query":"What are employees expected to follow under the code of conduct?","category":"conduct","expected_sources":["XYZ_Code_of_Conduct.pdf"]},
+  {"id":"harassment","query":"What is the workplace harassment policy?","category":"conduct","expected_sources":["XYZ_Code_of_Conduct.pdf"]},
+  {"id":"it-security","query":"What does the IT security policy say?","category":"security","expected_sources":["XYZ_IT_Security_Policy.pdf"]},
+  {"id":"password","query":"What is the password policy?","category":"security","expected_sources":["XYZ_IT_Security_Policy.pdf"]},
+  {"id":"phishing","query":"How should a phishing email be handled?","category":"security","expected_sources":["XYZ_IT_Security_Policy.pdf"]},
+  {"id":"handbook","query":"What is the workforce management handbook about?","category":"handbook","expected_sources":["XYZ_Workforce_Management_Handbook.pdf"]},
+  {"id":"planned-leave","query":"How is planned leave managed?","category":"handbook","expected_sources":["XYZ_Workforce_Management_Handbook.pdf","XYZ_Leave_Attendance_Policy.pdf"]},
+  {"id":"remote-work","query":"What guidance exists for workforce availability and work arrangements?","category":"handbook","expected_sources":["XYZ_Workforce_Management_Handbook.pdf"]}
+]

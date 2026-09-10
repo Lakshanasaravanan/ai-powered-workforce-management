@@ -14,12 +14,14 @@ from app.rag.chunking import chunk_documents
 from app.rag.embeddings import EmbeddingService
 from app.schemas.rag import PageDocument
 from app.services.vector_store import FaissVectorStore
+from app.rag.sparse import write_sparse_corpus
 
 
 logger = logging.getLogger(__name__)
 PROJECT_DIR = Path(__file__).resolve().parents[3]
 DOCUMENTS_DIR = PROJECT_DIR / "data" / "documents"
 VECTOR_STORE_DIR = PROJECT_DIR / "data" / "vectorstore"
+SPARSE_INDEX_PATH = PROJECT_DIR / "data" / "sparse" / "bm25_corpus.json"
 
 
 def _sha256(value: bytes | str) -> str:
@@ -89,6 +91,7 @@ def build_local_index() -> dict[str, int]:
     store = FaissVectorStore(VECTOR_STORE_DIR)
     store.create_collection(embeddings.shape[1], recreate=True)
     store.upsert(chunks, embeddings)
+    write_sparse_corpus(SPARSE_INDEX_PATH, chunks)
     return {
         "documents": len({page.document_id for page in pages}),
         "pages": len(pages),

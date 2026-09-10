@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     rag_chunk_overlap: int = Field(default=60, ge=0, le=1024)
     rag_min_chunk_tokens: int = Field(default=24, ge=1, le=1024)
     rag_retrieval_top_k: int = Field(default=5, ge=1, le=50)
+    rag_retrieval_candidate_k: int = Field(default=30, ge=1, le=200)
+    rag_hybrid_enabled: bool = False
+    rag_rrf_k: int = Field(default=60, ge=1, le=500)
+    rag_rerank_enabled: bool = False
+    rag_rerank_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
     rag_max_context_tokens: int = Field(default=1800, ge=128, le=16000)
 
     jwt_secret_key: SecretStr | None = None
@@ -55,6 +60,8 @@ class Settings(BaseSettings):
             raise ValueError("RAG_CHUNK_OVERLAP must be smaller than RAG_CHUNK_SIZE")
         if self.rag_min_chunk_tokens > self.rag_chunk_size:
             raise ValueError("RAG_MIN_CHUNK_TOKENS must not exceed RAG_CHUNK_SIZE")
+        if self.rag_retrieval_candidate_k < self.rag_retrieval_top_k:
+            raise ValueError("RAG_RETRIEVAL_CANDIDATE_K must be at least RAG_RETRIEVAL_TOP_K")
         return self
 
     @property

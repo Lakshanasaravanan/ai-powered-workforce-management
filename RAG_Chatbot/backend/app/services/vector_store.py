@@ -10,7 +10,7 @@ from pathlib import Path
 import faiss
 import numpy as np
 
-from app.schemas.rag import DocumentChunk, RetrievedChunk
+from app.schemas.rag import DocumentChunk, MetadataFilter, RetrievedChunk
 
 # Keep the local baseline deterministic and avoid OpenMP oversubscription in API/test workers.
 faiss.omp_set_num_threads(1)
@@ -28,7 +28,10 @@ class VectorStore(ABC):
     def upsert(self, chunks: list[DocumentChunk], vectors: np.ndarray) -> None: ...
 
     @abstractmethod
-    def search(self, vector: np.ndarray, limit: int) -> list[RetrievedChunk]: ...
+    def search(self, vector: np.ndarray, limit: int, metadata_filter: MetadataFilter | None = None) -> list[RetrievedChunk]: ...
+
+    @abstractmethod
+    def all_chunks(self) -> list[DocumentChunk]: ...
 
     @abstractmethod
     def delete(self, ids: list[str]) -> None: ...
@@ -114,21 +117,44 @@ class FaissVectorStore(VectorStore):
             self._id_lookup[numeric_id] = chunk.id
         self._persist()
 
-    def search(self, vector: np.ndarray, limit: int) -> list[RetrievedChunk]:
+    @staticmethod
+    def _matches_filter(chunk: DocumentChunk, metadata_filter: MetadataFilter | None) -> bool:
+        if metadata_filter is None:
+            return True
+        metadata = chunk.metadata
+        return (
+            (not metadata_filter.sources or metadata.source in metadata_filter.sources)
+            and (not metadata_filter.document_ids or metadata.document_id in metadata_filter.document_ids)
+            and (not metadata_filter.sections or metadata.section in metadata_filter.sections)
+            and (not metadata_filter.document_version or metadata.document_version == metadata_filter.document_version)
+            and (metadata_filter.page_min is None or metadata.page >= metadata_filter.page_min)
+            and (metadata_filter.page_max is None or metadata.page <= metadata_filter.page_max)
+        )
+
+    def search(self, vector: np.ndarray, limit: int, metadata_filter: MetadataFilter | None = None) -> list[RetrievedChunk]:
         index = self._require_index()
         if limit < 1:
             return []
         vector = np.asarray(vector, dtype=np.float32).reshape(1, -1)
         if vector.shape[1] != index.d:
             raise VectorStoreError("Query vector dimension does not match the collection")
-        scores, ids = index.search(vector, min(limit, index.ntotal))
+        # FAISS has no payload filters. Search all local vectors when filtering so valid matches
+        # are not lost behind non-matching high-score vectors; Qdrant can optimize this natively.
+        search_limit = index.ntotal if metadata_filter is not None else min(limit, index.ntotal)
+        scores, ids = index.search(vector, search_limit)
         results: list[RetrievedChunk] = []
         for score, numeric_id in zip(scores[0], ids[0], strict=True):
             if numeric_id < 0 or (chunk_id := self._id_lookup.get(int(numeric_id))) is None:
                 continue
             chunk = self._records[chunk_id]
-            results.append(RetrievedChunk(**chunk.model_dump(), score=float(score)))
+            if self._matches_filter(chunk, metadata_filter):
+                results.append(RetrievedChunk(**chunk.model_dump(), score=float(score), dense_score=float(score)))
+            if len(results) == limit:
+                break
         return results
+
+    def all_chunks(self) -> list[DocumentChunk]:
+        return [self._records[key] for key in sorted(self._records)]
 
     def delete(self, ids: list[str]) -> None:
         index = self._require_index()

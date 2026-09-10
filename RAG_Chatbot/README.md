@@ -2,9 +2,11 @@
 
 This directory contains the standalone AI-assistant service for the Workforce Management Platform. It does not access the `SLAMS` database; future workforce integration will use authenticated REST clients.
 
-## Phase 1
+## Retrieval architecture
 
-Phase 1 provides a FastAPI foundation, development JWT authentication, request-scoped structured logs, health endpoints, and a placeholder authenticated chat endpoint. RAG, vector databases, workforce tools, and the frontend are intentionally deferred.
+Policy retrieval defaults to BGE dense search, bounded to `RAG_RETRIEVAL_CANDIDATE_K` (default 30) and reduced to final `RAG_RETRIEVAL_TOP_K` (default 5) before context assembly. This is the current baseline because a manual, synthetic document-level evaluation set showed better retrieval quality and latency than the hybrid variants. BM25 plus Reciprocal Rank Fusion (RRF), and cross-encoder reranking, are available as explicit opt-ins through `RAG_HYBRID_ENABLED=true` and `RAG_RERANK_ENABLED=true`.
+
+On the 12-case fixture in `backend/data/evaluation/retrieval_cases.json`, dense-only achieved Hit@5 1.000, MRR 0.958, and Recall@5 0.958. Hybrid without reranking measured 0.917, 0.833, and 0.917; hybrid with reranking measured the same quality and added substantial latency. These are small synthetic document-level results, so hybrid and reranking should only be enabled after broader representative evaluation.
 
 ## Local setup
 
@@ -43,10 +45,16 @@ Indexing is an explicit offline operation; chat requests never process PDFs or b
 
 ```bash
 cd RAG_Chatbot
-PYTHONPATH=backend backend/.venv/bin/python -m app.rag.ingestion
+PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion
 ```
 
 The command reads `data/documents/`, writes an ignored local FAISS baseline under `data/vectorstore/`, and reports document/page/chunk counts plus embedding dimension. Configure chunk sizes and retrieval limits with the `RAG_*` environment variables in `.env.example`.
+
+It also writes an ignored, inspectable BM25 corpus at `data/sparse/bm25_corpus.json`. The sparse corpus is loaded only when hybrid retrieval is enabled and is validated against the FAISS records. The reranker model is downloaded lazily on its first enabled request; normal tests mock it and do not download models.
+
+## Retrieval evaluation
+
+The manually reviewed document-level fixture is at `backend/data/evaluation/retrieval_cases.json`. Evaluation computes Hit Rate@K, MRR, and source-level Recall@K without an LLM. FAISS metadata filtering scans the local corpus for correctness; a future Qdrant backend can apply the same typed filters natively.
 
 ## Tests
 
