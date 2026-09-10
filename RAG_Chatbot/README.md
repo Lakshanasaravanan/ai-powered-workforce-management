@@ -93,3 +93,12 @@ PYTHONPATH=backend .venv/bin/pytest backend/tests -q
 ```
 
 The suite includes offline `httpx.MockTransport` coverage for RS256 delegation claims, self-service employee binding, SLAMS response mapping, error mapping, and retry behavior. SLAMS has its own Maven integration suite for delegation verification.
+# Agentic RAG workforce service
+
+## Phase 6 reliability
+
+Pending actions can run in local in-memory mode (`REDIS_ENABLED=false`) or distributed Redis mode. In Redis mode, every FastAPI replica shares JSON action state and uses Redis `WATCH/MULTI/EXEC` to atomically claim execution. The action-derived idempotency key is persisted, so a lease recovery reuses the same key and SLAMS remains the final mutation-idempotency authority.
+
+Run local Redis with `docker compose up -d redis`, then set `REDIS_ENABLED=true`. Redis failure is fail-closed for action safety and makes `/ready` return unavailable; `/health` remains liveness-only. `/metrics` exposes low-cardinality Prometheus metrics. Chat and confirmation requests are rate limited per authenticated employee; Redis mode shares counters across replicas.
+
+Execution leases prevent immediate stale-worker reclamation. A process that crashes after calling SLAMS can be recovered only after the lease, with the same persisted key. Redis credentials, prompts, tokens, and action reasons are never logged or exposed publicly.

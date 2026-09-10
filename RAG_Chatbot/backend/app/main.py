@@ -5,12 +5,14 @@ from __future__ import annotations
 import logging
 import time
 from contextlib import asynccontextmanager
+from datetime import timedelta
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.agents.planner import DeterministicPlanner
@@ -20,8 +22,9 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging, request_id_context
 from app.rag.ingestion import VECTOR_STORE_DIR
 from app.rag.service import RAGServiceError, create_rag_service
-from app.services.pending_actions import PendingActionStore
+from app.services.pending_actions import PendingActionStore, RedisPendingActionStore
 from app.services.slams import SLAMSWorkforceProvider
+from app.services.rate_limit import InMemoryRateLimiter, RedisRateLimiter
 from app.services.workforce import MockWorkforceProvider
 from app.tools.actions import RegularizeAttendanceTool, RequestLeaveTool
 from app.tools.rag_tool import PolicyAnswerTool
@@ -30,6 +33,8 @@ from app.tools.workforce import GetMyAttendanceRecordsTool, GetMyAttendanceSumma
 
 
 logger = logging.getLogger("agentic_rag.request")
+HTTP_REQUESTS = Counter("agentic_rag_http_requests_total", "HTTP requests", ["method", "route", "status"])
+HTTP_LATENCY = Histogram("agentic_rag_http_latency_seconds", "HTTP latency", ["method", "route"])
 
 
 @asynccontextmanager
@@ -39,7 +44,20 @@ async def lifespan(_: FastAPI):
     app.state.rag_service = create_rag_service(settings, VECTOR_STORE_DIR)
     workforce = SLAMSWorkforceProvider.from_settings(settings) if settings.slams_enabled else MockWorkforceProvider()
     app.state.workforce_provider = workforce
-    pending_actions = PendingActionStore()
+    redis_client = None
+    if settings.redis_enabled:
+        import redis
+        try:
+            redis_client = redis.Redis.from_url(settings.redis_url, socket_connect_timeout=1, socket_timeout=1, decode_responses=True)
+            redis_client.ping()
+        except redis.RedisError as exc:
+            logger.error("redis_unavailable", extra={"dependency": "redis"})
+            raise RuntimeError("Required Redis dependency is unavailable") from exc
+        pending_actions = RedisPendingActionStore(redis_client, ttl=timedelta(seconds=settings.pending_action_ttl_seconds), execution_lease=timedelta(seconds=settings.pending_action_execution_lease_seconds))
+    else:
+        pending_actions = PendingActionStore(ttl=timedelta(seconds=settings.pending_action_ttl_seconds))
+    app.state.redis_client = redis_client
+    app.state.rate_limiter = RedisRateLimiter(redis_client) if redis_client is not None else InMemoryRateLimiter()
     app.state.agent_service = AgentService(
         planner=DeterministicPlanner(),
         registry=ToolRegistry([
@@ -59,6 +77,8 @@ async def lifespan(_: FastAPI):
     close = getattr(workforce, "close", None)
     if close is not None:
         close()
+    if redis_client is not None:
+        redis_client.close()
     logger.info("application_stopped")
 
 
@@ -71,6 +91,11 @@ app = FastAPI(
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(chat.router)
+
+@app.get("/metrics", include_in_schema=False)
+def metrics():
+    from fastapi.responses import Response
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 def _request_id(value: str | None) -> str:
@@ -100,6 +125,8 @@ async def request_logging_middleware(request: Request, call_next):
         )
     latency_ms = round((time.perf_counter() - started_at) * 1000, 2)
     response.headers["X-Request-ID"] = request_id
+    HTTP_REQUESTS.labels(request.method, request.url.path, str(response.status_code)).inc()
+    HTTP_LATENCY.labels(request.method, request.url.path).observe(time.perf_counter() - started_at)
     logger.info(
         "request_completed",
         extra={

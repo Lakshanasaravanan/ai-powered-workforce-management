@@ -97,7 +97,7 @@ class AgentService:
         )
         try:
             if self.action_provider is None: raise WorkforceProviderError("Workforce action execution is unavailable")
-            args = action.execution_arguments; key = f"agent-action-{action.action_id}"
+            args = action.execution_arguments; key = action.idempotency_key
             if action.tool_name == "request_leave":
                 result = self.action_provider.request_leave(context.employee_id, key, args["leave_type"], date.fromisoformat(args["start_date"]), date.fromisoformat(args["end_date"]), args["reason"], context.request_id)
                 answer = f"Your {result.leave_type} leave request was submitted successfully and is pending approval. Leave request ID: {result.leave_request_id}."
@@ -106,7 +106,9 @@ class AgentService:
                 answer = f"Your attendance regularization request was submitted successfully and is pending approval. Request ID: {result.regularization_request_id}."
             else: raise WorkforceProviderError("Unsupported workforce action")
             action = self.pending_actions.finish(action.action_id, PendingActionStatus.SUCCEEDED)
+            logger.info("pending_action_succeeded", extra={"request_id": context.request_id, "action_id": str(action.action_id), "tool_name": action.tool_name, "status": "succeeded"})
             return AgentResponse(answer=answer, conversation_id=context.conversation_id, status=AgentStatus.SUCCEEDED, tool=ToolResultSummary(tool_name=action.tool_name, category=self.registry.spec_for(action.tool_name).category, status="succeeded"), pending_action=to_public(action))
         except WorkforceProviderError:
             action = self.pending_actions.finish(action.action_id, PendingActionStatus.FAILED)
+            logger.warning("pending_action_failed", extra={"request_id": context.request_id, "action_id": str(action.action_id), "tool_name": action.tool_name, "status": "failed"})
             return AgentResponse(answer="I could not complete that action safely.", conversation_id=context.conversation_id, status=AgentStatus.ERROR, pending_action=to_public(action))

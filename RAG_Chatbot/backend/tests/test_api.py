@@ -23,6 +23,13 @@ def test_ready(client):
     assert response.json()["status"] == "ready"
     assert response.json()["environment"] == "test"
 
+def test_metrics_are_reachable_and_private(client):
+    client.get("/health")
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert "agentic_rag_http_requests_total" in response.text
+    assert "EMP001" not in response.text and "Authorization" not in response.text and "private" not in response.text
+
 
 def test_request_id_is_generated_and_returned(client):
     response = client.get("/health")

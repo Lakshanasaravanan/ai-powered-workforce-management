@@ -72,6 +72,8 @@ class PendingAction(BaseModel):
     expires_at: datetime
     status: PendingActionStatus
     confirmation_required: bool = True
+    idempotency_key: str
+    execution_started_at: datetime | None = None
 
 
 class PendingActionPublic(BaseModel):

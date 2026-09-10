@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     qdrant_url: AnyHttpUrl | None = None
     qdrant_api_key: SecretStr | None = None
     redis_url: str | None = None
+    redis_enabled: bool = False
+    pending_action_ttl_seconds: int = Field(default=300, ge=30, le=3600)
+    pending_action_execution_lease_seconds: int = Field(default=60, ge=5, le=900)
+    chat_rate_limit_per_minute: int = Field(default=30, ge=1, le=1000)
+    confirmation_rate_limit_per_minute: int = Field(default=10, ge=1, le=1000)
 
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     rag_chunk_size: int = Field(default=450, ge=64, le=4096)
@@ -86,6 +91,8 @@ class Settings(BaseSettings):
             ]
             if missing:
                 raise ValueError(f"SLAMS integration is enabled but required configuration is missing: {', '.join(missing)}")
+        if self.redis_enabled and not self.redis_url:
+            raise ValueError("REDIS_URL must be configured when REDIS_ENABLED=true")
         return self
 
     @property
