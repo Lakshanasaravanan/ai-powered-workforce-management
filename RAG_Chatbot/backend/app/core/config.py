@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     jwt_secret_key: SecretStr | None = None
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = Field(default=60, ge=1, le=1440)
+    assistant_proxy_jwt_secret: SecretStr | None = None
+    assistant_proxy_issuer: str = "slams-assistant-proxy"
+    assistant_proxy_audience: str = "agentic-rag-assistant"
 
     slams_enabled: bool = False
     slams_base_url: AnyHttpUrl | None = None

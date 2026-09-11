@@ -55,6 +55,13 @@ def create_access_token(user: AuthenticatedUser, settings: Settings) -> tuple[st
 
 
 def decode_access_token(token: str, settings: Settings) -> AuthenticatedUser:
+    if settings.assistant_proxy_jwt_secret is not None:
+        try:
+            payload = jwt.decode(token, settings.assistant_proxy_jwt_secret.get_secret_value(), algorithms=["HS256"], issuer=settings.assistant_proxy_issuer, audience=settings.assistant_proxy_audience)
+            if payload.get("token_type") == "assistant" and payload.get("sub") == payload.get("employee_id") and isinstance(payload.get("name"), str):
+                return AuthenticatedUser(payload["sub"], payload["name"], ("employee",))
+        except InvalidTokenError:
+            pass
     try:
         payload = jwt.decode(token, settings.jwt_signing_key, algorithms=[settings.jwt_algorithm])
         employee_id, name, roles = payload.get("sub"), payload.get("name"), payload.get("roles")
