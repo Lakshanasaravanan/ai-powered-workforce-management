@@ -1,20 +1,30 @@
 import face_recognition
 import numpy as np
+from PIL import Image
+from io import BytesIO
 
 
-def generate_embedding(image_path: str) -> list[float]:
-    """
-    Detect a face in an image and generate its 128-dimensional encoding.
-    """
+def generate_embedding_from_bytes(image_bytes: bytes) -> list[float]:
+    image = Image.open(BytesIO(image_bytes)).convert("RGB")
+    image_array = np.array(image)
 
-    image = face_recognition.load_image_file(image_path)
-    face_encodings = face_recognition.face_encodings(image)
+    face_locations = face_recognition.face_locations(image_array)
 
-    if not face_encodings:
+    if not face_locations:
         raise ValueError("No face detected in the image.")
 
-    if len(face_encodings) > 1:
-        raise ValueError("Multiple faces detected. Please provide an image with one face.")
+    if len(face_locations) > 1:
+        raise ValueError(
+            "Multiple faces detected. Please provide an image with one face."
+        )
+
+    face_encodings = face_recognition.face_encodings(
+        image_array,
+        face_locations
+    )
+
+    if not face_encodings:
+        raise ValueError("Could not generate face embedding.")
 
     return face_encodings[0].tolist()
 
@@ -24,10 +34,6 @@ def compare_embeddings(
     face_embedding: list[float],
     tolerance: float = 0.6
 ) -> bool:
-    """
-    Compare a stored face embedding with a newly detected face.
-    """
-
     known = np.array(known_embedding)
     current = np.array(face_embedding)
 

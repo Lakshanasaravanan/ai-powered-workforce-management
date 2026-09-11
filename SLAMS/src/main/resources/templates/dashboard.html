@@ -118,7 +118,7 @@
                     ADMIN
                 </span>
 
-                <span th:if="${currentUser.role.name() == 'ROLE_MANAGER'}"
+                <span th:if="${currentUser.role.name() == 'ROLE_HR'}"
                       class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold bg-brandLight border border-brand/15 text-brand tracking-wide">
                     MANAGER
                 </span>
@@ -370,7 +370,7 @@
     </div>
 
     <!-- ================= MANAGER VIEW ================= -->
-    <div th:if="${currentUser.role.name() == 'ROLE_MANAGER'}" class="space-y-8">
+    <div th:if="${currentUser.role.name() == 'ROLE_HR'}" class="space-y-8">
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="bg-surface border border-line shadow-card p-6 rounded-3xl flex items-center justify-between glass-card-hover">
@@ -922,7 +922,7 @@
                 <select id="empRole" required
                         class="w-full px-3 py-2.5 bg-surface border border-slate-300 rounded-xl text-textSoft text-xs outline-none input-focus">
                     <option value="ROLE_EMPLOYEE">Employee</option>
-                    <option value="ROLE_MANAGER">Manager</option>
+                    <option value="ROLE_HR">Manager</option>
                     <option value="ROLE_ADMIN">Admin</option>
                 </select>
             </div>
@@ -1155,7 +1155,7 @@
         if (role === 'ROLE_ADMIN') {
             return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-dangerLight border border-danger/20 text-danger">ADMIN</span>`;
         }
-        if (role === 'ROLE_MANAGER') {
+        if (role === 'ROLE_HR') {
             return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-brandLight border border-brand/20 text-brand">MANAGER</span>`;
         }
         return `<span class="px-2.5 py-1 rounded-full text-[9px] font-bold bg-successLight border border-success/20 text-success">EMPLOYEE</span>`;

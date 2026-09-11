@@ -62,7 +62,7 @@ public class ViewController {
 
         if (currentUser.getRole() == Role.ROLE_EMPLOYEE) {
             loadEmployeeDashboard(model, currentUser);
-        } else if (currentUser.getRole() == Role.ROLE_MANAGER) {
+        } else if (currentUser.getRole() == Role.ROLE_HR) {
             loadManagerDashboard(model, currentUser);
         } else if (currentUser.getRole() == Role.ROLE_ADMIN) {
             loadAdminDashboard(model);

@@ -35,7 +35,7 @@ public class DashboardApiController {
     private UserService userService;
 
     @GetMapping("/stats")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<Map<String, Object>> getStats(Authentication authentication) {
         User currentUser = userService.findByUsername(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("User not found: " + authentication.getName()));
@@ -47,7 +47,7 @@ public class DashboardApiController {
         List<Attendance> todayAttendance;
         long pendingLeavesCount;
 
-        if (currentUser.getRole() == Role.ROLE_MANAGER) {
+        if (currentUser.getRole() == Role.ROLE_HR) {
             employees = userRepository.findByReportingManagerAndRole(currentUser, Role.ROLE_EMPLOYEE);
             todayAttendance = employees.isEmpty() ? List.of() : attendanceRepository.findByUserInAndDate(employees, today);
             pendingLeavesCount = employees.isEmpty() ? 0 : leaveRequestRepository.countByUserInAndStatus(employees, LeaveStatus.PENDING);

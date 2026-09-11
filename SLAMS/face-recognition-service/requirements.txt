@@ -4,3 +4,4 @@ opencv-python
 face_recognition
 numpy
 Pillow
+python-multipart

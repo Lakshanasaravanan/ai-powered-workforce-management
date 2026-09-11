@@ -203,7 +203,7 @@ class DelegationSecurityIntegrationTest {
 
     @Test
     void managerAndAdminEndpointsRequireTheirActualDatabaseRoles() throws Exception {
-        User manager = user("EMP-MANAGER", "manager.test", Role.ROLE_MANAGER);
+        User manager = user("EMP-MANAGER", "manager.test", Role.ROLE_HR);
         User admin = user("EMP-ADMIN", "admin.test", Role.ROLE_ADMIN);
         given(userService.findByEmployeeId(manager.getEmployeeId())).willReturn(Optional.of(manager));
         given(userService.findByEmployeeId(admin.getEmployeeId())).willReturn(Optional.of(admin));

@@ -89,7 +89,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public List<User> getManagers() {
-        return userRepository.findByRole(Role.ROLE_MANAGER);
+        return userRepository.findByRole(Role.ROLE_HR);
     }
 
     @Transactional(readOnly = true)
@@ -337,128 +337,91 @@ public class UserService implements UserDetailsService {
                 .build();
         shiftRepository.save(generalShift);
 
-        // 2. Seed Admin
-        User admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("admin123"))
-                .email("admin@slams.com")
-                .fullName("System Administrator")
-                .role(Role.ROLE_ADMIN)
-                .employeeId("ADM-001")
-                .designation("System Administrator")
-                .joiningDate(LocalDate.now())
-                .shift(generalShift)
-                .status(UserStatus.ACTIVE)
-                .workMode(WorkMode.WFO)
-                .build();
-        admin = userRepository.save(admin);
+       // 2. Seed Admin
+User admin = User.builder()
+        .username("admin")
+        .password(passwordEncoder.encode("admin123"))
+        .email("admin@slams.com")
+        .fullName("System Administrator")
+        .role(Role.ROLE_ADMIN)
+        .employeeId("ADM-001")
+        .designation("System Administrator")
+        .joiningDate(LocalDate.now())
+        .shift(generalShift)
+        .status(UserStatus.ACTIVE)
+        .workMode(WorkMode.WFO)
+        .build();
+admin = userRepository.save(admin);
 
-        // 3. Seed Department
-        Department engineering = Department.builder()
-                .code("ENG")
-                .name("Engineering")
-                .description("Software Development and QA")
-                .manager(admin)
-                .active(true)
-                .build();
-        engineering = departmentRepository.save(engineering);
+// 3. Seed Department
+Department engineering = Department.builder()
+        .code("ENG")
+        .name("Engineering")
+        .description("Software Development and QA")
+        .manager(admin)
+        .active(true)
+        .build();
+engineering = departmentRepository.save(engineering);
 
-        // 4. Seed Manager
-        User manager = User.builder()
-                .username("manager")
-                .password(passwordEncoder.encode("manager123"))
-                .email("manager@slams.com")
-                .fullName("Sarah Jenkins")
-                .role(Role.ROLE_MANAGER)
-                .employeeId("MGR-001")
-                .designation("Engineering Manager")
-                .joiningDate(LocalDate.now())
-                .department(engineering)
-                .shift(generalShift)
-                .status(UserStatus.ACTIVE)
-                .workMode(WorkMode.WFO)
-                .build();
-        manager = userRepository.save(manager);
+// 4. Seed HR
+User manager = User.builder()
+        .username("hr")
+        .password(passwordEncoder.encode("hr123"))
+        .email("hr@slams.com")
+        .fullName("HR")
+        .role(Role.ROLE_HR)
+        .employeeId("HR-001")
+        .designation("HR Manager")
+        .joiningDate(LocalDate.now())
+        .department(engineering)
+        .shift(generalShift)
+        .status(UserStatus.ACTIVE)
+        .workMode(WorkMode.WFO)
+        .build();
+manager = userRepository.save(manager);
 
-        engineering.setManager(manager);
-        departmentRepository.save(engineering);
+engineering.setManager(manager);
+departmentRepository.save(engineering);
 
-        // 5. Seed Employees
-        User john = User.builder()
-                .username("john")
-                .password(passwordEncoder.encode("123"))
-                .email("john@slams.com")
-                .fullName("John Doe")
-                .role(Role.ROLE_EMPLOYEE)
-                .employeeId("EMP-001")
-                .designation("Software Engineer")
-                .joiningDate(LocalDate.now())
-                .department(engineering)
-                .reportingManager(manager)
-                .shift(generalShift)
-                .status(UserStatus.ACTIVE)
-                .workMode(WorkMode.WFO)
-                .build();
-        john = userRepository.save(john);
+// 5. Seed Employees
+User kawin = User.builder()
+        .username("kawin")
+        .password(passwordEncoder.encode("123"))
+        .email("kawin@slams.com")
+        .fullName("Kawin King C")
+        .role(Role.ROLE_EMPLOYEE)
+        .employeeId("EMP-001")
+        .designation("Software Engineer")
+        .joiningDate(LocalDate.now())
+        .department(engineering)
+        .reportingManager(manager)
+        .shift(generalShift)
+        .status(UserStatus.ACTIVE)
+        .workMode(WorkMode.WFO)
+        .build();
+kawin = userRepository.save(kawin);
 
-        User alice = User.builder()
-                .username("alice")
-                .password(passwordEncoder.encode("123"))
-                .email("alice@slams.com")
-                .fullName("Alice Smith")
-                .role(Role.ROLE_EMPLOYEE)
-                .employeeId("EMP-002")
-                .designation("QA Analyst")
-                .joiningDate(LocalDate.now())
-                .department(engineering)
-                .reportingManager(manager)
-                .shift(generalShift)
-                .status(UserStatus.ACTIVE)
-                .workMode(WorkMode.WFO)
-                .build();
-        alice = userRepository.save(alice);
+User harikkrishnan = User.builder()
+        .username("harikkrishnan")
+        .password(passwordEncoder.encode("123"))
+        .email("harikkrishnan@slams.com")
+        .fullName("Harikkrishnan R")
+        .role(Role.ROLE_EMPLOYEE)
+        .employeeId("EMP-002")
+        .designation("Software Engineer")
+        .joiningDate(LocalDate.now())
+        .department(engineering)
+        .reportingManager(manager)
+        .shift(generalShift)
+        .status(UserStatus.ACTIVE)
+        .workMode(WorkMode.WFO)
+        .build();
+harikkrishnan = userRepository.save(harikkrishnan);
 
-        User kavin = User.builder()
-                .username("kavin")
-                .password(passwordEncoder.encode("123"))
-                .email("kavin@slams.com")
-                .fullName("Kavin Raj")
-                .role(Role.ROLE_EMPLOYEE)
-                .employeeId("EMP-003")
-                .designation("Backend Developer")
-                .joiningDate(LocalDate.now())
-                .department(engineering)
-                .reportingManager(manager)
-                .shift(generalShift)
-                .status(UserStatus.ACTIVE)
-                .workMode(WorkMode.HYBRID)
-                .build();
-        kavin = userRepository.save(kavin);
-
-        User priya = User.builder()
-                .username("priya")
-                .password(passwordEncoder.encode("123"))
-                .email("priya@slams.com")
-                .fullName("Priya Nair")
-                .role(Role.ROLE_EMPLOYEE)
-                .employeeId("EMP-004")
-                .designation("Frontend Developer")
-                .joiningDate(LocalDate.now())
-                .department(engineering)
-                .reportingManager(manager)
-                .shift(generalShift)
-                .status(UserStatus.ACTIVE)
-                .workMode(WorkMode.WFH)
-                .build();
-        priya = userRepository.save(priya);
-
-        // 6. Seed Leave Balances
-        createDefaultLeaveBalance(john);
-        createDefaultLeaveBalance(alice);
-        createDefaultLeaveBalance(kavin);
-        createDefaultLeaveBalance(priya);
+// 6. Seed Leave Balances
+createDefaultLeaveBalance(kawin);
+createDefaultLeaveBalance(harikkrishnan);
     }
-
     // =========================================================
     // Helpers
     // =========================================================
@@ -479,7 +442,7 @@ public class UserService implements UserDetailsService {
     private String generateEmployeeId(Role role) {
         String prefix = switch (role) {
             case ROLE_ADMIN -> "ADM";
-            case ROLE_MANAGER -> "MGR";
+            case ROLE_HR -> "HR";
             case ROLE_EMPLOYEE -> "EMP";
         };
         return prefix + "-" + System.currentTimeMillis();

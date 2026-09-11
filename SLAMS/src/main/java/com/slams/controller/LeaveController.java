@@ -30,7 +30,7 @@ public class LeaveController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR', 'ADMIN')")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
             @RequestParam LeaveStatus status,
@@ -47,7 +47,7 @@ public class LeaveController {
     }
 
     @GetMapping("/pending")
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR', 'ADMIN')")
     public ResponseEntity<List<LeaveRequestResponse>> getPendingLeaves() {
         return ResponseEntity.ok(leaveService.getPendingLeaves().stream().map(LeaveRequestResponse::from).toList());
     }

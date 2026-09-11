@@ -1,21 +1,20 @@
-from fastapi import APIRouter, HTTPException
-
-from app.face_service import generate_embedding, compare_embeddings
+from fastapi import APIRouter, HTTPException, UploadFile, File
+from app.face_service import generate_embedding_from_bytes
 from app.schemas import (
-    FaceEmbeddingRequest,
     FaceEmbeddingResponse,
     FaceCompareRequest,
     FaceCompareResponse,
 )
 
-
 router = APIRouter(prefix="/face", tags=["Face Recognition"])
 
 
 @router.post("/embedding", response_model=FaceEmbeddingResponse)
-def create_embedding(request: FaceEmbeddingRequest):
+async def create_embedding(file: UploadFile = File(...)):
     try:
-        embedding = generate_embedding(request.image_path)
+        image_bytes = await file.read()
+
+        embedding = generate_embedding_from_bytes(image_bytes)
 
         return FaceEmbeddingResponse(
             embedding=embedding,
@@ -32,6 +31,8 @@ def create_embedding(request: FaceEmbeddingRequest):
 @router.post("/compare", response_model=FaceCompareResponse)
 def compare_face(request: FaceCompareRequest):
     try:
+        from app.face_service import compare_embeddings
+
         matched = compare_embeddings(
             request.known_embedding,
             request.face_embedding,

@@ -72,13 +72,13 @@ public class AttendanceController {
     }
 
     @GetMapping("/regularize/pending")
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR', 'ADMIN')")
     public ResponseEntity<?> getPendingRegularizations(Principal principal) {
         return ResponseEntity.ok(attendanceService.getPendingRegularizationsForManager(principal.getName()));
     }
 
     @PostMapping("/regularize/{id}/decide")
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HR', 'ADMIN')")
     public ResponseEntity<?> decideRegularization(Principal principal, @PathVariable Long id, @RequestParam com.slams.model.LeaveStatus status) {
         try {
             attendanceService.decideRegularization(principal.getName(), id, status);
