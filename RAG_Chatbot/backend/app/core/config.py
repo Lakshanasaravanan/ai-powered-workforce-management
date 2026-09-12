@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     jwt_secret_key: SecretStr | None = None
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = Field(default=60, ge=1, le=1440)
+    development_auth_enabled: bool = True
     assistant_proxy_jwt_secret: SecretStr | None = None
     assistant_proxy_issuer: str = "slams-assistant-proxy"
     assistant_proxy_audience: str = "agentic-rag-assistant"
@@ -71,8 +72,20 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def require_secret_in_non_development(self) -> "Settings":
-        if self.environment in {"staging", "production"} and self.jwt_secret_key is None:
-            raise ValueError("JWT_SECRET_KEY must be configured outside development and test")
+        def unsafe(value: SecretStr | None) -> bool:
+            if value is None:
+                return True
+            normalized = value.get_secret_value().strip().lower()
+            return not normalized or "replace-with" in normalized or "change-me" in normalized
+        if self.environment in {"staging", "production"}:
+            if unsafe(self.jwt_secret_key):
+                raise ValueError("JWT_SECRET_KEY must be a non-placeholder secret outside development and test")
+            if self.development_auth_enabled:
+                raise ValueError("DEVELOPMENT_AUTH_ENABLED must be false outside development and test")
+            if unsafe(self.assistant_proxy_jwt_secret):
+                raise ValueError("ASSISTANT_PROXY_JWT_SECRET must be a non-placeholder secret outside development and test")
+            if not all((self.llm_provider, self.llm_api_key, self.llm_model)):
+                raise ValueError("LLM_PROVIDER, LLM_API_KEY, and LLM_MODEL are required outside development and test")
         if self.rag_chunk_overlap >= self.rag_chunk_size:
             raise ValueError("RAG_CHUNK_OVERLAP must be smaller than RAG_CHUNK_SIZE")
         if self.rag_min_chunk_tokens > self.rag_chunk_size:

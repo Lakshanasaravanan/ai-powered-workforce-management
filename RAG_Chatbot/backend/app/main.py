@@ -89,7 +89,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(health.router)
-app.include_router(auth.router)
+if get_settings().development_auth_enabled:
+    app.include_router(auth.router)
 app.include_router(chat.router)
 
 @app.get("/metrics", include_in_schema=False)

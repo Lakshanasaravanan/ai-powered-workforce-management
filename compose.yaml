@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-slamsdb}
+      MYSQL_USER: ${MYSQL_USER:-slams}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD}
+    volumes: [mysql-data:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  rag:
+    build: ./RAG_Chatbot
+    env_file: ./RAG_Chatbot/.env
+    environment:
+      ENVIRONMENT: production
+      DEVELOPMENT_AUTH_ENABLED: "false"
+      REDIS_ENABLED: "true"
+      REDIS_URL: redis://redis:6379/0
+      SLAMS_BASE_URL: http://slams:8080
+    depends_on:
+      redis: {condition: service_healthy}
+    ports: ["8000:8000"]
+  slams:
+    build: ./SLAMS
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      SLAMS_DB_URL: jdbc:mysql://mysql:3306/slamsdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SLAMS_DB_USERNAME: ${MYSQL_USER:-slams}
+      SLAMS_DB_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
+      SLAMS_JWT_SECRET: ${SLAMS_JWT_SECRET:?set SLAMS_JWT_SECRET}
+      ASSISTANT_PROXY_BASE_URL: http://rag:8000
+      ASSISTANT_PROXY_JWT_SECRET: ${ASSISTANT_PROXY_JWT_SECRET:?set ASSISTANT_PROXY_JWT_SECRET}
+    depends_on:
+      mysql: {condition: service_healthy}
+      rag: {condition: service_started}
+    ports: ["8080:8080"]
+volumes:
+  mysql-data:
