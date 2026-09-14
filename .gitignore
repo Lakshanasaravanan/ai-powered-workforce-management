@@ -13,6 +13,7 @@ __pycache__/
 .pytest_cache/
 *.tsbuildinfo
 apps/web/src/*.js
+apps/web/src/**/*.js
 
 # IDE files
 .vscode/
