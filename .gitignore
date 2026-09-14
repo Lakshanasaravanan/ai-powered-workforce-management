@@ -6,6 +6,11 @@ SLAMS/target/
 
 # Java compiled files
 *.class
+node_modules/
+dist/
+.venv/
+__pycache__/
+.pytest_cache/
 
 # IDE files
 .vscode/
