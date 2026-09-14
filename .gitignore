@@ -11,6 +11,8 @@ dist/
 .venv/
 __pycache__/
 .pytest_cache/
+*.tsbuildinfo
+apps/web/src/*.js
 
 # IDE files
 .vscode/
