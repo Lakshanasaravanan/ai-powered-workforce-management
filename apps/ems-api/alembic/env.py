@@ -1,6 +1,8 @@
 from alembic import context
 from app.db.session import Base
 from app.models.employee import Employee
+from app.models.leave import LeaveRequest
+from app.models.notification import Notification
 from app.core.config import Settings
 config=context.config
 config.set_main_option('sqlalchemy.url', Settings().database_url.replace('+asyncpg', '+psycopg'))

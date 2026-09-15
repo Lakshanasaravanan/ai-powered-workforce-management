@@ -78,3 +78,17 @@ retain Google passwords.
 
 Administrative role membership alone must never grant access to private employee
 chat content.
+
+## Leave management and inbox
+
+The Leave page uses the EMS API directly. Casual and Emergency leave require a direct Manager decision. Day Off is a half-day request and requires Morning or Afternoon plus a direct Manager decision. Medical/Sick leave is immediately approved, has `approval_required=false`, has no Manager approver, and uses the `AUTOMATIC_POLICY` decision source. The direct Manager receives an awareness notification for Medical leave, not an approval task.
+
+Decisions are terminal: only pending approval-required requests can transition to Approved or Rejected. ADMIN is not an approval authority. A Manager cannot decide their own request or bypass another Manager in the reporting chain; a Manager can decide another Manager's leave only when they are that person's direct Manager.
+
+The inbox is recipient-private and supports `LEAVE`, `CHAT`, `CALENDAR`, and `SYSTEM` categories. Only Leave events are currently emitted. Use the Inbox to view notifications, see the unread count, mark an item read, or mark all of the current user's items read. ADMIN and Managers cannot inspect another employee's inbox. Leave creation plus its notification, and Manager decision plus its notification, are each committed as one transaction. The pending-state decision uses a conditional atomic transition.
+
+The frontend provides My Leave, Apply Leave, Manager Team Leave, direct-manager Approve/Reject controls, a real Inbox, and its unread badge. Browser role checks are presentation-only; all authorization remains server-side.
+
+### Unresolved leave policy
+
+Do not present balances or quotas to users. Leave accrual, carry-forward, annual quota, monthly reset, half-year reset, and balance enforcement are not implemented because the entitlement policy has not yet been finalized.
