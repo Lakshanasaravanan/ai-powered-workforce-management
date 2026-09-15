@@ -92,3 +92,38 @@ The frontend provides My Leave, Apply Leave, Manager Team Leave, direct-manager 
 ### Unresolved leave policy
 
 Do not present balances or quotas to users. Leave accrual, carry-forward, annual quota, monthly reset, half-year reset, and balance enforcement are not implemented because the entitlement policy has not yet been finalized.
+
+## Phase 4 policy assistant
+
+The workspace `/agent` route is a Company Policy Assistant. It reuses the existing EMS session token and calls the standalone RAG service; it cannot apply leave, approve leave, regularize attendance, or modify employee data.
+
+Build a local index explicitly before starting RAG. To avoid replacing historical generated artifacts, use an ignored runtime directory:
+
+```sh
+cd RAG_Chatbot
+export RAG_RUNTIME_VECTOR_STORE_DIR=data/runtime/vectorstore
+export RAG_RUNTIME_SPARSE_INDEX_PATH=data/runtime/sparse/bm25_corpus.json
+export EMBEDDING_LOCAL_FILES_ONLY=true
+export EMBEDDING_DEVICE=cpu
+export EMBEDDING_CACHE_DIR=/path/to/provisioned/huggingface/hub
+PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion build
+PYTHONPATH=backend .venv/bin/uvicorn app.main:app --port 8000
+```
+
+The manifest validates PDF hashes, BGE model/dimension, chunk settings, FAISS records, and BM25 consistency. Do not commit generated indexes, model caches, or local paths. A stale index makes `/ready` and policy requests fail safely until an operator performs the explicit build.
+
+Set the non-secret browser location with `VITE_AGENT_API_BASE_URL=http://localhost:8000`. Set `CORS_ALLOWED_ORIGINS` on RAG to the web origin (the local default is `http://localhost:5173`). Deployment-side RAG configuration includes `EMS_JWT_SECRET`, `EMS_API_BASE_URL`, `LLM_PROVIDER`, `LLM_API_KEY`, and `LLM_MODEL`; never put their values in frontend variables or documentation.
+
+Dense BGE/FAISS is the default. Qdrant is a production-oriented option that validates an existing compatible collection. Hybrid and reranking remain off, and no score threshold is enabled because evidence calibration did not show a safe separating threshold. The server validates model-supplied evidence IDs before returning citations.
+
+### Local Ollama generation
+
+OpenRouter remains the default provider. To keep policy context local for development, install and run Ollama, pull an appropriate local model, then select it through environment configuration (do not commit local values):
+
+```sh
+export LLM_PROVIDER=ollama
+export OLLAMA_BASE_URL=http://localhost:11434
+export OLLAMA_MODEL=qwen3:8b
+```
+
+The RAG service calls Ollama's non-streaming chat API with deterministic temperature, JSON schema output, and thinking disabled. It never falls back from Ollama to OpenRouter. If Ollama or the configured model is unavailable, readiness reports it and policy requests fail safely. Local model performance and hardware compatibility vary by machine.

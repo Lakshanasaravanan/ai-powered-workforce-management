@@ -23,17 +23,23 @@ class DisabledReranker(Reranker):
 
 
 class CrossEncoderReranker(Reranker):
-    def __init__(self, model_name: str, batch_size: int = 16, model_factory: Callable[[str], Any] = CrossEncoder) -> None:
+    def __init__(self, model_name: str, batch_size: int = 16, model_factory: Callable[[str], Any] = CrossEncoder, cache_dir: str | None = None, local_files_only: bool = False) -> None:
         self.model_name, self.batch_size, self._factory = model_name, batch_size, model_factory
         self._model: Any | None = None
         self._lock = threading.Lock()
+        self._cache_dir, self._local_files_only = cache_dir, local_files_only
 
     @property
     def model(self) -> Any:
         if self._model is None:
             with self._lock:
                 if self._model is None:
-                    self._model = self._factory(self.model_name)
+                    kwargs: dict[str, object] = {}
+                    if self._cache_dir:
+                        kwargs["cache_folder"] = self._cache_dir
+                    if self._local_files_only:
+                        kwargs["local_files_only"] = True
+                    self._model = self._factory(self.model_name, **kwargs)
         return self._model
 
     def rerank(self, query: str, candidates: list[RetrievedChunk]) -> list[RetrievedChunk]:

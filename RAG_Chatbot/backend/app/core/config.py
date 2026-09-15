@@ -26,12 +26,18 @@ class Settings(BaseSettings):
     environment: Literal["development", "test", "staging", "production"] = "development"
     log_level: str = "INFO"
 
-    llm_provider: str | None = None
+    llm_provider: Literal["openrouter", "ollama"] = "openrouter"
     llm_api_key: SecretStr | None = None
     llm_base_url: AnyHttpUrl | None = None
     llm_model: str | None = None
+    llm_timeout_seconds: float = Field(default=30.0, gt=0, le=120)
+    ollama_base_url: AnyHttpUrl | None = None
+    ollama_model: str | None = None
     qdrant_url: AnyHttpUrl | None = None
     qdrant_api_key: SecretStr | None = None
+    qdrant_collection: str = "infotech-policy"
+    vector_store_backend: Literal["faiss", "qdrant"] = "faiss"
+    vector_store_dimension: int = Field(default=384, ge=1, le=8192)
     redis_url: str | None = None
     redis_enabled: bool = False
     pending_action_ttl_seconds: int = Field(default=300, ge=30, le=3600)
@@ -40,6 +46,9 @@ class Settings(BaseSettings):
     confirmation_rate_limit_per_minute: int = Field(default=10, ge=1, le=1000)
 
     embedding_model: str = "BAAI/bge-small-en-v1.5"
+    embedding_device: Literal["cpu", "mps", "cuda"] = "cpu"
+    embedding_cache_dir: Path | None = None
+    embedding_local_files_only: bool = False
     rag_chunk_size: int = Field(default=450, ge=64, le=4096)
     rag_chunk_overlap: int = Field(default=60, ge=0, le=1024)
     rag_min_chunk_tokens: int = Field(default=24, ge=1, le=1024)
@@ -49,6 +58,8 @@ class Settings(BaseSettings):
     rag_rrf_k: int = Field(default=60, ge=1, le=500)
     rag_rerank_enabled: bool = False
     rag_rerank_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    rerank_cache_dir: Path | None = None
+    rerank_local_files_only: bool = False
     rag_max_context_tokens: int = Field(default=1800, ge=128, le=16000)
 
     jwt_secret_key: SecretStr | None = None
@@ -58,6 +69,14 @@ class Settings(BaseSettings):
     assistant_proxy_jwt_secret: SecretStr | None = None
     assistant_proxy_issuer: str = "slams-assistant-proxy"
     assistant_proxy_audience: str = "agentic-rag-assistant"
+
+    # InfoTech EMS is the authority for the new policy-QA API.  These are kept
+    # distinct from the legacy service's development and SLAMS credentials.
+    ems_jwt_secret: SecretStr | None = None
+    ems_jwt_algorithm: Literal["HS256"] = "HS256"
+    ems_api_base_url: AnyHttpUrl | None = None
+    ems_auth_timeout_seconds: float = Field(default=3.0, gt=0, le=30)
+    cors_allowed_origins: str = "http://localhost:5173"
 
     slams_enabled: bool = False
     slams_base_url: AnyHttpUrl | None = None
@@ -84,8 +103,12 @@ class Settings(BaseSettings):
                 raise ValueError("DEVELOPMENT_AUTH_ENABLED must be false outside development and test")
             if unsafe(self.assistant_proxy_jwt_secret):
                 raise ValueError("ASSISTANT_PROXY_JWT_SECRET must be a non-placeholder secret outside development and test")
-            if not all((self.llm_provider, self.llm_api_key, self.llm_model)):
-                raise ValueError("LLM_PROVIDER, LLM_API_KEY, and LLM_MODEL are required outside development and test")
+            if self.llm_provider == "openrouter" and (not self.llm_api_key or self.llm_base_url is None or not self.llm_model):
+                raise ValueError("LLM_API_KEY, LLM_BASE_URL, and LLM_MODEL are required for OpenRouter outside development and test")
+            if self.llm_provider == "ollama" and (self.ollama_base_url is None or not self.ollama_model):
+                raise ValueError("OLLAMA_BASE_URL and OLLAMA_MODEL are required for Ollama outside development and test")
+            if unsafe(self.ems_jwt_secret) or self.ems_api_base_url is None:
+                raise ValueError("EMS_JWT_SECRET and EMS_API_BASE_URL are required outside development and test")
         if self.rag_chunk_overlap >= self.rag_chunk_size:
             raise ValueError("RAG_CHUNK_OVERLAP must be smaller than RAG_CHUNK_SIZE")
         if self.rag_min_chunk_tokens > self.rag_chunk_size:
@@ -125,6 +148,11 @@ class Settings(BaseSettings):
         if self.jwt_secret_key is None:
             return ["JWT_SECRET_KEY is not configured; using an ephemeral development signing key"]
         return []
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Configured browser origins; credentials are never permitted for wildcards."""
+        return [origin.strip() for origin in self.cors_allowed_origins.split(",") if origin.strip()]
 
 
 @lru_cache

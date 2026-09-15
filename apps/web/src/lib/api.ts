@@ -1,4 +1,5 @@
 const base = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8001';
+const agentBase = import.meta.env.VITE_AGENT_API_BASE_URL ?? 'http://localhost:8000';
 
 export class ApiError extends Error {
   constructor(public readonly status: number, message: string) { super(message); }
@@ -24,6 +25,34 @@ export type DecisionSource = 'AUTOMATIC_POLICY' | 'MANAGER';
 export type LeaveRequest = { id: string; employee: Pick<Employee, 'id' | 'employee_code' | 'full_name'>; leave_type: LeaveType; status: LeaveStatus; start_date: string; end_date: string; duration: LeaveDuration; half_day_period: HalfDayPeriod | null; reason: string; approval_required: boolean; decided_by_id: string | null; decided_at: string | null; decision_note: string | null; decision_source: DecisionSource | null; manager_notification_delivered: boolean | null; created_at: string; updated_at: string; };
 export type NotificationCategory = 'LEAVE' | 'CHAT' | 'CALENDAR' | 'SYSTEM';
 export type Notification = { id: string; category: NotificationCategory; title: string; message: string; is_read: boolean; read_at: string | null; related_entity_type: string | null; related_entity_id: string | null; created_at: string; };
+export type PolicyCitation = { document: string; page: number; section: string | null; subsection: string | null };
+export type PolicyAnswer = { answer: string; sources: PolicyCitation[]; conversation_id: string; request_id: string | null };
+
+function agentErrorMessage(status: number): string {
+  if (status === 401) return 'Your session has expired. Please sign in again.';
+  if (status === 403) return 'You are not authorized to use the policy assistant.';
+  if (status === 422) return 'Please enter a valid policy question.';
+  if (status === 429) return 'Too many requests. Please try again shortly.';
+  if (status === 503) return 'The policy assistant is temporarily unavailable. Please try again later.';
+  return 'The policy assistant could not complete this request.';
+}
+
+function isPolicyAnswer(value: unknown): value is PolicyAnswer {
+  if (!value || typeof value !== 'object') return false;
+  const response = value as Record<string, unknown>;
+  return typeof response.answer === 'string'
+    && typeof response.conversation_id === 'string'
+    && (response.request_id === null || typeof response.request_id === 'string')
+    && Array.isArray(response.sources)
+    && response.sources.every((source) => {
+      if (!source || typeof source !== 'object') return false;
+      const citation = source as Record<string, unknown>;
+      return typeof citation.document === 'string'
+        && typeof citation.page === 'number'
+        && (citation.section === null || typeof citation.section === 'string')
+        && (citation.subsection === null || typeof citation.subsection === 'string');
+    });
+}
 
 export const employees = {
   list: () => request<Employee[]>('/api/v1/employees'),
@@ -41,4 +70,33 @@ export const notifications = {
   list: () => request<Notification[]>('/api/v1/notifications'), unreadCount: () => request<{ unread_count: number }>('/api/v1/notifications/unread-count'),
   markRead: (id: string) => request<Notification>(`/api/v1/notifications/${id}/read`, { method: 'POST' }),
   markAllRead: () => request<{ updated_count: number }>('/api/v1/notifications/read-all', { method: 'POST' }),
+};
+
+export const policyAssistant = {
+  async query(message: string, conversationId?: string): Promise<PolicyAnswer> {
+    let response: Response;
+    try {
+      response = await fetch(`${agentBase}/api/v1/agent/query`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionStorage.getItem('infotech_token') ?? ''}`,
+        },
+        body: JSON.stringify({ message, ...(conversationId ? { conversation_id: conversationId } : {}) }),
+      });
+    } catch {
+      throw new ApiError(0, 'Unable to reach the policy assistant. Please check your connection and try again.');
+    }
+    if (!response.ok) {
+      if (response.status === 401) {
+        sessionStorage.removeItem('infotech_token');
+        window.dispatchEvent(new Event('infotech:unauthorized'));
+      }
+      throw new ApiError(response.status, agentErrorMessage(response.status));
+    }
+    let payload: unknown;
+    try { payload = await response.json(); } catch { throw new ApiError(502, 'The policy assistant returned an unexpected response.'); }
+    if (!isPolicyAnswer(payload)) throw new ApiError(502, 'The policy assistant returned an unexpected response.');
+    return payload;
+  },
 };

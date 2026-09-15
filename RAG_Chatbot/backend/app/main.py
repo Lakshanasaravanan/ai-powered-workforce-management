@@ -13,14 +13,19 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
+from starlette.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.agents.planner import DeterministicPlanner
 from app.agents.service import AgentService
-from app.api.routes import auth, chat, health
+from app.api.routes import agent, auth, chat, health
 from app.core.config import get_settings
+from app.core.ems_auth import EMSIdentityVerifier
 from app.core.logging import configure_logging, request_id_context
 from app.rag.ingestion import VECTOR_STORE_DIR
+from app.rag.ingestion import DOCUMENTS_DIR, SPARSE_INDEX_PATH
+from app.rag.index_lifecycle import IndexStatus, index_status
+from app.services.vector_store import create_vector_store, VectorStoreError
 from app.rag.service import RAGServiceError, create_rag_service
 from app.services.pending_actions import PendingActionStore, RedisPendingActionStore
 from app.services.slams import SLAMSWorkforceProvider
@@ -42,6 +47,21 @@ async def lifespan(_: FastAPI):
     settings = get_settings()
     configure_logging(settings.log_level)
     app.state.rag_service = create_rag_service(settings, VECTOR_STORE_DIR)
+    if settings.vector_store_backend == "faiss":
+        app.state.rag_index_status = index_status(settings, DOCUMENTS_DIR, VECTOR_STORE_DIR, SPARSE_INDEX_PATH)
+    else:
+        try:
+            store = create_vector_store(settings, VECTOR_STORE_DIR)
+            store.validate_collection(settings.vector_store_dimension)
+            app.state.rag_index_status = IndexStatus(True)
+        except (AttributeError, VectorStoreError):
+            app.state.rag_index_status = IndexStatus(False, "Qdrant collection is unavailable or incompatible")
+    if not app.state.rag_index_status.available:
+        logger.error(
+            "rag_index_unavailable",
+            extra={"error_code": "index_unavailable", "index_reason": app.state.rag_index_status.reason},
+        )
+    app.state.ems_identity_verifier = EMSIdentityVerifier(settings)
     workforce = SLAMSWorkforceProvider.from_settings(settings) if settings.slams_enabled else MockWorkforceProvider()
     app.state.workforce_provider = workforce
     redis_client = None
@@ -88,7 +108,15 @@ app = FastAPI(
     description="Standalone AI assistant service. Phase 1 foundation only.",
     lifespan=lifespan,
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_settings().cors_origins,
+    allow_credentials=False,
+    allow_methods=["POST"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+)
 app.include_router(health.router)
+app.include_router(agent.router)
 if get_settings().development_auth_enabled:
     app.include_router(auth.router)
 app.include_router(chat.router)

@@ -75,3 +75,25 @@ Leave entitlement policy is intentionally unresolved. The system does not implem
 Notifications are informational, recipient-private inbox records with `LEAVE`, `CHAT`, `CALENDAR`, and `SYSTEM` categories. Leave is the only current event source. Submission and successful decision notifications are written in the same database transaction as the corresponding leave operation. A notification record never authorizes a leave action.
 
 Employees can list only their own notifications, retrieve an unread count, mark an owned notification read, and mark their own inbox read. Neither ADMIN nor a Manager may inspect another employee's inbox. The React workspace provides My Leave, Apply Leave, Manager Team Leave, direct Manager Approve/Reject controls, and an Inbox with an unread badge.
+
+## Phase 4 policy assistant
+
+Phase 4 adds a separate policy-QA boundary; it does not grant the agent EMS mutation authority.
+
+```text
+React InfoTech Workspace /agent
+        | existing EMS JWT bearer token
+        v
+RAG POST /api/v1/agent/query
+        |-- validate HS256 JWT (expiry + UUID subject)
+        |-- EMS GET /api/v1/auth/me (active identity confirmation)
+        |-- dense BGE retrieval: FAISS default or Qdrant collection option
+        |-- bounded context assembly -> OpenRouter structured generation
+        `-- evidence-ID validation -> grounded answer + citations
+```
+
+The request accepts only `message` and optional `conversation_id`; frontend employee, role, and manager fields are rejected. The RAG service has no direct EMS PostgreSQL access and this endpoint cannot reach SLAMS, leave, attendance, or arbitrary action tools.
+
+An explicit offline index build creates a manifest that binds PDF hashes, embedding model/dimension, chunk configuration, FAISS records, and BM25 artifacts. Startup validates but never rebuilds indexes; stale artifacts fail closed. Dense FAISS remains the default. Hybrid/RRF and reranking remain disabled, and no cosine evidence threshold is used because calibration distributions overlapped. Instead the server validates evidence IDs before mapping citations.
+
+The browser reuses its sessionStorage EMS token, stores no RAG credential, renders model output as text, and uses server-returned citation metadata. Phase 4 is policy QA only; Phase 5 is reserved for separately designed confirmed EMS actions.

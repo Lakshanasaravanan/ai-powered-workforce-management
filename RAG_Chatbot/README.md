@@ -1,33 +1,127 @@
-# Agentic RAG workforce service
+# InfoTech Policy RAG service
 
-## Overview
+## Phase 4 scope
 
-This FastAPI service provides policy retrieval and safe employee self-service for SLAMS. The browser uses the employee assistant in the SLAMS Thymeleaf UI; it never receives a trusted employee ID, assistant secret, delegation key, database credential, or provider key.
+This FastAPI service provides **policy question answering only** for InfoTech Workspace. It does not create leave, approve leave, modify attendance, write the EMS database, call SLAMS action APIs, or run arbitrary tools. Those workflows are deliberately outside Phase 4.
 
-## RAG pipeline and evaluation
+```text
+React InfoTech Workspace
+        |  existing EMS bearer token
+        v
+POST /api/v1/agent/query
+        |-- validate EMS HS256 JWT (expiration and UUID subject)
+        |-- EMS GET /api/v1/auth/me (active identity is authoritative)
+        |-- dense BGE retrieval
+        |     |-- local FAISS (default)
+        |     `-- existing Qdrant collection (production-oriented option)
+        |-- grounded OpenRouter generation
+        `-- evidence-ID validation -> answer + structured citations
+```
 
-Indexing is explicit and offline: `PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion`. It cleans policy PDFs, chunks them, embeds with BGE `BAAI/bge-small-en-v1.5`, and writes ignored FAISS artifacts. Chat startup never rebuilds embeddings. Dense FAISS retrieval is the default. BM25 plus reciprocal-rank fusion and a cross-encoder reranker are optional through `RAG_HYBRID_ENABLED` and `RAG_RERANK_ENABLED`.
+The browser sends only `message` and an optional `conversation_id`. It never supplies trusted employee identity, role, manager, or authorization fields. The endpoint is strict and rejects extra identity fields.
 
-The final dense evaluation at k=5 on a 12-case manually reviewed synthetic/document-level fixture measured Hit@5 **1.000**, MRR **0.9583**, Recall@5 **0.9583**, and average retrieval latency **17.74 ms**. This small fixture is useful regression evidence, not proof of quality for arbitrary production queries.
+## API contract
 
-## Agent, tools, and actions
+`POST /api/v1/agent/query`
 
-`AgentService` uses deterministic planning, typed tool contracts, an immutable execution context, and server-side authorization. Employees can retrieve profile, leave balance, attendance summary, attendance records, and policy answers. Leave requests and attendance regularizations are proposed first, then execute against SLAMS only after explicit confirmation.
+```json
+{"message":"What is the leave policy?","conversation_id":"optional UUID"}
+```
 
-Confirmation accepts only opaque `action_id` and `conversation_id`. Stored action arguments are immutable, employee/conversation-bound, and cannot be replaced by browser input. Persisted idempotency keys, atomic claims, and concurrent-confirmation protections prevent duplicate mutations. Redis mode shares pending-action state across replicas; stale execution lease recovery reuses the same stored idempotency key.
+The response contains `answer`, `sources`, `conversation_id`, and `request_id`. A source has only validated server metadata: `document`, `page`, `section`, and `subsection`. Model output cannot author citation metadata. Invalid or absent evidence IDs produce a safe answer with no citations; malformed provider output also fails safely.
 
-## Trust boundaries and integration
+The React Agent screen uses the employee's existing EMS session token, keeps its conversation ID in memory, renders model text as text rather than HTML, and presents grounding fallbacks as normal answers. Service failures are displayed separately.
 
-SLAMS authenticates the browser and its server-side bridge issues a short-lived assistant token. FastAPI validates its HS256 algorithm, issuer, audience, expiry, type, and subject/employee consistency; assistant role claims are ignored. FastAPI calls SLAMS workforce APIs with short-lived RS256 delegation tokens; SLAMS validates the key/claims and resolves employee authorization itself. Real integration failures never fall back to mock mutations.
+## Provider selection
 
-## Operations
+The provider is backend configuration, not a React contract. OpenRouter remains the backward-compatible default:
 
-`GET /health` is liveness, `GET /ready` reports readiness of required dependencies, and `GET /metrics` exposes Prometheus metrics with low-cardinality labels. Chat and confirmation limits are separate per employee. `POST /api/v1/auth/token` exists only when `DEVELOPMENT_AUTH_ENABLED=true`; production requires it false and rejects missing or placeholder JWT, assistant-token, Redis, SLAMS/delegation, and provider configuration.
+```sh
+LLM_PROVIDER=openrouter
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_MODEL=provider-model-id
+```
 
-## Development, testing, and deployment
+For local generation, select Ollama explicitly. It has no API key and never falls back to OpenRouter when unavailable:
 
-Use Python 3.13. Install dependencies with `.venv/bin/pip install -r requirements.txt`, then run `PYTHONPATH=backend .venv/bin/pytest backend/tests -q`. The root `compose.yaml` defines FastAPI, SLAMS, Redis, and MySQL; secrets are environment-supplied and `.env` is never copied into images. Prebuild and mount/provide ignored FAISS artifacts for deployment. CI runs the Python suite and Java 21 Maven test/package checks.
+```sh
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen3:8b
+```
 
-## Limitations
+Install Ollama, pull the configured model, and run its local server before starting RAG. Hardware requirements and latency vary by laptop; `qwen3:8b` is not assumed to be suitable for every machine. Ollama receives the same system prompt and bounded evidence as OpenRouter through `/api/chat`, with non-streaming deterministic options, `think:false`, and the JSON schema for the grounded response. Only the final message content is parsed; reasoning/thinking fields and raw provider responses are never returned to an employee. `/ready` checks that the configured local Ollama model is available without issuing a generation request.
 
-FAISS is local rather than a managed vector database. The evaluation fixture is small. OpenRouter is an external dependency. H2 concurrency is not identical to MySQL. The project does not include enterprise SSO, Kubernetes autoscaling, or a cloud staging load test.
+## Offline index lifecycle
+
+Indexing is explicit and never occurs at startup or query time:
+
+```sh
+cd RAG_Chatbot
+PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion build
+```
+
+The builder deterministically discovers the five policy PDFs, extracts and cleans pages, chunks them, embeds with `BAAI/bge-small-en-v1.5`, writes FAISS and BM25 artifacts to a staging directory, validates them, then promotes them atomically. A manifest records source hashes, the embedding model/dimension, chunk settings, and artifact counts. Missing, stale, or corrupt artifacts fail readiness and policy queries closed; serving never silently rebuilds an index.
+
+To keep historical repository artifacts untouched during local verification, set these non-secret paths to an ignored local directory before building and serving:
+
+```sh
+export RAG_RUNTIME_VECTOR_STORE_DIR=data/runtime/vectorstore
+export RAG_RUNTIME_SPARSE_INDEX_PATH=data/runtime/sparse/bm25_corpus.json
+export EMBEDDING_LOCAL_FILES_ONLY=true
+export EMBEDDING_CACHE_DIR=/path/to/already-provisioned/huggingface/hub
+PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion build
+```
+
+Runtime indexes, model caches, and generated sparse artifacts are not committed. `RAG_RUNTIME_VECTOR_STORE_DIR`, `RAG_RUNTIME_SPARSE_INDEX_PATH`, `EMBEDDING_CACHE_DIR`, `EMBEDDING_LOCAL_FILES_ONLY`, and `EMBEDDING_DEVICE` are configuration names only; do not commit local paths or credentials. `EMBEDDING_DEVICE=cpu` is the deterministic local default; select another supported device only after operational validation.
+
+## Retrieval and evidence calibration
+
+Local FAISS dense retrieval is the default: BGE dimension 384, candidate pool 30, top-K 5, context budget 1800. BM25/RRF hybrid retrieval and the cross-encoder reranker are available but disabled by default. On the 12-case manually reviewed synthetic/document-level fixture, dense retrieval measured Hit@5 **1.000**, MRR **0.9583**, Recall@5 **0.9583**, and average retrieval latency **17.74 ms**.
+
+The evidence calibration experiment found overlap between answerable and unsupported dense-score distributions. No cosine threshold was selected because it would reject legitimate evidence or admit unsupported material. The generation contract therefore requires the provider to return evidence IDs that are validated against retrieved chunks; it is instructed to use only the supplied evidence and to say it is not sure when evidence is insufficient.
+
+`VECTOR_STORE_BACKEND=faiss` is the default. `VECTOR_STORE_BACKEND=qdrant` validates a pre-existing compatible collection named by `QDRANT_COLLECTION`; it does not create, recreate, or index it during serving. A live production Qdrant deployment remains an operational follow-up.
+
+## Local run
+
+1. Start InfoTech infrastructure:
+
+   ```sh
+   cd infra
+   docker compose -f compose.yaml up -d
+   ```
+
+2. Start EMS:
+
+   ```sh
+   cd apps/ems-api
+   PYTHONPATH=. .venv/bin/alembic upgrade head
+   PYTHONPATH=. .venv/bin/uvicorn app.main:app --port 8001
+   ```
+
+3. Build the explicit local index as above, then run this service:
+
+   ```sh
+   cd RAG_Chatbot
+   PYTHONPATH=backend .venv/bin/uvicorn app.main:app --port 8000
+   ```
+
+4. Run the workspace:
+
+   ```sh
+   cd apps/web
+   VITE_AGENT_API_BASE_URL=http://localhost:8000 npm run dev
+   ```
+
+For browser access, configure `CORS_ALLOWED_ORIGINS` with the Vite origin (default `http://localhost:5173`). CORS permits the configured origin only and does not enable credentialed wildcard access. Required deployment configuration names include `EMS_JWT_SECRET`, `EMS_API_BASE_URL`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, and, if applicable, Qdrant configuration. Do not place secrets in Vite variables.
+
+## Verification and limitations
+
+Run the RAG regression suite with:
+
+```sh
+PYTHONPATH=backend .venv/bin/pytest backend/tests -q
+```
+
+The evaluation fixture is limited and is not a production-quality guarantee. OpenRouter is an external dependency. Local FAISS is not a distributed vector database, and live Qdrant operational validation remains pending. Phase 5 is reserved for explicitly designed, authorized EMS action flows.
