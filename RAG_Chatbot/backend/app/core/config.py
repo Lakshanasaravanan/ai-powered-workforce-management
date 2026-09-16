@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     redis_enabled: bool = False
     pending_action_ttl_seconds: int = Field(default=300, ge=30, le=3600)
     pending_action_execution_lease_seconds: int = Field(default=60, ge=5, le=900)
+    decision_reference_ttl_seconds: int = Field(default=300, ge=30, le=3600)
     chat_rate_limit_per_minute: int = Field(default=30, ge=1, le=1000)
     confirmation_rate_limit_per_minute: int = Field(default=10, ge=1, le=1000)
 

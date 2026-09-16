@@ -7,7 +7,13 @@ from collections.abc import Callable
 from typing import Any
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+
+
+def _sentence_transformer_factory(model_name: str, **kwargs: object) -> Any:
+    """Avoid importing Torch until an embedding model is actually needed."""
+    from sentence_transformers import SentenceTransformer
+
+    return SentenceTransformer(model_name, **kwargs)
 
 
 class EmbeddingService:
@@ -17,7 +23,7 @@ class EmbeddingService:
         self,
         model_name: str,
         batch_size: int = 32,
-        model_factory: Callable[[str], Any] = SentenceTransformer,
+        model_factory: Callable[..., Any] = _sentence_transformer_factory,
         device: str = "cpu",
         cache_dir: str | None = None,
         local_files_only: bool = False,

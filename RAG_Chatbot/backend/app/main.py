@@ -18,7 +18,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.agents.planner import DeterministicPlanner
 from app.agents.service import AgentService
-from app.api.routes import agent, auth, chat, health
+from app.api.routes import actions, agent, auth, chat, health
 from app.core.config import get_settings
 from app.core.ems_auth import EMSIdentityVerifier
 from app.core.logging import configure_logging, request_id_context
@@ -31,6 +31,10 @@ from app.services.pending_actions import PendingActionStore, RedisPendingActionS
 from app.services.slams import SLAMSWorkforceProvider
 from app.services.rate_limit import InMemoryRateLimiter, RedisRateLimiter
 from app.services.workforce import MockWorkforceProvider
+from app.services.infotech_ems import InfoTechEMSReadClient
+from app.tools.infotech_ems import build_infotech_read_registry
+from app.services.infotech_pending_actions import NonExecutingActionExecutor, RedisInfoTechPendingActionStore, UnavailableInfoTechPendingActionStore
+from app.services.infotech_decision_references import RedisInfoTechDecisionReferenceStore, UnavailableInfoTechDecisionReferenceStore
 from app.tools.actions import RegularizeAttendanceTool, RequestLeaveTool
 from app.tools.rag_tool import PolicyAnswerTool
 from app.tools.registry import ToolRegistry
@@ -62,6 +66,8 @@ async def lifespan(_: FastAPI):
             extra={"error_code": "index_unavailable", "index_reason": app.state.rag_index_status.reason},
         )
     app.state.ems_identity_verifier = EMSIdentityVerifier(settings)
+    app.state.infotech_ems_client = InfoTechEMSReadClient(settings)
+    app.state.infotech_read_registry = build_infotech_read_registry(app.state.infotech_ems_client)
     workforce = SLAMSWorkforceProvider.from_settings(settings) if settings.slams_enabled else MockWorkforceProvider()
     app.state.workforce_provider = workforce
     redis_client = None
@@ -77,6 +83,11 @@ async def lifespan(_: FastAPI):
     else:
         pending_actions = PendingActionStore(ttl=timedelta(seconds=settings.pending_action_ttl_seconds))
     app.state.redis_client = redis_client
+    app.state.infotech_pending_actions = RedisInfoTechPendingActionStore(redis_client, ttl=timedelta(seconds=settings.pending_action_ttl_seconds)) if redis_client is not None else UnavailableInfoTechPendingActionStore()
+    app.state.infotech_decision_references = RedisInfoTechDecisionReferenceStore(
+        redis_client, ttl=timedelta(seconds=settings.decision_reference_ttl_seconds)
+    ) if redis_client is not None else UnavailableInfoTechDecisionReferenceStore()
+    app.state.infotech_pending_executor = NonExecutingActionExecutor()
     app.state.rate_limiter = RedisRateLimiter(redis_client) if redis_client is not None else InMemoryRateLimiter()
     app.state.agent_service = AgentService(
         planner=DeterministicPlanner(),
@@ -117,6 +128,7 @@ app.add_middleware(
 )
 app.include_router(health.router)
 app.include_router(agent.router)
+app.include_router(actions.router)
 if get_settings().development_auth_enabled:
     app.include_router(auth.router)
 app.include_router(chat.router)

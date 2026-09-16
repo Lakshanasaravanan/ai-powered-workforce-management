@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -29,3 +30,5 @@ class PolicyQueryResponse(BaseModel):
     sources: list[SourceCitation] = Field(default_factory=list)
     conversation_id: UUID
     request_id: str | None = None
+    response_type: Literal["message", "clarification", "action_proposal"] = "message"
+    action: dict | None = None

@@ -26,7 +26,9 @@ export type LeaveRequest = { id: string; employee: Pick<Employee, 'id' | 'employ
 export type NotificationCategory = 'LEAVE' | 'CHAT' | 'CALENDAR' | 'SYSTEM';
 export type Notification = { id: string; category: NotificationCategory; title: string; message: string; is_read: boolean; read_at: string | null; related_entity_type: string | null; related_entity_id: string | null; created_at: string; };
 export type PolicyCitation = { document: string; page: number; section: string | null; subsection: string | null };
-export type PolicyAnswer = { answer: string; sources: PolicyCitation[]; conversation_id: string; request_id: string | null };
+export type AgentAction = { action_id: string; tool_name: 'apply_leave' | 'approve_leave' | 'reject_leave'; safe_display: Record<string, string | null>; created_at: string; expires_at: string; state: string };
+export type PolicyAnswer = { answer: string; sources: PolicyCitation[]; conversation_id: string; request_id: string | null; response_type?: 'message' | 'clarification' | 'action_proposal'; action?: AgentAction | null };
+export type ActionResult = { action_id: string; state: string; message: string; conversation_id: string; request_id: string | null };
 
 function agentErrorMessage(status: number): string {
   if (status === 401) return 'Your session has expired. Please sign in again.';
@@ -98,5 +100,10 @@ export const policyAssistant = {
     try { payload = await response.json(); } catch { throw new ApiError(502, 'The policy assistant returned an unexpected response.'); }
     if (!isPolicyAnswer(payload)) throw new ApiError(502, 'The policy assistant returned an unexpected response.');
     return payload;
+  },
+  async action(actionId: string, conversationId: string, operation: 'confirm' | 'cancel'): Promise<ActionResult> {
+    const response = await fetch(`${agentBase}/api/v1/agent/actions/${encodeURIComponent(actionId)}/${operation}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem('infotech_token') ?? ''}` }, body: JSON.stringify({ conversation_id: conversationId }) });
+    if (!response.ok) throw new ApiError(response.status, agentErrorMessage(response.status));
+    return response.json() as Promise<ActionResult>;
   },
 };

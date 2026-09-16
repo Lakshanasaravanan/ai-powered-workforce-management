@@ -110,7 +110,7 @@ def test_infotech_policy_query_isolated_from_legacy_actions_and_supports_no_evid
     )
     no_evidence = client.post("/api/v1/agent/query", json={"message": "unknown policy"}, headers=headers())
     assert action.status_code == 200
-    assert "cannot perform workforce actions" in action.json()["answer"]
+    assert action.json()["response_type"] == "clarification"
     assert action.json()["sources"] == []
     assert rag.questions == ["unknown policy"]
     assert no_evidence.status_code == 200

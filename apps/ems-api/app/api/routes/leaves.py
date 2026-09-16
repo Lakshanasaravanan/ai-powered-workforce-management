@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 
@@ -12,6 +12,9 @@ from app.models.leave import DecisionSource, LeaveRequest, LeaveStatus, LeaveTyp
 from app.models.notification import NotificationCategory
 from app.schemas.leaves import EmployeeSummary, LeaveCreate, LeaveDecision, LeaveResponse
 from app.services.notifications import create_notification
+from app.models.audit import AuditEvent, AuditOutcome, AuditSource
+from app.models.idempotency import MutationIdempotency
+from app.services.idempotency import key_hash, leave_fingerprint, leave_decision_fingerprint
 
 
 router = APIRouter(prefix="/api/v1/leaves", tags=["leaves"])
@@ -77,7 +80,30 @@ def create_leave(
     body: LeaveCreate,
     user: Employee = Depends(get_current_user),
     db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+    agent_source: str | None = Header(default=None, alias="X-InfoTech-Agent"),
+    correlation_id: str | None = Header(default=None, alias="X-Request-ID"),
 ) -> LeaveResponse:
+    """Create normal leaves unchanged; agent-tagged calls get EMS idempotency/audit.
+
+    The source header changes only audit provenance, never authorization: the
+    authenticated EMS employee remains the sole requester.
+    """
+    is_agent = agent_source == "1"
+    if is_agent and not idempotency_key:
+        raise HTTPException(400, "Idempotency-Key is required for agent leave requests")
+    fingerprint = leave_fingerprint(body) if is_agent else None
+    if is_agent:
+        prior = db.query(MutationIdempotency).filter_by(
+            actor_employee_id=user.id, operation="apply_leave", idempotency_key=idempotency_key
+        ).one_or_none()
+        if prior is not None:
+            if prior.request_fingerprint != fingerprint:
+                raise HTTPException(409, "Idempotency key conflicts with a different request")
+            existing = db.get(LeaveRequest, prior.target_id)
+            if existing is None:
+                raise HTTPException(409, "Idempotency result is unavailable")
+            return leave_response(existing, user)
     automatically_approved = body.leave_type is LeaveType.MEDICAL
     request = LeaveRequest(
         employee_id=user.id,
@@ -118,7 +144,25 @@ def create_leave(
             related_entity_type="LEAVE_REQUEST",
             related_entity_id=request.id,
         )
-    db.commit()
+    if is_agent:
+        db.add(MutationIdempotency(
+            actor_employee_id=user.id, operation="apply_leave", idempotency_key=idempotency_key,
+            request_fingerprint=fingerprint, target_id=request.id,
+        ))
+        # No leave reason is duplicated in generic audit JSON.
+        db.add(AuditEvent(
+            actor_employee_id=user.id, operation="apply_leave", target_type="LEAVE_REQUEST",
+            target_id=request.id, source=AuditSource.AI_AGENT, outcome=AuditOutcome.SUCCEEDED,
+            correlation_id=correlation_id, idempotency_key_hash=key_hash(idempotency_key),
+            before_state=None,
+            after_state={"leave_type": request.leave_type.value, "status": request.status.value,
+                         "start_date": request.start_date.isoformat(), "end_date": request.end_date.isoformat()},
+        ))
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     db.refresh(request)
     return leave_response(request, user, manager_notification_delivered)
 
@@ -187,6 +231,9 @@ def decide_leave(
     status: LeaveStatus,
     user: Employee,
     db: Session,
+    idempotency_key: str | None = None,
+    agent_source: str | None = None,
+    correlation_id: str | None = None,
 ) -> LeaveResponse:
     request = get_leave_or_404(db, leave_id)
     requester = get_employee_or_404(db, request.employee_id)
@@ -196,6 +243,23 @@ def decide_leave(
         or requester.manager_id != user.id
     ):
         raise HTTPException(403, "Only the direct Manager may decide this leave request")
+    is_agent = agent_source == "1"
+    if is_agent and not idempotency_key:
+        raise HTTPException(400, "Idempotency-Key is required for agent leave decisions")
+    operation = "approve_leave" if status is LeaveStatus.APPROVED else "reject_leave"
+    fingerprint = leave_decision_fingerprint(request.id, body.decision_note) if is_agent else None
+    if is_agent:
+        prior = db.query(MutationIdempotency).filter_by(
+            actor_employee_id=user.id, operation=operation, idempotency_key=idempotency_key
+        ).one_or_none()
+        if prior is not None:
+            if prior.request_fingerprint != fingerprint:
+                raise HTTPException(409, "Idempotency key conflicts with a different request")
+            existing = db.get(LeaveRequest, prior.target_id)
+            if existing is None:
+                raise HTTPException(409, "Idempotency result is unavailable")
+            existing_requester = get_employee_or_404(db, existing.employee_id)
+            return leave_response(existing, existing_requester)
     if request.status is not LeaveStatus.PENDING or not request.approval_required:
         raise HTTPException(409, "Leave request cannot be decided in its current state")
     if not apply_manager_decision(db, request, user, status, body.decision_note):
@@ -216,6 +280,18 @@ def decide_leave(
         related_entity_type="LEAVE_REQUEST",
         related_entity_id=request.id,
     )
+    if is_agent:
+        db.add(MutationIdempotency(
+            actor_employee_id=user.id, operation=operation, idempotency_key=idempotency_key,
+            request_fingerprint=fingerprint, target_id=request.id,
+        ))
+        db.add(AuditEvent(
+            actor_employee_id=user.id, operation=operation, target_type="LEAVE_REQUEST",
+            target_id=request.id, source=AuditSource.AI_AGENT, outcome=AuditOutcome.SUCCEEDED,
+            correlation_id=correlation_id, idempotency_key_hash=key_hash(idempotency_key),
+            before_state={"status": LeaveStatus.PENDING.value},
+            after_state={"status": status.value},
+        ))
     db.commit()
     db.refresh(request)
     return leave_response(request, requester)
@@ -227,8 +303,11 @@ def approve_leave(
     body: LeaveDecision,
     user: Employee = Depends(get_current_user),
     db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+    agent_source: str | None = Header(default=None, alias="X-InfoTech-Agent"),
+    correlation_id: str | None = Header(default=None, alias="X-Request-ID"),
 ) -> LeaveResponse:
-    return decide_leave(leave_id, body, LeaveStatus.APPROVED, user, db)
+    return decide_leave(leave_id, body, LeaveStatus.APPROVED, user, db, idempotency_key, agent_source, correlation_id)
 
 
 @router.post("/{leave_id}/reject", response_model=LeaveResponse)
@@ -237,5 +316,8 @@ def reject_leave(
     body: LeaveDecision,
     user: Employee = Depends(get_current_user),
     db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+    agent_source: str | None = Header(default=None, alias="X-InfoTech-Agent"),
+    correlation_id: str | None = Header(default=None, alias="X-Request-ID"),
 ) -> LeaveResponse:
-    return decide_leave(leave_id, body, LeaveStatus.REJECTED, user, db)
+    return decide_leave(leave_id, body, LeaveStatus.REJECTED, user, db, idempotency_key, agent_source, correlation_id)

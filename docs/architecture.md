@@ -96,4 +96,31 @@ The request accepts only `message` and optional `conversation_id`; frontend empl
 
 An explicit offline index build creates a manifest that binds PDF hashes, embedding model/dimension, chunk configuration, FAISS records, and BM25 artifacts. Startup validates but never rebuilds indexes; stale artifacts fail closed. Dense FAISS remains the default. Hybrid/RRF and reranking remain disabled, and no cosine evidence threshold is used because calibration distributions overlapped. Instead the server validates evidence IDs before mapping citations.
 
-The browser reuses its sessionStorage EMS token, stores no RAG credential, renders model output as text, and uses server-returned citation metadata. Phase 4 is policy QA only; Phase 5 is reserved for separately designed confirmed EMS actions.
+The browser reuses its sessionStorage EMS token, stores no RAG credential, renders model output as text, and uses server-returned citation metadata.
+
+## Phase 5 confirmed workforce actions
+
+Phase 5 adds a deliberately narrow action boundary to the authenticated
+assistant. Grounded policy RAG remains available alongside deterministic intent
+routing and read-only EMS tools. The supported typed actions are `APPLY_LEAVE`,
+`APPROVE_LEAVE`, and `REJECT_LEAVE`; the latter two are available only to the
+requester's direct Manager. Agent-visible pending team leaves use opaque `LR-*`
+references rather than database identifiers.
+
+```text
+Browser Agent card -> typed proposal -> explicit Confirm/Cancel
+                     -> Redis pending action (immutable server arguments)
+                     -> typed EMS endpoint -> EMS RBAC/business validation
+                     -> PostgreSQL leave, idempotency, audit, notification
+```
+
+The browser never reconstructs mutation arguments. The server stores the
+proposal arguments and actor/conversation binding, and confirmation can only
+claim that stored action. Redis provides the pending-action lifecycle; EMS owns
+the durable idempotency record and persisted `AuditEvent`. The RAG service has
+no direct PostgreSQL write path and exposes no arbitrary mutation HTTP tool.
+
+EMS remains the final authority for authorization and leave business rules.
+Employee and Admin roles cannot make Manager leave decisions. Existing Medical
+leave semantics remain unchanged: they are automatically approved by policy and
+are not converted into Manager decision actions.

@@ -127,3 +127,31 @@ export OLLAMA_MODEL=qwen3:8b
 ```
 
 The RAG service calls Ollama's non-streaming chat API with deterministic temperature, JSON schema output, and thinking disabled. It never falls back from Ollama to OpenRouter. If Ollama or the configured model is unavailable, readiness reports it and policy requests fail safely. Local model performance and hardware compatibility vary by machine.
+
+## Phase 5 confirmed Agent actions
+
+The authenticated Agent retains grounded policy RAG and adds deterministic
+intent routing, read-only EMS tools, and a small typed action set: apply leave,
+approve a direct report's leave, and reject a direct report's leave. Pending
+team decisions are represented by opaque `LR-*` references. The UI presents an
+action proposal card; Confirm and Cancel use the server-issued action ID and do
+not reconstruct action arguments in the browser.
+
+Confirmation uses server-stored immutable arguments and an actor/conversation
+binding. Redis manages the pending-action lifecycle, while EMS persists the
+final idempotency, audit, notification, and business-state effects. EMS remains
+the RBAC and business-rule authority: neither an Employee nor an Admin can make
+a Manager decision. Medical leave remains automatically approved according to
+its existing policy semantics.
+
+The relevant deployment-side variables are `EMS_API_BASE_URL`,
+`EMS_JWT_SECRET`, `REDIS_ENABLED`, and `REDIS_URL`. Keep their values in local
+or deployment configuration only; do not expose them to the browser or commit
+them.
+
+Live Phase 5 verification completed approve and reject actions and verified
+their authoritative persisted effects. A later live replay was unavailable
+because the original ephemeral Redis pending-action records had expired or were
+no longer present locally. Replay, idempotency, concurrency, and lost-response
+recovery remain covered by automated Phase 5 tests; this does not claim that a
+later live replay passed.
