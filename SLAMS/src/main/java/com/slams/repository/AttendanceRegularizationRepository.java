@@ -10,4 +10,5 @@ import java.util.List;
 public interface AttendanceRegularizationRepository extends JpaRepository<AttendanceRegularization, Long> {
     List<AttendanceRegularization> findByAttendance_User_ReportingManager_IdAndStatus(Long managerId, com.slams.model.LeaveStatus status);
     List<AttendanceRegularization> findByAttendance_UserId(Long userId);
+    boolean existsByAttendanceIdAndStatus(Long attendanceId, com.slams.model.LeaveStatus status);
 }

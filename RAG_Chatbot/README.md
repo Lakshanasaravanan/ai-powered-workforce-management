@@ -1,95 +1,127 @@
-# Agentic RAG service
+# InfoTech Policy RAG service
 
-This directory contains the standalone AI-assistant service for the Workforce Management Platform. It does not access the `SLAMS` database; future workforce integration will use authenticated REST clients.
+## Phase 4 scope
 
-## Phase 4 agent safety foundation
+This FastAPI service provides **policy question answering only** for InfoTech Workspace. It does not create leave, approve leave, modify attendance, write the EMS database, call SLAMS action APIs, or run arbitrary tools. Those workflows are deliberately outside Phase 4.
 
-`POST /api/v1/chat` now builds an immutable server-side execution context from the verified JWT, request ID, and conversation ID. `AgentService` uses a small deterministic planner that can only propose a server-registered tool invocation; `ToolRegistry` validates strict Pydantic inputs, enforces the employee self-service permission boundary, executes the tool, and emits safe audit metadata.
-
-Available tools are policy answers through the existing RAG service, plus read-only `get_my_profile`, `get_my_leave_balance`, and `get_my_attendance_summary` tools. Workforce identity is always derived from the authenticated context, never from a chat message or tool input.
-
-Leave requests and attendance regularization are proposal-only. They produce a short-lived, employee- and conversation-bound pending action. `POST /api/v1/chat/confirm` accepts only the opaque action ID and conversation ID. A valid confirmation transitions it to `confirmed_not_executed` and explicitly reports that no workforce action was performed. It does not submit leave, modify attendance, or call an external system.
-
-Example behavior:
-
-- `Show my leave balance` returns a synthetic read-only balance.
-- `What is the medical leave policy?` delegates to RAG and preserves citations.
-- `Apply leave from 2026-02-03 to 2026-02-04` returns `confirmation_required` and a pending action.
-- Confirming that action returns `confirmed_not_executed`; no mutation occurs.
-
-## Phase 5B SLAMS read-only integration
-
-SLAMS integration is disabled by default. When enabled, the Python service uses a process-reused synchronous `httpx.Client` and a short-lived RS256 delegation JWT for each self-service read. The token contains only issuer, audience, employee subject/ID, issue/expiry times, a unique ID, and `token_type=delegation`; it contains no role claims. Python obtains the employee ID exclusively from `ExecutionContext`. SLAMS verifies the signature, resolves that employee and their authorities independently, and exposes only its principal-bound endpoints.
-
-The Python private signing key is supplied through `SLAMS_DELEGATION_PRIVATE_KEY` at runtime and is never logged or committed. SLAMS receives only the corresponding public verification key. The client propagates `X-Request-ID`, maps safe response DTOs, never logs headers/tokens/payloads, retries one time only for connection/timeouts and 502/503/504 reads, and does not retry authentication or business failures.
-
-Set `SLAMS_ENABLED=true` only when every `SLAMS_*` setting in `.env.example` is configured. Startup selects `SLAMSWorkforceProvider` in that mode; it never falls back to synthetic mock data if SLAMS is unavailable. With integration disabled, `MockWorkforceProvider` remains the explicit development-only source of clearly fictional data.
-
-Supported real reads are profile, leave balance, and SLAMS attendance analytics. SLAMS analytics is aggregate history rather than a date-filtered API, so Python exposes it as `slams_aggregate` and rejects `current_month` and `last_30_days` instead of fabricating filtered data. It preserves casual, sick, and earned leave categories; its aggregate attendance model separately reports late, half-day, and absent counts. No leave request or attendance regularization execution is enabled: proposals and confirmation remain `confirmed_not_executed`.
-
-Phase 5B deliberately excludes SLAMS database access, workforce mutations, manager/admin workflows, Redis, persistent conversations, production SSO, Qdrant, frontend work, and autonomous multi-step actions.
-
-## Retrieval architecture
-
-Policy retrieval defaults to BGE dense search, bounded to `RAG_RETRIEVAL_CANDIDATE_K` (default 30) and reduced to final `RAG_RETRIEVAL_TOP_K` (default 5) before context assembly. This is the current baseline because a manual, synthetic document-level evaluation set showed better retrieval quality and latency than the hybrid variants. BM25 plus Reciprocal Rank Fusion (RRF), and cross-encoder reranking, are available as explicit opt-ins through `RAG_HYBRID_ENABLED=true` and `RAG_RERANK_ENABLED=true`.
-
-On the 12-case fixture in `backend/data/evaluation/retrieval_cases.json`, dense-only achieved Hit@5 1.000, MRR 0.958, and Recall@5 0.958. Hybrid without reranking measured 0.917, 0.833, and 0.917; hybrid with reranking measured the same quality and added substantial latency. These are small synthetic document-level results, so hybrid and reranking should only be enabled after broader representative evaluation.
-
-## Local setup
-
-Use Python 3.13 for local development and indexing. This matches the Docker image and the verified FAISS runtime; the local FAISS wheel has not been reliable under Python 3.14 on macOS arm64.
-
-```bash
-cd RAG_Chatbot
-python3.13 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-cp .env.example .env
-.venv/bin/uvicorn app.main:app --app-dir backend --reload
+```text
+React InfoTech Workspace
+        |  existing EMS bearer token
+        v
+POST /api/v1/agent/query
+        |-- validate EMS HS256 JWT (expiration and UUID subject)
+        |-- EMS GET /api/v1/auth/me (active identity is authoritative)
+        |-- dense BGE retrieval
+        |     |-- local FAISS (default)
+        |     `-- existing Qdrant collection (production-oriented option)
+        |-- grounded OpenRouter generation
+        `-- evidence-ID validation -> answer + structured citations
 ```
 
-Set a unique `JWT_SECRET_KEY` before any non-development deployment. In development, an ephemeral process-local signing key is used only if no key is configured; readiness reports this as a warning.
+The browser sends only `message` and an optional `conversation_id`. It never supplies trusted employee identity, role, manager, or authorization fields. The endpoint is strict and rejects extra identity fields.
 
-For local SLAMS read-only integration, create a temporary RSA keypair outside the repository. Give the private key to `SLAMS_DELEGATION_PRIVATE_KEY` and configure the matching public key in SLAMS through its `SLAMS_DELEGATION_PUBLIC_KEY` environment setting. Do not store either key in `.env.example`, source control, or logs. `/ready` remains available for policy RAG even when SLAMS is unavailable; workforce reads return a safe error rather than synthetic data in enabled mode.
+## API contract
 
-## API
+`POST /api/v1/agent/query`
 
-- `GET /health` checks that the process is running.
-- `GET /ready` checks Phase 1 configuration.
-- `POST /api/v1/auth/token` issues a development token for `EMP001` or `EMP002`.
-- `POST /api/v1/chat` is an authenticated placeholder endpoint.
-
-For development login, use `EMP001` / `demo-emp001` or `EMP002` / `demo-emp002`. These mock credentials are not a production authentication mechanism.
-
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/token \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"EMP001","password":"demo-emp001"}'
+```json
+{"message":"What is the leave policy?","conversation_id":"optional UUID"}
 ```
 
-Use the returned access token as a bearer token when calling `/api/v1/chat`.
+The response contains `answer`, `sources`, `conversation_id`, and `request_id`. A source has only validated server metadata: `document`, `page`, `section`, and `subsection`. Model output cannot author citation metadata. Invalid or absent evidence IDs produce a safe answer with no citations; malformed provider output also fails safely.
 
-## Index company policy PDFs
+The React Agent screen uses the employee's existing EMS session token, keeps its conversation ID in memory, renders model text as text rather than HTML, and presents grounding fallbacks as normal answers. Service failures are displayed separately.
 
-Indexing is an explicit offline operation; chat requests never process PDFs or build vectors.
+## Provider selection
 
-```bash
-cd RAG_Chatbot
-PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion
+The provider is backend configuration, not a React contract. OpenRouter remains the backward-compatible default:
+
+```sh
+LLM_PROVIDER=openrouter
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_MODEL=provider-model-id
 ```
 
-The command reads `data/documents/`, writes an ignored local FAISS baseline under `data/vectorstore/`, and reports document/page/chunk counts plus embedding dimension. Configure chunk sizes and retrieval limits with the `RAG_*` environment variables in `.env.example`.
+For local generation, select Ollama explicitly. It has no API key and never falls back to OpenRouter when unavailable:
 
-It also writes an ignored, inspectable BM25 corpus at `data/sparse/bm25_corpus.json`. The sparse corpus is loaded only when hybrid retrieval is enabled and is validated against the FAISS records. The reranker model is downloaded lazily on its first enabled request; normal tests mock it and do not download models.
+```sh
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen3:8b
+```
 
-## Retrieval evaluation
+Install Ollama, pull the configured model, and run its local server before starting RAG. Hardware requirements and latency vary by laptop; `qwen3:8b` is not assumed to be suitable for every machine. Ollama receives the same system prompt and bounded evidence as OpenRouter through `/api/chat`, with non-streaming deterministic options, `think:false`, and the JSON schema for the grounded response. Only the final message content is parsed; reasoning/thinking fields and raw provider responses are never returned to an employee. `/ready` checks that the configured local Ollama model is available without issuing a generation request.
 
-The manually reviewed document-level fixture is at `backend/data/evaluation/retrieval_cases.json`. Evaluation computes Hit Rate@K, MRR, and source-level Recall@K without an LLM. FAISS metadata filtering scans the local corpus for correctness; a future Qdrant backend can apply the same typed filters natively.
+## Offline index lifecycle
 
-## Tests
+Indexing is explicit and never occurs at startup or query time:
 
-```bash
+```sh
 cd RAG_Chatbot
+PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion build
+```
+
+The builder deterministically discovers the five policy PDFs, extracts and cleans pages, chunks them, embeds with `BAAI/bge-small-en-v1.5`, writes FAISS and BM25 artifacts to a staging directory, validates them, then promotes them atomically. A manifest records source hashes, the embedding model/dimension, chunk settings, and artifact counts. Missing, stale, or corrupt artifacts fail readiness and policy queries closed; serving never silently rebuilds an index.
+
+To keep historical repository artifacts untouched during local verification, set these non-secret paths to an ignored local directory before building and serving:
+
+```sh
+export RAG_RUNTIME_VECTOR_STORE_DIR=data/runtime/vectorstore
+export RAG_RUNTIME_SPARSE_INDEX_PATH=data/runtime/sparse/bm25_corpus.json
+export EMBEDDING_LOCAL_FILES_ONLY=true
+export EMBEDDING_CACHE_DIR=/path/to/already-provisioned/huggingface/hub
+PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion build
+```
+
+Runtime indexes, model caches, and generated sparse artifacts are not committed. `RAG_RUNTIME_VECTOR_STORE_DIR`, `RAG_RUNTIME_SPARSE_INDEX_PATH`, `EMBEDDING_CACHE_DIR`, `EMBEDDING_LOCAL_FILES_ONLY`, and `EMBEDDING_DEVICE` are configuration names only; do not commit local paths or credentials. `EMBEDDING_DEVICE=cpu` is the deterministic local default; select another supported device only after operational validation.
+
+## Retrieval and evidence calibration
+
+Local FAISS dense retrieval is the default: BGE dimension 384, candidate pool 30, top-K 5, context budget 1800. BM25/RRF hybrid retrieval and the cross-encoder reranker are available but disabled by default. On the 12-case manually reviewed synthetic/document-level fixture, dense retrieval measured Hit@5 **1.000**, MRR **0.9583**, Recall@5 **0.9583**, and average retrieval latency **17.74 ms**.
+
+The evidence calibration experiment found overlap between answerable and unsupported dense-score distributions. No cosine threshold was selected because it would reject legitimate evidence or admit unsupported material. The generation contract therefore requires the provider to return evidence IDs that are validated against retrieved chunks; it is instructed to use only the supplied evidence and to say it is not sure when evidence is insufficient.
+
+`VECTOR_STORE_BACKEND=faiss` is the default. `VECTOR_STORE_BACKEND=qdrant` validates a pre-existing compatible collection named by `QDRANT_COLLECTION`; it does not create, recreate, or index it during serving. A live production Qdrant deployment remains an operational follow-up.
+
+## Local run
+
+1. Start InfoTech infrastructure:
+
+   ```sh
+   cd infra
+   docker compose -f compose.yaml up -d
+   ```
+
+2. Start EMS:
+
+   ```sh
+   cd apps/ems-api
+   PYTHONPATH=. .venv/bin/alembic upgrade head
+   PYTHONPATH=. .venv/bin/uvicorn app.main:app --port 8001
+   ```
+
+3. Build the explicit local index as above, then run this service:
+
+   ```sh
+   cd RAG_Chatbot
+   PYTHONPATH=backend .venv/bin/uvicorn app.main:app --port 8000
+   ```
+
+4. Run the workspace:
+
+   ```sh
+   cd apps/web
+   VITE_AGENT_API_BASE_URL=http://localhost:8000 npm run dev
+   ```
+
+For browser access, configure `CORS_ALLOWED_ORIGINS` with the Vite origin (default `http://localhost:5173`). CORS permits the configured origin only and does not enable credentialed wildcard access. Required deployment configuration names include `EMS_JWT_SECRET`, `EMS_API_BASE_URL`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, and, if applicable, Qdrant configuration. Do not place secrets in Vite variables.
+
+## Verification and limitations
+
+Run the RAG regression suite with:
+
+```sh
 PYTHONPATH=backend .venv/bin/pytest backend/tests -q
 ```
 
-The suite includes offline `httpx.MockTransport` coverage for RS256 delegation claims, self-service employee binding, SLAMS response mapping, error mapping, and retry behavior. SLAMS has its own Maven integration suite for delegation verification.
+The evaluation fixture is limited and is not a production-quality guarantee. OpenRouter is an external dependency. Local FAISS is not a distributed vector database, and live Qdrant operational validation remains pending. Phase 5 is reserved for explicitly designed, authorized EMS action flows.

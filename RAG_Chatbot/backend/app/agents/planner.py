@@ -11,6 +11,8 @@ from app.schemas.workforce import AttendancePeriod
 
 
 DATE_PATTERN = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
+ID_PATTERN = re.compile(r"\b(?:id|record)\s*#?\s*(\d+)\b")
+TIME_PATTERN = re.compile(r"\b([01]\d|2[0-3]):[0-5]\d\b")
 
 
 @dataclass(frozen=True)
@@ -25,20 +27,20 @@ class DeterministicPlanner:
     def plan(self, message: str) -> Plan:
         normalized = message.strip().lower()
         if "regulariz" in normalized and "attendance" in normalized:
+            record = ID_PATTERN.search(normalized); times = TIME_PATTERN.findall(normalized)
+            if record is None or not times or "because" not in normalized: return Plan(clarification="Please provide an attendance record ID, requested check-in time, and reason before I prepare a proposal.")
+            args = {"attendance_id": int(record.group(1)), "requested_in_time": times[0] + ":00", "reason": normalized.split("because", 1)[1].strip()}
+            if len(times) > 1: args["requested_out_time"] = times[1] + ":00"
+            return Plan(invocation=ToolInvocation(tool_name="regularize_attendance", arguments=args))
+        if "leave" in normalized and any(term in normalized for term in ("apply", "request", "take")):
             dates = DATE_PATTERN.findall(normalized)
-            if len(dates) != 1:
-                return Plan(clarification="Please provide one attendance date in YYYY-MM-DD format before I prepare a proposal.")
-            return Plan(invocation=ToolInvocation(tool_name="regularize_attendance", arguments={"attendance_date": dates[0], "requested_status": "present"}))
-        if any(term in normalized for term in ("apply leave", "request leave", "take leave")):
-            dates = DATE_PATTERN.findall(normalized)
-            if "tomorrow" in normalized and not dates:
-                tomorrow = (date.today() + timedelta(days=1)).isoformat()
-                dates = [tomorrow, tomorrow]
-            if len(dates) != 2:
-                return Plan(clarification="Please provide leave start and end dates in YYYY-MM-DD format before I prepare a proposal.")
-            return Plan(invocation=ToolInvocation(tool_name="request_leave", arguments={"start_date": dates[0], "end_date": dates[1]}))
+            leave_type = next((kind for kind in ("casual", "sick", "earned") if kind in normalized), None)
+            if len(dates) != 2 or leave_type is None or "because" not in normalized: return Plan(clarification="Please provide leave type (CASUAL, SICK, or EARNED), start and end dates, and a reason.")
+            return Plan(invocation=ToolInvocation(tool_name="request_leave", arguments={"leave_type": leave_type.upper(), "start_date": dates[0], "end_date": dates[1], "reason": normalized.split("because", 1)[1].strip()}))
         if "leave balance" in normalized or "leave remaining" in normalized:
             return Plan(invocation=ToolInvocation(tool_name="get_my_leave_balance"))
+        if "attendance" in normalized and any(term in normalized for term in ("records", "recent", "which attendance record")):
+            return Plan(invocation=ToolInvocation(tool_name="get_my_attendance_records"))
         if "attendance" in normalized and any(term in normalized for term in ("summary", "show", "my attendance")):
             period = AttendancePeriod.LAST_30_DAYS if "30" in normalized else AttendancePeriod.SLAMS_AGGREGATE
             return Plan(invocation=ToolInvocation(tool_name="get_my_attendance_summary", arguments={"period": period.value}))

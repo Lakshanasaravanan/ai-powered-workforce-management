@@ -15,6 +15,7 @@ htmlcov/
 # Runtime output (introduced by later phases)
 data/vectorstore/
 data/sparse/
+data/runtime/
 *.log
 
 # Editor and operating-system files

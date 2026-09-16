@@ -1,0 +1,14 @@
+[
+  {"id":"a-leave","label":"answerable","query":"What is the leave policy?","expected_sources":["XYZ_Leave_Attendance_Policy.pdf"]},
+  {"id":"a-security","label":"answerable","query":"What guidance is provided for phishing emails?","expected_sources":["XYZ_IT_Security_Policy.pdf"]},
+  {"id":"a-conduct","label":"answerable","query":"What does the code of conduct require from employees?","expected_sources":["XYZ_Code_of_Conduct.pdf"]},
+  {"id":"a-attendance","label":"answerable","query":"How should attendance clock-in be handled?","expected_sources":["XYZ_Leave_Attendance_Policy.pdf"]},
+  {"id":"a-handbook","label":"answerable","query":"What guidance exists for workforce availability?","expected_sources":["XYZ_Workforce_Management_Handbook.pdf"]},
+  {"id":"u-balance","label":"unanswerable","query":"How many leave days do I personally have remaining?"},
+  {"id":"u-manager","label":"unanswerable","query":"Who is my current manager?"},
+  {"id":"u-attendance","label":"unanswerable","query":"Was I present at work yesterday?"},
+  {"id":"u-payroll","label":"unanswerable","query":"What is my next payroll deposit amount?"},
+  {"id":"u-office","label":"unanswerable","query":"What is the current office cafeteria menu?"},
+  {"id":"u-project","label":"unanswerable","query":"What is the current status of my project?"},
+  {"id":"u-weather","label":"unanswerable","query":"Will it rain in Bengaluru tomorrow?"}
+]

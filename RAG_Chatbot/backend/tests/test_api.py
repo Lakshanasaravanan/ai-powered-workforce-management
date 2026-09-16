@@ -19,9 +19,18 @@ def test_health(client):
 
 def test_ready(client):
     response = client.get("/ready")
-    assert response.status_code == 200
-    assert response.json()["status"] == "ready"
+    # The tracked legacy artifacts intentionally have no Step 2 manifest, so
+    # readiness must fail closed rather than silently rebuilding them.
+    assert response.status_code == 503
+    assert response.json()["dependencies"]["rag"] == "unavailable"
     assert response.json()["environment"] == "test"
+
+def test_metrics_are_reachable_and_private(client):
+    client.get("/health")
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert "agentic_rag_http_requests_total" in response.text
+    assert "EMP001" not in response.text and "Authorization" not in response.text and "private" not in response.text
 
 
 def test_request_id_is_generated_and_returned(client):
