@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Agent from './Agent';
 import Chat from './Chat';
+import Calendar from './Calendar';
 import { AuthProvider, useAuth } from './auth';
 import Employees from './Employees';
 import Inbox from './Inbox';
@@ -48,7 +49,7 @@ function Workspace() {
   const { user, logout } = useAuth(); const [unread, setUnread] = useState(0);
   const refreshUnread = async () => { try { setUnread((await notifications.unreadCount()).unread_count); } catch { setUnread(0); } };
   useEffect(() => { void refreshUnread(); }, []);
-  return <div className="app"><nav aria-label="Workspace navigation"><strong>IT</strong><NavLink to="/" end>Home</NavLink><NavLink to="/chat">Chat</NavLink><NavLink to="/leave">Leave</NavLink><NavLink to="/inbox">Inbox{unread > 0 && <b className="badge">{unread}</b>}</NavLink><NavLink to="/agent">Agent</NavLink>{user?.role === 'ADMIN' && <NavLink to="/employees">Employees</NavLink>}<button className="logout" onClick={logout}>Logout</button></nav><div className="workspace-content"><Routes><Route path="/" element={<Home />} /><Route path="/chat" element={<Chat />} /><Route path="/leave" element={<Leave onNotificationChange={() => void refreshUnread()} />} /><Route path="/inbox" element={<Inbox onUnreadChange={() => void refreshUnread()} />} /><Route path="/agent" element={<Agent />} /><Route path="/employees" element={user?.role === 'ADMIN' ? <Employees /> : <Navigate to="/" replace />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></div></div>;
+  return <div className="app"><nav aria-label="Workspace navigation"><strong>IT</strong><NavLink to="/" end>Home</NavLink><NavLink to="/chat">Chat</NavLink><NavLink to="/calendar">Calendar</NavLink><NavLink to="/leave">Leave</NavLink><NavLink to="/inbox">Inbox{unread > 0 && <b className="badge">{unread}</b>}</NavLink><NavLink to="/agent">Agent</NavLink>{user?.role === 'ADMIN' && <NavLink to="/employees">Employees</NavLink>}<button className="logout" onClick={logout}>Logout</button></nav><div className="workspace-content"><Routes><Route path="/" element={<Home />} /><Route path="/chat" element={<Chat />} /><Route path="/calendar" element={<Calendar />} /><Route path="/leave" element={<Leave onNotificationChange={() => void refreshUnread()} />} /><Route path="/inbox" element={<Inbox onUnreadChange={() => void refreshUnread()} />} /><Route path="/agent" element={<Agent />} /><Route path="/employees" element={user?.role === 'ADMIN' ? <Employees /> : <Navigate to="/" replace />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></div></div>;
 }
 
 function App() { const { user, loading } = useAuth(); if (loading) return <main>Restoring your session…</main>; if (!user) return <Routes><Route path="/login" element={<Login />} /><Route path="/first-login" element={<FirstLogin />} /><Route path="*" element={<Navigate to="/login" replace />} /></Routes>; return <Workspace />; }

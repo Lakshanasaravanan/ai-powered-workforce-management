@@ -170,3 +170,21 @@ persist, or place that token in URLs outside the local connection. Production
 should prefer a secure cookie or short-lived WebSocket ticket. The connection
 manager is single-instance only; horizontally scaled delivery requires Redis
 Pub/Sub or equivalent. Chat is not E2EE and does not use Gmail or Google Chat.
+
+## Phase 7 built-in Calendar
+
+Run the EMS migration before using Calendar:
+
+```sh
+cd apps/ems-api
+PYTHONPATH=. .venv/bin/alembic upgrade head
+```
+
+The `/calendar` workspace view uses runtime browser dates for Today and month
+navigation. It loads an authenticated date-range feed containing persisted
+company `CalendarEvent` records plus authorized projections of approved leave.
+Leave remains a `LeaveRequest`; it is not copied into `calendar_events`.
+Employees see their own approved leave, direct Managers see a direct report's
+approved leave, and ADMIN has no automatic private-leave access. Calendar event
+controls are convenience UI only; EMS enforces JWT-derived identity and mutation
+authorization. Google Calendar, Meet, and OAuth are not part of this phase.

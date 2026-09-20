@@ -144,3 +144,19 @@ local-development query parameter; it is not persisted or logged. The in-process
 connection manager is suitable for one EMS instance. Horizontal scaling needs
 Redis Pub/Sub or an equivalent fan-out layer. This is authorization-based
 privacy, not end-to-end encryption, and has no Gmail or Google Chat dependency.
+
+## Phase 7 built-in workplace calendar
+
+The built-in Calendar is an EMS feature. `CalendarEvent` records are persisted
+in PostgreSQL for company events, while `LeaveRequest` remains the authoritative
+source for leave. The calendar feed projects only approved leave into an
+authorized viewer's feed; it never creates a duplicate `CalendarEvent` row for
+leave.
+
+Calendar identity comes from the JWT on the server. Company-event mutations are
+authorized by the EMS API, not by browser controls. Private leave projection is
+limited to the employee and their direct Manager; an ADMIN role does not gain a
+private-leave visibility bypass. The React month view derives Today and the
+displayed month from the runtime date, and date-only all-day leave is rendered
+without a UTC date shift. Google Calendar, Google Meet, and OAuth integration
+are explicitly outside Phase 7.

@@ -83,6 +83,8 @@ export const chat = {
   send: (id: string, content: string) => request<ChatMessage>(`/api/v1/chat/conversations/${id}/messages`, { method: 'POST', body: JSON.stringify({ content }) }),
   read: (id: string) => request<{ ok: boolean }>(`/api/v1/chat/conversations/${id}/read`, { method: 'POST' }),
 };
+export type CalendarItem={id:string;title:string;event_type:string;start_at:string;end_at:string;all_day:boolean;kind:string;description?:string|null;location?:string|null};
+export const calendar={feed:(start:string,end:string)=>request<CalendarItem[]>(`/api/v1/calendar/feed?start=${start}&end=${end}`),get:(id:string)=>request<CalendarItem>(`/api/v1/calendar/events/${id}`),create:(body:object)=>request<CalendarItem>('/api/v1/calendar/events',{method:'POST',body:JSON.stringify(body)}),update:(id:string,body:object)=>request<CalendarItem>(`/api/v1/calendar/events/${id}`,{method:'PATCH',body:JSON.stringify(body)}),delete:(id:string)=>request<{ok:boolean}>(`/api/v1/calendar/events/${id}`,{method:'DELETE'})};
 
 export const policyAssistant = {
   async query(message: string, conversationId?: string): Promise<PolicyAnswer> {
