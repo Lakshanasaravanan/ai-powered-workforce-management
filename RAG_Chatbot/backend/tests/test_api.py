@@ -19,11 +19,14 @@ def test_health(client):
 
 def test_ready(client):
     response = client.get("/ready")
-    # The tracked legacy artifacts intentionally have no Step 2 manifest, so
-    # readiness must fail closed rather than silently rebuilding them.
-    assert response.status_code == 503
-    assert response.json()["dependencies"]["rag"] == "unavailable"
-    assert response.json()["environment"] == "test"
+    payload = response.json()
+    # Runtime artifacts are valid. The test host may or may not run the local
+    # selected provider, so assert the readiness contract rather than external
+    # provider availability.
+    provider_statuses = [value for key, value in payload["dependencies"].items() if key not in {"rag", "redis"}]
+    assert payload["dependencies"]["rag"] == "ready"
+    assert response.status_code == (200 if provider_statuses == ["ready"] else 503)
+    assert payload["environment"] == "test"
 
 def test_metrics_are_reachable_and_private(client):
     client.get("/health")

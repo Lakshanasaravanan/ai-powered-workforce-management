@@ -42,12 +42,12 @@ LLM_BASE_URL=https://openrouter.ai/api/v1
 LLM_MODEL=provider-model-id
 ```
 
-For local generation, select Ollama explicitly. It has no API key and never falls back to OpenRouter when unavailable:
+For local generation, use the non-secret launcher. It selects Ollama
+explicitly and never falls back to OpenRouter when Ollama is unavailable:
 
 ```sh
-LLM_PROVIDER=ollama
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen3:8b
+cd RAG_Chatbot
+bash scripts/run_local_ollama.sh
 ```
 
 Install Ollama, pull the configured model, and run its local server before starting RAG. Hardware requirements and latency vary by laptop; `qwen3:8b` is not assumed to be suitable for every machine. Ollama receives the same system prompt and bounded evidence as OpenRouter through `/api/chat`, with non-streaming deterministic options, `think:false`, and the JSON schema for the grounded response. Only the final message content is parsed; reasoning/thinking fields and raw provider responses are never returned to an employee. `/ready` checks that the configured local Ollama model is available without issuing a generation request.
@@ -63,17 +63,16 @@ PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion build
 
 The builder deterministically discovers the five policy PDFs, extracts and cleans pages, chunks them, embeds with `BAAI/bge-small-en-v1.5`, writes FAISS and BM25 artifacts to a staging directory, validates them, then promotes them atomically. A manifest records source hashes, the embedding model/dimension, chunk settings, and artifact counts. Missing, stale, or corrupt artifacts fail readiness and policy queries closed; serving never silently rebuilds an index.
 
-To keep historical repository artifacts untouched during local verification, set these non-secret paths to an ignored local directory before building and serving:
+Local artifacts resolve to the ignored `data/runtime/` directory by default.
+Build them explicitly before serving; startup and requests never rebuild an index:
 
 ```sh
-export RAG_RUNTIME_VECTOR_STORE_DIR=data/runtime/vectorstore
-export RAG_RUNTIME_SPARSE_INDEX_PATH=data/runtime/sparse/bm25_corpus.json
 export EMBEDDING_LOCAL_FILES_ONLY=true
 export EMBEDDING_CACHE_DIR=/path/to/already-provisioned/huggingface/hub
 PYTHONPATH=backend .venv/bin/python -m app.rag.ingestion build
 ```
 
-Runtime indexes, model caches, and generated sparse artifacts are not committed. `RAG_RUNTIME_VECTOR_STORE_DIR`, `RAG_RUNTIME_SPARSE_INDEX_PATH`, `EMBEDDING_CACHE_DIR`, `EMBEDDING_LOCAL_FILES_ONLY`, and `EMBEDDING_DEVICE` are configuration names only; do not commit local paths or credentials. `EMBEDDING_DEVICE=cpu` is the deterministic local default; select another supported device only after operational validation.
+Runtime indexes, model caches, and generated sparse artifacts are not committed. `RAG_RUNTIME_VECTOR_STORE_DIR`, `RAG_RUNTIME_SPARSE_INDEX_PATH`, `EMBEDDING_CACHE_DIR`, `EMBEDDING_LOCAL_FILES_ONLY`, and `EMBEDDING_DEVICE` are configuration names only; do not commit local paths or credentials. `EMBEDDING_DEVICE=cpu` is the deterministic local default; select another supported device only after operational validation. The local launcher also supplies macOS-safe `KMP_DUPLICATE_LIB_OK=TRUE`, `OMP_NUM_THREADS=1`, and `MKL_NUM_THREADS=1` defaults, which operators may override process-locally.
 
 ## Retrieval and evidence calibration
 
@@ -100,11 +99,14 @@ The evidence calibration experiment found overlap between answerable and unsuppo
    PYTHONPATH=. .venv/bin/uvicorn app.main:app --port 8001
    ```
 
-3. Build the explicit local index as above, then run this service:
+3. Build the explicit local index as above, then start Ollama and this service:
 
    ```sh
    cd RAG_Chatbot
-   PYTHONPATH=backend .venv/bin/uvicorn app.main:app --port 8000
+   ollama pull qwen3:8b
+   ollama serve
+   # In another terminal:
+   bash scripts/run_local_ollama.sh
    ```
 
 4. Run the workspace:
@@ -114,7 +116,7 @@ The evidence calibration experiment found overlap between answerable and unsuppo
    VITE_AGENT_API_BASE_URL=http://localhost:8000 npm run dev
    ```
 
-For browser access, configure `CORS_ALLOWED_ORIGINS` with the Vite origin (default `http://localhost:5173`). CORS permits the configured origin only and does not enable credentialed wildcard access. Required deployment configuration names include `EMS_JWT_SECRET`, `EMS_API_BASE_URL`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, and, if applicable, Qdrant configuration. Do not place secrets in Vite variables.
+For browser access, configure `CORS_ALLOWED_ORIGINS` with the Vite origin (default `http://localhost:5173`). CORS permits the configured origin only and does not enable credentialed wildcard access. `/health` is process liveness; `/ready` additionally requires valid retrieval artifacts and the selected LLM provider (including the configured Ollama model) to be usable. Required deployment configuration names include `EMS_JWT_SECRET`, `EMS_API_BASE_URL`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, and, if applicable, Qdrant configuration. Do not place secrets in Vite variables.
 
 ## Verification and limitations
 

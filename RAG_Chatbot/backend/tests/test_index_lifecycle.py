@@ -16,7 +16,14 @@ from app.rag.index_lifecycle import (
     validate_index,
     write_manifest,
 )
-from app.rag.ingestion import DOCUMENTS_DIR, _runtime_artifact_path, build_local_index
+from app.rag.ingestion import (
+    DOCUMENTS_DIR,
+    PROJECT_DIR,
+    SPARSE_INDEX_PATH,
+    VECTOR_STORE_DIR,
+    _runtime_artifact_path,
+    build_local_index,
+)
 from app.rag.sparse import write_sparse_corpus
 from app.schemas.rag import ChunkMetadata, DocumentChunk, PageDocument
 from app.services.vector_store import FaissVectorStore
@@ -69,6 +76,11 @@ def test_runtime_artifact_paths_are_opt_in(monkeypatch: pytest.MonkeyPatch, tmp_
     configured = tmp_path / "runtime" / "vectorstore"
     monkeypatch.setenv("RAG_TEST_RUNTIME_ARTIFACT", str(configured))
     assert _runtime_artifact_path("RAG_TEST_RUNTIME_ARTIFACT", default) == configured
+
+
+def test_local_runtime_artifact_defaults_are_project_relative():
+    assert VECTOR_STORE_DIR == PROJECT_DIR / "data" / "runtime" / "vectorstore"
+    assert SPARSE_INDEX_PATH == PROJECT_DIR / "data" / "runtime" / "sparse" / "bm25_corpus.json"
 
 
 def test_manifest_and_valid_artifacts_are_accepted(tmp_path: Path):

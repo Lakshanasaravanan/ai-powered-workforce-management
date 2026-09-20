@@ -97,12 +97,11 @@ Do not present balances or quotas to users. Leave accrual, carry-forward, annual
 
 The workspace `/agent` route is a Company Policy Assistant. It reuses the existing EMS session token and calls the standalone RAG service; it cannot apply leave, approve leave, regularize attendance, or modify employee data.
 
-Build a local index explicitly before starting RAG. To avoid replacing historical generated artifacts, use an ignored runtime directory:
+Build a local index explicitly before starting RAG. Generated local artifacts
+resolve under the ignored `data/runtime/` directory by default:
 
 ```sh
 cd RAG_Chatbot
-export RAG_RUNTIME_VECTOR_STORE_DIR=data/runtime/vectorstore
-export RAG_RUNTIME_SPARSE_INDEX_PATH=data/runtime/sparse/bm25_corpus.json
 export EMBEDDING_LOCAL_FILES_ONLY=true
 export EMBEDDING_DEVICE=cpu
 export EMBEDDING_CACHE_DIR=/path/to/provisioned/huggingface/hub
@@ -118,15 +117,26 @@ Dense BGE/FAISS is the default. Qdrant is a production-oriented option that vali
 
 ### Local Ollama generation
 
-OpenRouter remains the default provider. To keep policy context local for development, install and run Ollama, pull an appropriate local model, then select it through environment configuration (do not commit local values):
+OpenRouter remains the normal configuration default. For local policy
+generation, install and run Ollama, pull an appropriate local model, then use
+the non-secret launcher rather than maintaining a long shell export block:
 
 ```sh
-export LLM_PROVIDER=ollama
-export OLLAMA_BASE_URL=http://localhost:11434
-export OLLAMA_MODEL=qwen3:8b
+ollama pull qwen3:8b
+ollama serve
+# In another terminal, from RAG_Chatbot:
+bash scripts/run_local_ollama.sh
 ```
 
-The RAG service calls Ollama's non-streaming chat API with deterministic temperature, JSON schema output, and thinking disabled. It never falls back from Ollama to OpenRouter. If Ollama or the configured model is unavailable, readiness reports it and policy requests fail safely. Local model performance and hardware compatibility vary by machine.
+The launcher selects Ollama, project-relative runtime artifacts, CPU
+embeddings, local-files-only model loading, and macOS-safe OpenMP defaults
+(`KMP_DUPLICATE_LIB_OK=TRUE`, `OMP_NUM_THREADS=1`, and
+`MKL_NUM_THREADS=1`). Each is process-local and can be explicitly overridden.
+The RAG service calls Ollama's non-streaming chat API with deterministic
+temperature, JSON schema output, and thinking disabled. It never falls back
+from Ollama to OpenRouter. `/health` is liveness; `/ready` fails closed when
+the selected provider or retrieval artifacts are unavailable. Local model
+performance and hardware compatibility vary by machine.
 
 ## Phase 5 confirmed Agent actions
 

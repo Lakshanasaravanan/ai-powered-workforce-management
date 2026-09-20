@@ -19,6 +19,10 @@ class LLMProvider(ABC):
     @abstractmethod
     def generate(self, system_prompt: str, user_prompt: str, response_schema: dict[str, Any] | None = None) -> str: ...
 
+    def is_ready(self) -> bool:
+        """Return whether the selected provider is usable without generation."""
+        return True
+
 
 class UnavailableLLMProvider(LLMProvider):
     def __init__(self, reason: str) -> None:
@@ -26,6 +30,9 @@ class UnavailableLLMProvider(LLMProvider):
 
     def generate(self, system_prompt: str, user_prompt: str, response_schema: dict[str, Any] | None = None) -> str:
         raise LLMProviderError(self.reason)
+
+    def is_ready(self) -> bool:
+        return False
 
 
 class OpenRouterProvider(LLMProvider):

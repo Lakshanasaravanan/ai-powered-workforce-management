@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import httpx
 import pytest
@@ -13,7 +14,7 @@ from app.rag.context import ContextAssembler
 from app.rag.generator import GroundedGenerator
 from app.rag.service import RAGService
 from app.schemas.rag import ChunkMetadata, DocumentChunk, RetrievedChunk
-from app.services.llm import LLMProviderError, OllamaProvider
+from app.services.llm import LLMProviderError, OllamaProvider, UnavailableLLMProvider, build_llm_provider
 
 
 def ollama_settings() -> Settings:
@@ -29,6 +30,31 @@ def test_provider_configuration_accepts_openrouter_and_ollama_and_rejects_invali
     assert ollama_settings().llm_provider == "ollama"
     with pytest.raises(ValidationError):
         Settings(_env_file=None, llm_provider="unsupported")
+
+
+def test_local_ollama_launcher_sets_a_project_relative_backend_pythonpath():
+    launcher = Path(__file__).resolve().parents[2] / "scripts" / "run_local_ollama.sh"
+    contents = launcher.read_text(encoding="utf-8")
+    assert 'export PYTHONPATH="$project_dir/backend${PYTHONPATH:+:$PYTHONPATH}"' in contents
+    assert 'exec "$project_dir/.venv/bin/python" -m uvicorn app.main:app' in contents
+
+
+@pytest.mark.parametrize("provider", ["ollama", "openrouter"])
+def test_selected_provider_missing_configuration_is_unavailable_without_fallback(provider):
+    settings = Settings(
+        _env_file=None,
+        llm_provider=provider,
+        llm_api_key=None,
+        llm_base_url=None,
+        llm_model=None,
+        ollama_base_url=None,
+        ollama_model=None,
+    )
+    selected = build_llm_provider(settings)
+    assert isinstance(selected, UnavailableLLMProvider)
+    assert selected.is_ready() is False
+    assert "secret" not in selected.reason.lower()
+    assert "key" not in selected.reason.lower()
 
 
 def test_ollama_request_uses_model_json_schema_and_suppresses_thinking():

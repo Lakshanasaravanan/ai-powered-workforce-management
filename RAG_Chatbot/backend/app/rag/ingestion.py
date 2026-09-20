@@ -40,8 +40,11 @@ def _runtime_artifact_path(variable: str, default: Path) -> Path:
     return Path(configured).expanduser() if configured else default
 
 
-VECTOR_STORE_DIR = _runtime_artifact_path("RAG_RUNTIME_VECTOR_STORE_DIR", PROJECT_DIR / "data" / "vectorstore")
-SPARSE_INDEX_PATH = _runtime_artifact_path("RAG_RUNTIME_SPARSE_INDEX_PATH", PROJECT_DIR / "data" / "sparse" / "bm25_corpus.json")
+# Generated local artifacts belong under the ignored runtime directory by
+# default.  Explicit environment values remain available for deployments and
+# controlled builds, but local serving must never depend on the caller's cwd.
+VECTOR_STORE_DIR = _runtime_artifact_path("RAG_RUNTIME_VECTOR_STORE_DIR", PROJECT_DIR / "data" / "runtime" / "vectorstore")
+SPARSE_INDEX_PATH = _runtime_artifact_path("RAG_RUNTIME_SPARSE_INDEX_PATH", PROJECT_DIR / "data" / "runtime" / "sparse" / "bm25_corpus.json")
 
 
 def _sha256(value: bytes | str) -> str:

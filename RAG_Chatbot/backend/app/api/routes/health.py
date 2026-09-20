@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
 
 from app.core.config import get_settings
-from app.services.llm import LLMProviderError, OllamaProvider
+from app.services.llm import LLMProviderError, LLMProvider
 
 
 router = APIRouter(tags=["health"])
@@ -23,12 +23,13 @@ def ready(request: Request) -> JSONResponse:
     dependencies = {"rag": "ready" if rag_ready else "unavailable", "redis": "disabled"}
     ok = rag_ready
     provider = getattr(getattr(getattr(request.app.state, "rag_service", None), "generator", None), "provider", None)
-    if isinstance(provider, OllamaProvider):
+    if isinstance(provider, LLMProvider):
+        provider_name = getattr(settings, "llm_provider", "llm")
         try:
-            dependencies["ollama"] = "ready" if provider.is_ready() else "unavailable"
+            dependencies[provider_name] = "ready" if provider.is_ready() else "unavailable"
         except LLMProviderError:
-            dependencies["ollama"] = "unavailable"
-        ok = ok and dependencies["ollama"] == "ready"
+            dependencies[provider_name] = "unavailable"
+        ok = ok and dependencies[provider_name] == "ready"
     if settings.redis_enabled:
         try:
             request.app.state.redis_client.ping()
