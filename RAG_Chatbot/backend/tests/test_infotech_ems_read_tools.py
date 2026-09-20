@@ -79,6 +79,7 @@ def make_client(handler) -> InfoTechEMSReadClient:
     ("method", "path", "payload", "expected_type"),
     [
         ("get_my_profile", "/api/v1/auth/me", profile(), "EMSProfile"),
+        ("get_my_manager", "/api/v1/employees/me/manager", {"manager": profile(role="MANAGER")}, "EMSManagerResult"),
         ("get_my_leaves", "/api/v1/leaves/me", [leave()], "list"),
         ("get_my_notifications", "/api/v1/notifications", [notification()], "list"),
         ("get_unread_notification_count", "/api/v1/notifications/unread-count", {"unread_count": 3}, "EMSUnreadCount"),
@@ -121,10 +122,10 @@ def test_timeout_and_malformed_ems_response_fail_closed():
         malformed_client.get_my_profile(BEARER)
 
 
-def test_registry_has_exact_six_read_tools_and_no_generic_transport_surface():
+def test_registry_has_exact_seven_read_tools_and_no_generic_transport_surface():
     registry = build_infotech_read_registry(make_client(lambda _: httpx.Response(200, json=profile())))
     assert registry.names() == frozenset({
-        "get_my_profile", "get_my_leaves", "get_my_notifications", "get_unread_notification_count", "get_direct_reports", "get_team_leaves",
+        "get_my_profile", "get_my_manager", "get_my_leaves", "get_my_notifications", "get_unread_notification_count", "get_direct_reports", "get_team_leaves",
     })
     assert not hasattr(registry, "register")
     assert not hasattr(registry, "request")
@@ -156,7 +157,7 @@ def test_unknown_tool_fails_closed_without_any_http_call():
 
 def test_agent_role_policy_allows_personal_reads_and_manager_only_tools():
     registry = build_infotech_read_registry(make_client(lambda _: httpx.Response(200, json=[])))
-    personal = frozenset({"get_my_profile", "get_my_leaves", "get_my_notifications", "get_unread_notification_count"})
+    personal = frozenset({"get_my_profile", "get_my_manager", "get_my_leaves", "get_my_notifications", "get_unread_notification_count"})
     assert registry.names_for(context("EMPLOYEE")) == personal
     assert registry.names_for(context("ADMIN")) == personal
     assert registry.names_for(context("MANAGER")) == personal | {"get_direct_reports", "get_team_leaves"}

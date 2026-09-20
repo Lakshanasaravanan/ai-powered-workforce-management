@@ -41,7 +41,7 @@ def employee_payload(role: str) -> dict[str, object]:
     }
 
 
-def configure(client, *, role="EMPLOYEE", read_status=200):
+def configure(client, *, role="EMPLOYEE", read_status=200, manager_profile=None):
     def identity_handler(request: httpx.Request) -> httpx.Response:
         assert request.url.path == "/api/v1/auth/me"
         return httpx.Response(200, json={**employee_payload(role)})
@@ -54,6 +54,8 @@ def configure(client, *, role="EMPLOYEE", read_status=200):
             return httpx.Response(read_status, json={"detail": "safe"})
         if request.url.path == "/api/v1/auth/me":
             return httpx.Response(200, json=employee_payload(role))
+        if request.url.path == "/api/v1/employees/me/manager":
+            return httpx.Response(200, json={"manager": manager_profile})
         if request.url.path == "/api/v1/notifications/unread-count":
             return httpx.Response(200, json={"unread_count": 2})
         if request.url.path in {"/api/v1/leaves/me", "/api/v1/notifications", "/api/v1/leaves/team", "/api/v1/employees/me/direct-reports"}:
@@ -111,6 +113,26 @@ def test_policy_remains_grounded_path_while_nonpolicy_intents_do_not_call_rag(cl
     assert "no executable pending action" in confirmation.json()["answer"]
     assert "no pending action" in cancellation.json()["answer"]
     assert requests == []
+
+
+def test_manager_queries_use_the_fixed_self_hierarchy_read_path_without_rag(client):
+    manager = {**employee_payload("MANAGER"), "id": "87654321-4321-8765-4321-876543218765", "employee_code": "INF1002", "full_name": "Authoritative Manager"}
+    for message in ("Who is my manager?", "Who's my manager?", "Tell me my manager", "What is my manager's name?"):
+        rag, requests = configure(client, manager_profile=manager)
+        response = client.post("/api/v1/agent/query", json={"message": message}, headers=headers())
+        assert response.status_code == 200
+        assert "Authoritative Manager" in response.json()["answer"]
+        assert response.json()["sources"] == [] and rag.questions == []
+        assert [request.url.path for request in requests] == ["/api/v1/employees/me/manager"]
+
+
+def test_no_manager_and_client_identity_substitution_are_safe(client):
+    rag, requests = configure(client, manager_profile=None)
+    response = client.post("/api/v1/agent/query", json={"message": "Who is my manager?"}, headers=headers())
+    assert response.status_code == 200 and "No manager" in response.json()["answer"]
+    assert rag.questions == [] and [request.url.path for request in requests] == ["/api/v1/employees/me/manager"]
+    injected = client.post("/api/v1/agent/query", json={"message": "Who is my manager?", "employee_id": str(UUID("87654321-4321-8765-4321-876543218765"))}, headers=headers())
+    assert injected.status_code == 422
 
 
 def test_ems_error_is_safe_and_identity_fields_remain_rejected(client):

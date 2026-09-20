@@ -34,6 +34,9 @@ def search(q:str,db:Session=Depends(get_db),_:Employee=Depends(get_current_user)
  term=f'%{q}%';return [summary(x) for x in db.query(Employee).filter(Employee.is_active,or_(Employee.full_name.ilike(term),Employee.company_email.ilike(term),Employee.employee_code.ilike(term))).all()]
 @router.get('/me/direct-reports')
 def reports(user:Employee=Depends(require_manager),db:Session=Depends(get_db)):return [summary(x) for x in db.query(Employee).filter_by(manager_id=user.id,is_active=True).all()]
+@router.get('/me/manager')
+def manager(user:Employee=Depends(get_current_user),db:Session=Depends(get_db)):
+ return {'manager':summary(db.get(Employee,user.manager_id)) if user.manager_id and db.get(Employee,user.manager_id) else None}
 @router.get('/{employee_id}')
 def one(employee_id:str,db:Session=Depends(get_db),_:Employee=Depends(require_admin)):
  try:u=db.get(Employee,UUID(employee_id))

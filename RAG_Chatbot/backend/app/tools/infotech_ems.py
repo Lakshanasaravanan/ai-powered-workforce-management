@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from app.agents.models import InfoTechAgentExecutionContext
 from app.services.infotech_ems import (
     EMSLeave,
+    EMSManagerResult,
     EMSNotification,
     EMSProfile,
     EMSUnreadCount,
@@ -67,6 +68,16 @@ class GetMyProfileTool(InfoTechReadTool):
 
     def execute(self, context: InfoTechAgentExecutionContext, bearer_token: str, tool_input: EmptyReadInput) -> EMSProfile:
         return self._client.get_my_profile(bearer_token)
+
+
+class GetMyManagerTool(InfoTechReadTool):
+    spec = InfoTechReadToolSpec(name="get_my_manager", description="Read the authenticated employee's assigned manager.", allowed_roles=frozenset({"ADMIN", "MANAGER", "EMPLOYEE"}))
+
+    def __init__(self, client: InfoTechEMSReadClient) -> None:
+        self._client = client
+
+    def execute(self, context: InfoTechAgentExecutionContext, bearer_token: str, tool_input: EmptyReadInput) -> EMSManagerResult:
+        return self._client.get_my_manager(bearer_token)
 
 
 class GetMyLeavesTool(InfoTechReadTool):
@@ -157,6 +168,7 @@ class InfoTechReadToolRegistry:
 def build_infotech_read_registry(client: InfoTechEMSReadClient) -> InfoTechReadToolRegistry:
     return InfoTechReadToolRegistry([
         GetMyProfileTool(client),
+        GetMyManagerTool(client),
         GetMyLeavesTool(client),
         GetMyNotificationsTool(client),
         GetUnreadNotificationCountTool(client),

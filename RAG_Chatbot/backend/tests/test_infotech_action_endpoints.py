@@ -124,6 +124,34 @@ def test_confirm_is_authenticated_bound_nonexecuting_and_idempotent(client):
     assert replay.status_code == 409
 
 
+def test_explicit_date_query_prepares_before_the_typed_ems_confirmation(client):
+    store = configure(client)
+    recorder = client.app.state.infotech_ems_client
+    response = client.post(
+        "/api/v1/agent/query",
+        json={
+            "message": "Apply for casual leave on September 25, 2026 because of a family visit.",
+            "conversation_id": str(CONVERSATION_ID),
+        },
+        headers=bearer(),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["response_type"] == "action_proposal"
+    assert body["action"]["safe_display"]["date"] == "2026-09-25"
+    assert recorder.calls == []
+    action_id = body["action"]["action_id"]
+    confirmed = client.post(
+        f"/api/v1/agent/actions/{action_id}/confirm",
+        json={"conversation_id": str(CONVERSATION_ID)},
+        headers=bearer(),
+    )
+    assert confirmed.status_code == 200
+    assert len(recorder.calls) == 1
+    stored = store._load(store._client.get(store._key(UUID(action_id))))
+    assert stored.tool_name is InfoTechActionName.APPLY_LEAVE
+
+
 def test_cancel_and_privacy_boundaries_reject_unsafe_inputs(client):
     store = configure(client)
     action = create(store)

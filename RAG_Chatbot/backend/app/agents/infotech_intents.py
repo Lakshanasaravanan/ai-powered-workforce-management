@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from enum import StrEnum
 
-from app.services.infotech_ems import EMSLeave, EMSNotification, EMSProfile, EMSUnreadCount
+from app.services.infotech_ems import EMSLeave, EMSManagerResult, EMSNotification, EMSProfile, EMSUnreadCount
 
 
 class InfoTechIntent(StrEnum):
@@ -20,7 +20,7 @@ class InfoTechIntent(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
-READ_TOOL_NAMES = frozenset({"get_my_profile", "get_my_leaves", "get_my_notifications", "get_unread_notification_count", "get_direct_reports", "get_team_leaves"})
+READ_TOOL_NAMES = frozenset({"get_my_profile", "get_my_manager", "get_my_leaves", "get_my_notifications", "get_unread_notification_count", "get_direct_reports", "get_team_leaves"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,6 +44,7 @@ class InfoTechIntentRouter:
     _balance = re.compile(r"\b(?:leave balance|leaves? (?:do i|can i) have left|leaves? remaining|remaining (?:casual|medical|sick)? ?leaves?)\b", re.IGNORECASE)
     _mutation = re.compile(r"\b(?:apply|request|take|approve|reject|mark)\b.*\b(?:leave|day off|notification|inbox)\b", re.IGNORECASE)
     _leave_decision = re.compile(r"^\s*(?:approve|reject)\b", re.IGNORECASE)
+    _my_manager = re.compile(r"(?:who(?:'s| is) my manager|tell me (?:who )?my manager|what is my manager's name)\??", re.IGNORECASE)
     _unsupported = re.compile(r"\b(?:attendance|payroll|salary|delete[_\s]+employee|create\s+(?:an?\s+)?employee|edit\s+(?:an?\s+)?employee|deactivate\s+(?:an?\s+)?employee|another employee|someone else(?:'s)? (?:profile|leaves?)|employee_id|manager_id|call a tool|tool named|ignore your rules|call\s+get_[a-z_]+)\b", re.IGNORECASE)
     _policy = re.compile(r"\b(?:what is|explain|does|policy|code of conduct|security policy|it security|casual leave|medical leave|day off)\b", re.IGNORECASE)
 
@@ -55,6 +56,8 @@ class InfoTechIntentRouter:
             return InfoTechIntentDecision(InfoTechIntent.CANCELLATION)
         if self._leave_decision.match(normalized):
             return InfoTechIntentDecision(InfoTechIntent.LEAVE_DECISION_REQUEST)
+        if self._my_manager.fullmatch(normalized):
+            return InfoTechIntentDecision(InfoTechIntent.READ_ACTION, "get_my_manager")
         if self._balance.search(normalized):
             return InfoTechIntentDecision(InfoTechIntent.UNSUPPORTED, message="Leave balance is unavailable because InfoTech EMS does not yet have an authoritative entitlement or accrual engine.")
         if self._mutation.search(normalized):
@@ -86,6 +89,11 @@ def format_read_result(tool_name: str, result, *, decision_references: dict[str,
         assert isinstance(result, EMSProfile)
         manager = "No manager is assigned" if result.manager_id is None else "A manager is assigned"
         return f"{result.full_name} ({result.employee_code}) — {result.designation} in {result.department}. {manager}."
+    if tool_name == "get_my_manager":
+        assert isinstance(result, EMSManagerResult)
+        if result.manager is None:
+            return "No manager is currently assigned."
+        return f"Your manager is {result.manager.full_name} ({result.manager.employee_code})."
     if tool_name == "get_unread_notification_count":
         assert isinstance(result, EMSUnreadCount)
         return f"You have {result.unread_count} unread notification{'s' if result.unread_count != 1 else ''}."

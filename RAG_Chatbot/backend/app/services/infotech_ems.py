@@ -70,6 +70,12 @@ class EMSProfile(BaseModel):
     is_active: bool
 
 
+class EMSManagerResult(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    manager: EMSProfile | None
+
+
 class EMSLeaveEmployee(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -179,6 +185,9 @@ class InfoTechEMSReadClient:
 
     def get_my_profile(self, bearer_token: str) -> EMSProfile:
         return self._parse(EMSProfile, self._get("/api/v1/auth/me", bearer_token))
+
+    def get_my_manager(self, bearer_token: str) -> EMSManagerResult:
+        return self._parse(EMSManagerResult, self._get("/api/v1/employees/me/manager", bearer_token))
 
     def get_my_leaves(self, bearer_token: str) -> list[EMSLeave]:
         payload = self._get("/api/v1/leaves/me", bearer_token)
