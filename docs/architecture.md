@@ -124,3 +124,23 @@ EMS remains the final authority for authorization and leave business rules.
 Employee and Admin roles cannot make Manager leave decisions. Existing Medical
 leave semantics remain unchanged: they are automatically approved by policy and
 are not converted into Manager decision actions.
+
+## Phase 6 real-time chat
+
+Chat is an EMS-owned PostgreSQL feature using `ChatConversation`,
+`ChatParticipant`, and `ChatMessage`. Direct conversations use a canonical
+participant key to prevent duplicates; group conversations explicitly include
+their creator and selected active employees. Employee directory search is
+reused to start conversations.
+
+Conversation and message access is membership-based. ADMIN has no global
+private-chat access. REST is the only message mutation path: it resolves the
+JWT-derived sender, persists the message and recipient CHAT notifications, then
+emits a safe `message.created` event after commit. Unread state is per
+participant via `last_read_at`.
+
+The browser connects to `/api/v1/chat/ws` with its existing session token as a
+local-development query parameter; it is not persisted or logged. The in-process
+connection manager is suitable for one EMS instance. Horizontal scaling needs
+Redis Pub/Sub or an equivalent fan-out layer. This is authorization-based
+privacy, not end-to-end encryption, and has no Gmail or Google Chat dependency.

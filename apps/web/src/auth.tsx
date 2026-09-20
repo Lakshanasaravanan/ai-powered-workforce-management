@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const base = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8001';
-type User = { full_name: string; role: string; employee_code: string; company_email: string; designation: string; department: string; manager_id: string | null };
+type User = { id: string; full_name: string; role: string; employee_code: string; company_email: string; designation: string; department: string; manager_id: string | null };
 type Auth = { user: User | null; loading: boolean; login: (employeeCode: string, password: string) => Promise<void>; logout: () => void };
 const Context = createContext<Auth>(null!);
 

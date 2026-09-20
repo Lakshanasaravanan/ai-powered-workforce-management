@@ -155,3 +155,18 @@ because the original ephemeral Redis pending-action records had expired or were
 no longer present locally. Replay, idempotency, concurrency, and lost-response
 recovery remain covered by automated Phase 5 tests; this does not claim that a
 later live replay passed.
+
+## Phase 6 chat
+
+Use the Workspace Chat screen to search active employees, open direct or group
+conversations, and send messages. Messages are persisted through the EMS REST
+API; active members receive post-commit `message.created` WebSocket events and
+non-senders receive recipient-private CHAT notifications. A participant's
+`last_read_at` controls their own unread count only.
+
+The local WebSocket endpoint is `/api/v1/chat/ws` and uses the current browser
+session token in the connection query for development compatibility. Do not log,
+persist, or place that token in URLs outside the local connection. Production
+should prefer a secure cookie or short-lived WebSocket ticket. The connection
+manager is single-instance only; horizontally scaled delivery requires Redis
+Pub/Sub or equivalent. Chat is not E2EE and does not use Gmail or Google Chat.

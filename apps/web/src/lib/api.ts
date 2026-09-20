@@ -25,6 +25,8 @@ export type DecisionSource = 'AUTOMATIC_POLICY' | 'MANAGER';
 export type LeaveRequest = { id: string; employee: Pick<Employee, 'id' | 'employee_code' | 'full_name'>; leave_type: LeaveType; status: LeaveStatus; start_date: string; end_date: string; duration: LeaveDuration; half_day_period: HalfDayPeriod | null; reason: string; approval_required: boolean; decided_by_id: string | null; decided_at: string | null; decision_note: string | null; decision_source: DecisionSource | null; manager_notification_delivered: boolean | null; created_at: string; updated_at: string; };
 export type NotificationCategory = 'LEAVE' | 'CHAT' | 'CALENDAR' | 'SYSTEM';
 export type Notification = { id: string; category: NotificationCategory; title: string; message: string; is_read: boolean; read_at: string | null; related_entity_type: string | null; related_entity_id: string | null; created_at: string; };
+export type ChatMessage = { id: string; conversation_id: string; sender_employee_id: string; content: string; created_at: string; };
+export type ChatConversation = { id: string; type: 'DIRECT' | 'GROUP'; name: string | null; created_by: string; updated_at: string; unread_count: number; last_message: ChatMessage | null; };
 export type PolicyCitation = { document: string; page: number; section: string | null; subsection: string | null };
 export type AgentAction = { action_id: string; tool_name: 'apply_leave' | 'approve_leave' | 'reject_leave'; safe_display: Record<string, string | null>; created_at: string; expires_at: string; state: string };
 export type PolicyAnswer = { answer: string; sources: PolicyCitation[]; conversation_id: string; request_id: string | null; response_type?: 'message' | 'clarification' | 'action_proposal'; action?: AgentAction | null };
@@ -72,6 +74,14 @@ export const notifications = {
   list: () => request<Notification[]>('/api/v1/notifications'), unreadCount: () => request<{ unread_count: number }>('/api/v1/notifications/unread-count'),
   markRead: (id: string) => request<Notification>(`/api/v1/notifications/${id}/read`, { method: 'POST' }),
   markAllRead: () => request<{ updated_count: number }>('/api/v1/notifications/read-all', { method: 'POST' }),
+};
+export const chat = {
+  conversations: () => request<ChatConversation[]>('/api/v1/chat/conversations'),
+  direct: (target_employee_id: string) => request<ChatConversation>('/api/v1/chat/conversations/direct', { method: 'POST', body: JSON.stringify({ target_employee_id }) }),
+  group: (name: string, participant_employee_ids: string[]) => request<ChatConversation>('/api/v1/chat/conversations/group', { method: 'POST', body: JSON.stringify({ name, participant_employee_ids }) }),
+  messages: (id: string) => request<ChatMessage[]>(`/api/v1/chat/conversations/${id}/messages`),
+  send: (id: string, content: string) => request<ChatMessage>(`/api/v1/chat/conversations/${id}/messages`, { method: 'POST', body: JSON.stringify({ content }) }),
+  read: (id: string) => request<{ ok: boolean }>(`/api/v1/chat/conversations/${id}/read`, { method: 'POST' }),
 };
 
 export const policyAssistant = {
