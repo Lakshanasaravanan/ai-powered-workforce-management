@@ -76,6 +76,7 @@ export const notifications = {
   markAllRead: () => request<{ updated_count: number }>('/api/v1/notifications/read-all', { method: 'POST' }),
 };
 export const chat = {
+  websocketTicket: () => request<{ ticket: string; expires_in: number }>('/api/v1/chat/ws-ticket', { method: 'POST' }),
   conversations: () => request<ChatConversation[]>('/api/v1/chat/conversations'),
   direct: (target_employee_id: string) => request<ChatConversation>('/api/v1/chat/conversations/direct', { method: 'POST', body: JSON.stringify({ target_employee_id }) }),
   group: (name: string, participant_employee_ids: string[]) => request<ChatConversation>('/api/v1/chat/conversations/group', { method: 'POST', body: JSON.stringify({ name, participant_employee_ids }) }),

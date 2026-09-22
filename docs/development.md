@@ -57,6 +57,14 @@ PYTHONPATH=. .venv/bin/python -m app.seed
 PYTHONPATH=. .venv/bin/uvicorn app.main:app --port 8001
 ```
 
+Before starting EMS, create an ignored local `apps/ems-api/.env` from the
+example and set `JWT_SECRET` to a locally generated value of at least 32 bytes.
+EMS rejects short values and never echoes them in validation errors. Do not use
+the example placeholder or commit a real secret.
+When the local RAG Agent integration is enabled, its ignored
+`EMS_JWT_SECRET` must be set to the same local value so it can verify EMS
+sessions; do not place either value in frontend configuration.
+
 Run the web workspace in another terminal:
 
 ```sh
@@ -174,12 +182,18 @@ API; active members receive post-commit `message.created` WebSocket events and
 non-senders receive recipient-private CHAT notifications. A participant's
 `last_read_at` controls their own unread count only.
 
-The local WebSocket endpoint is `/api/v1/chat/ws` and uses the current browser
-session token in the connection query for development compatibility. Do not log,
-persist, or place that token in URLs outside the local connection. Production
-should prefer a secure cookie or short-lived WebSocket ticket. The connection
-manager is single-instance only; horizontally scaled delivery requires Redis
-Pub/Sub or equivalent. Chat is not E2EE and does not use Gmail or Google Chat.
+The local WebSocket endpoint is `/api/v1/chat/ws`. The browser first requests a
+short-lived, single-use ticket from authenticated `POST /api/v1/chat/ws-ticket`
+and passes that ticket only in the WebSocket subprotocol; the long-lived JWT is
+never placed in the WebSocket URL. Redis stores only a hash of the opaque ticket
+and atomically consumes it at connection time. Connections require an allowed
+Origin, an active server-resolved employee, and the normal chat membership
+checks. This keeps the credential out of normal URL access logs; EMS does not
+log WebSocket protocol headers or ticket values. Redis is therefore required for
+WebSocket ticket issuance and validation.
+The connection manager is single-instance only; horizontally scaled event
+delivery requires Redis Pub/Sub or equivalent. Chat is not E2EE and does not use
+Gmail or Google Chat.
 
 ## Phase 7 built-in Calendar
 

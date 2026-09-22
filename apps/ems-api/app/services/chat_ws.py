@@ -5,8 +5,8 @@ from fastapi import WebSocket
 
 class ChatConnectionManager:
     def __init__(self): self._connections: dict[str,set[WebSocket]]=defaultdict(set)
-    async def connect(self, employee_id:str, websocket:WebSocket):
-        await websocket.accept(); self._connections[employee_id].add(websocket)
+    async def connect(self, employee_id:str, websocket:WebSocket, subprotocol: str | None = None):
+        await websocket.accept(subprotocol=subprotocol); self._connections[employee_id].add(websocket)
     def disconnect(self, employee_id:str, websocket:WebSocket):
         self._connections[employee_id].discard(websocket)
         if not self._connections[employee_id]: self._connections.pop(employee_id,None)

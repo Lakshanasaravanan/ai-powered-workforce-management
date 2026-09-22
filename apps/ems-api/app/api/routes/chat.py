@@ -1,6 +1,6 @@
 from datetime import datetime
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -13,6 +13,7 @@ from app.models.notification import NotificationCategory
 from app.schemas.chat import DirectConversationRequest, GroupConversationRequest, MessageRequest
 from app.services.notifications import create_notification
 from app.services.chat_ws import manager
+from app.services.websocket_tickets import WebSocketTicketError
 
 router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
 def participant(db, cid, uid): return db.get(ChatParticipant, {"conversation_id": cid, "employee_id": uid})
@@ -67,18 +68,27 @@ async def send(conversation_id:UUID,body:MessageRequest,db:Session=Depends(get_d
 def read(conversation_id:UUID,db:Session=Depends(get_db),user:Employee=Depends(get_current_user)):
     require_member(db,conversation_id,user); p=participant(db,conversation_id,user.id); p.last_read_at=datetime.utcnow(); db.commit(); return {"ok":True}
 
+@router.post("/ws-ticket")
+def websocket_ticket(request: Request, user:Employee=Depends(get_current_user)):
+    try:
+        ticket = request.app.state.websocket_ticket_store.issue(user.id)
+    except WebSocketTicketError as exc:
+        raise HTTPException(503, "WebSocket authentication is temporarily unavailable") from exc
+    return {"ticket": ticket, "expires_in": request.app.state.websocket_ticket_store.ttl_seconds}
+
 @router.websocket("/ws")
 async def websocket_chat(websocket:WebSocket):
-    token=websocket.query_params.get("token")
+    from app.core.config import Settings
+    requested = [value for value in websocket.scope.get("subprotocols", []) if value.startswith("infotech.chat.ticket.")]
+    if websocket.headers.get("origin") not in Settings().cors_origins or len(requested) != 1:
+        await websocket.close(code=1008); return
     try:
-        import jwt
-        from app.core.config import Settings
-        settings=Settings(); payload=jwt.decode(token or "",settings.jwt_secret,algorithms=[settings.jwt_algorithm]); employee_id=UUID(str(payload.get("sub")))
+        employee_id=websocket.app.state.websocket_ticket_store.consume(requested[0].removeprefix("infotech.chat.ticket."))
         db=SessionLocal(); user=db.get(Employee,employee_id)
         if not user or not user.is_active: raise ValueError()
     except Exception:
         await websocket.close(code=1008); return
-    await manager.connect(str(employee_id),websocket)
+    await manager.connect(str(employee_id),websocket,requested[0])
     try:
         while True: await websocket.receive_text()
     except WebSocketDisconnect: pass
