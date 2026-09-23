@@ -96,7 +96,7 @@ The evidence calibration experiment found overlap between answerable and unsuppo
    ```sh
    cd apps/ems-api
    PYTHONPATH=. .venv/bin/alembic upgrade head
-   PYTHONPATH=. .venv/bin/uvicorn app.main:app --port 8001
+   PYTHONPATH=. .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8001 --workers 1
    ```
 
 3. Build the explicit local index as above, then start Ollama and this service:
@@ -106,17 +106,17 @@ The evidence calibration experiment found overlap between answerable and unsuppo
    ollama pull qwen3:8b
    ollama serve
    # In another terminal:
-   bash scripts/run_local_ollama.sh
+   CORS_ALLOWED_ORIGINS='http://localhost:5173,http://127.0.0.1:5173' bash scripts/run_local_ollama.sh
    ```
 
 4. Run the workspace:
 
    ```sh
    cd apps/web
-   VITE_AGENT_API_BASE_URL=http://localhost:8000 npm run dev
+   VITE_API_BASE_URL=http://127.0.0.1:8001 VITE_AGENT_API_BASE_URL=http://127.0.0.1:8000 npm run dev -- --host 127.0.0.1
    ```
 
-For browser access, configure `CORS_ALLOWED_ORIGINS` with the Vite origin (default `http://localhost:5173`). CORS permits the configured origin only and does not enable credentialed wildcard access. `/health` is process liveness; `/ready` additionally requires valid retrieval artifacts and the selected LLM provider (including the configured Ollama model) to be usable. Required deployment configuration names include `EMS_JWT_SECRET`, `EMS_API_BASE_URL`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, and, if applicable, Qdrant configuration. Do not place secrets in Vite variables.
+For browser access, configure `CORS_ALLOWED_ORIGINS` with both supported Vite origins, `http://localhost:5173` and `http://127.0.0.1:5173`. CORS permits configured origins only and does not enable credentialed wildcard access. `/health` is process liveness; `/ready` additionally requires valid retrieval artifacts and the selected LLM provider (including the configured Ollama model) to be usable. Required deployment configuration names include `EMS_JWT_SECRET`, `EMS_API_BASE_URL`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, and, if applicable, Qdrant configuration. Do not place secrets in Vite variables.
 
 ## Verification and limitations
 
@@ -126,4 +126,4 @@ Run the RAG regression suite with:
 PYTHONPATH=backend .venv/bin/pytest backend/tests -q
 ```
 
-The evaluation fixture is limited and is not a production-quality guarantee. OpenRouter is an external dependency. Local FAISS is not a distributed vector database, and live Qdrant operational validation remains pending. Phase 5 is reserved for explicitly designed, authorized EMS action flows.
+The evaluation fixture is limited and is not a production-quality guarantee. OpenRouter is an external dependency. Local FAISS is not a distributed vector database, and live Qdrant operational validation remains pending. The confirmed Agent workflow uses a deliberately small, typed set of authorized EMS actions; it does not permit arbitrary tool execution.
