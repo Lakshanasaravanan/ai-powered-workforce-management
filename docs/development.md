@@ -101,9 +101,9 @@ The frontend provides My Leave, Apply Leave, Manager Team Leave, direct-manager 
 
 Do not present balances or quotas to users. Leave accrual, carry-forward, annual quota, monthly reset, half-year reset, and balance enforcement are not implemented because the entitlement policy has not yet been finalized.
 
-## Phase 4 policy assistant
+## Policy RAG capability
 
-The workspace `/agent` route is a Company Policy Assistant. It reuses the existing EMS session token and calls the standalone RAG service; it cannot apply leave, approve leave, regularize attendance, or modify employee data.
+The workspace `/agent` route reuses the existing EMS session token and calls the standalone RAG service. Policy answers remain grounded in the policy index. The later Agent workflow can also prepare only its small, typed set of workforce actions; those actions require an explicit server-side confirmation and EMS remains the authorization authority.
 
 Build a local index explicitly before starting RAG. Generated local artifacts
 resolve under the ignored `data/runtime/` directory by default:
@@ -212,3 +212,99 @@ Employees see their own approved leave, direct Managers see a direct report's
 approved leave, and ADMIN has no automatic private-leave access. Calendar event
 controls are convenience UI only; EMS enforces JWT-derived identity and mutation
 authorization. Google Calendar, Meet, and OAuth are not part of this phase.
+
+## Local startup and recovery runbook
+
+### Prerequisites and first-time setup
+
+Install Docker Desktop with Compose, Python environments compatible with the
+checked-in `.venv` dependencies, Node/npm, and Ollama. Pull the local model once:
+
+```sh
+ollama pull qwen3:8b
+```
+
+Create ignored local configuration files from `apps/ems-api/.env.example` and
+`RAG_Chatbot/.env.example`. Generate the required local JWT values separately;
+never put their values in documentation, frontend variables, or Git. Build the
+policy index explicitly only when it is absent or stale, as described above.
+
+### Normal daily startup
+
+Use separate terminals, in this order:
+
+```sh
+cd infra
+docker compose up -d postgres redis
+docker compose ps
+```
+
+```sh
+cd apps/ems-api
+PYTHONPATH=. .venv/bin/alembic upgrade head
+PYTHONPATH=. .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001 --workers 1
+```
+
+If Ollama is not already listening on `127.0.0.1:11434`, start `ollama serve` in
+another terminal. Do not start a second instance when it is already running.
+
+```sh
+cd RAG_Chatbot
+CORS_ALLOWED_ORIGINS='http://localhost:5173,http://127.0.0.1:5173' bash scripts/run_local_ollama.sh
+```
+
+The launcher is self-contained: it sets its project-relative Python import and
+runtime-artifact paths, selects local Ollama `qwen3:8b`, uses CPU/offline
+embeddings, and enables the Redis pending-action store. It never falls back to a
+cloud provider.
+
+```sh
+cd apps/web
+npm run dev -- --host 127.0.0.1
+```
+
+The services are available at the following local URLs:
+
+- Workspace: `http://127.0.0.1:5173/`
+- EMS: `http://127.0.0.1:8001/health`
+- Agent liveness: `http://127.0.0.1:8000/health`
+- Agent readiness: `http://127.0.0.1:8000/ready`
+
+The frontend defaults use `localhost` for API URLs, which is supported by the
+configured CORS allowlists. When a local setup explicitly uses `127.0.0.1` API
+variables, keep the same two origins in both EMS and Agent CORS configuration.
+
+### Health checks, shutdown, and recovery
+
+After startup, `docker compose ps` must show healthy PostgreSQL and Redis; EMS
+`/health`, Agent `/health`, and Agent `/ready` must succeed. Readiness also
+confirms the FAISS/BM25 artifacts, Ollama model, and Redis pending-action store.
+
+Closing a frontend terminal only requires restarting the frontend. Closing EMS
+only requires the EMS command above after PostgreSQL is healthy. Closing Agent
+only requires the launcher command above; generated runtime artifacts remain on
+disk. If Ollama is unavailable, Agent readiness fails closed. If Redis is
+unavailable, secure WebSocket tickets and Agent write preparation fail closed;
+they recover after Redis returns. If PostgreSQL is unavailable, EMS remains
+unavailable until PostgreSQL returns.
+
+For a normal infrastructure stop/start, preserve volumes and data:
+
+```sh
+cd infra
+docker compose stop
+docker compose start
+```
+
+Never use `docker compose down -v` as a normal recovery command: `-v` removes
+the local database volume. Do not run `app.seed` on every start; it is a
+bootstrap/recovery utility and routine seeding is intentionally non-destructive.
+The development-only cleanup command is explicit and idempotent:
+
+```sh
+cd apps/ems-api
+PYTHONPATH=. .venv/bin/python -m app.cleanup_development_data
+```
+
+It removes only its documented allowlisted development records; do not use it as
+a general data-deletion tool.
