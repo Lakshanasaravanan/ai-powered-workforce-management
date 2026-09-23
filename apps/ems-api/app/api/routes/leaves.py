@@ -70,7 +70,6 @@ def get_employee_or_404(db: Session, employee_id: UUID) -> Employee:
 def can_view_leave(user: Employee, requester: Employee) -> bool:
     return (
         user.id == requester.id
-        or user.role is Role.ADMIN
         or (user.role is Role.MANAGER and requester.manager_id == user.id)
     )
 

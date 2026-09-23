@@ -136,14 +136,14 @@ def test_leave_validation_rejects_invalid_dates_and_day_off_shape():
     ).status_code == 422
 
 
-def test_leave_visibility_is_scoped_to_self_direct_manager_and_admin():
+def test_leave_visibility_is_scoped_to_self_and_direct_manager_only():
     admin, manager, employee, other = setup()
     response = create(employee)
     leave_id = response.json()["id"]
     assert client.get("/api/v1/leaves/me", headers=headers(employee)).status_code == 200
     assert client.get(f"/api/v1/leaves/{leave_id}", headers=headers(employee)).status_code == 200
     assert client.get(f"/api/v1/leaves/{leave_id}", headers=headers(manager)).status_code == 200
-    assert client.get(f"/api/v1/leaves/{leave_id}", headers=headers(admin)).status_code == 200
+    assert client.get(f"/api/v1/leaves/{leave_id}", headers=headers(admin)).status_code == 403
     assert client.get(f"/api/v1/leaves/{leave_id}", headers=headers(other)).status_code == 403
     team = client.get("/api/v1/leaves/team", headers=headers(manager))
     assert team.status_code == 200 and [item["id"] for item in team.json()] == [leave_id]
