@@ -1,5 +1,6 @@
 import os
 os.environ['DATABASE_URL']='sqlite:///./phase2-test.db'
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -7,7 +8,7 @@ from sqlalchemy.pool import StaticPool
 from app.main import app
 from app.db.session import Base,get_db
 from app.models.employee import Employee,Role
-from app.core.security import hash_password,token
+from app.core.security import hash_password,token,verify_password
 import jwt
 from datetime import datetime,timedelta,timezone
 from app.core.config import Settings
@@ -48,4 +49,13 @@ def test_inactive_first_login_does_not_consume_credential():
 def test_multi_node_cycle_rejected_and_hierarchy_preserved():
  admin,b,c=setup();db=Session();a=make('A',Role.MANAGER);db=Session();a.manager_id=b.id;b.manager_id=c.id;db.merge(a);db.merge(b);db.commit();db.close();assert client.patch('/api/v1/employees/'+str(c.id),json={'manager_id':str(a.id)},headers=headers(admin)).status_code==422;db=Session();assert db.get(Employee,a.id).manager_id==b.id and db.get(Employee,b.id).manager_id==c.id and db.get(Employee,c.id).manager_id is None;db.close()
 def test_seed_is_idempotent_and_uses_employee_email_convention(monkeypatch):
- Base.metadata.drop_all(engine);Base.metadata.create_all(engine);monkeypatch.setattr(seed,'engine',engine);seed.main(Session,create_schema=False);seed.main(Session,create_schema=False);db=Session();rows=db.query(Employee).all();by={x.employee_code:x for x in rows};assert len(rows)==3 and by['INF1001'].manager_id==by['INF1002'].id;assert by['INF1001'].company_email.split('@')[0]==by['INF1001'].employee_code and by['INF1002'].company_email.split('@')[0]==by['INF1002'].employee_code and by['ADM001'].role==Role.ADMIN;db.close()
+ Base.metadata.drop_all(engine);Base.metadata.create_all(engine);monkeypatch.setattr(seed,'engine',engine);monkeypatch.setenv('DEV_SEED_PASSWORD','isolated-local-seed-password');seed.main(Session,create_schema=False);seed.main(Session,create_schema=False);db=Session();rows=db.query(Employee).all();by={x.employee_code:x for x in rows};assert len(rows)==3 and by['INF1001'].manager_id==by['INF1002'].id;assert by['INF1001'].company_email.split('@')[0]==by['INF1001'].employee_code and by['INF1002'].company_email.split('@')[0]==by['INF1002'].employee_code and by['ADM001'].role==Role.ADMIN;db.close()
+def test_seed_admin_password_recovery_is_explicit_and_does_not_reset_other_seeded_accounts(monkeypatch):
+ Base.metadata.drop_all(engine);Base.metadata.create_all(engine);monkeypatch.setattr(seed,'engine',engine)
+ monkeypatch.setenv('DEV_SEED_PASSWORD','first-local-seed-password');seed.main(Session,create_schema=False)
+ db=Session();admin=db.query(Employee).filter_by(employee_code='ADM001').one();employee=db.query(Employee).filter_by(employee_code='INF1001').one();employee_hash=employee.password_hash;db.close()
+ monkeypatch.delenv('DEV_SEED_PASSWORD');seed.main(Session,create_schema=False)
+ db=Session();admin=db.query(Employee).filter_by(employee_code='ADM001').one();assert verify_password('first-local-seed-password',admin.password_hash);db.close()
+ with pytest.raises(RuntimeError):seed.main(Session,create_schema=False,reset_dev_admin_password=True)
+ monkeypatch.setenv('DEV_SEED_PASSWORD','recovered-local-admin-password');seed.main(Session,create_schema=False,reset_dev_admin_password=True)
+ db=Session();admin=db.query(Employee).filter_by(employee_code='ADM001').one();employee=db.query(Employee).filter_by(employee_code='INF1001').one();assert verify_password('recovered-local-admin-password',admin.password_hash) and employee.password_hash==employee_hash and admin.onboarding_completed and admin.temporary_password_hash is None;db.close()
