@@ -34,11 +34,11 @@ export type ActionResult = { action_id: string; state: string; message: string; 
 
 function agentErrorMessage(status: number): string {
   if (status === 401) return 'Your session has expired. Please sign in again.';
-  if (status === 403) return 'You are not authorized to use the policy assistant.';
-  if (status === 422) return 'Please enter a valid policy question.';
+  if (status === 403) return 'You are not authorized to use InfoTech Agent.';
+  if (status === 422) return 'InfoTech Agent could not safely process that request.';
   if (status === 429) return 'Too many requests. Please try again shortly.';
-  if (status === 503) return 'The policy assistant is temporarily unavailable. Please try again later.';
-  return 'The policy assistant could not complete this request.';
+  if (status === 503) return 'InfoTech Agent is temporarily unavailable. Please try again later.';
+  return 'InfoTech Agent could not complete this request.';
 }
 
 function isPolicyAnswer(value: unknown): value is PolicyAnswer {
@@ -100,7 +100,7 @@ export const policyAssistant = {
         body: JSON.stringify({ message, ...(conversationId ? { conversation_id: conversationId } : {}) }),
       });
     } catch {
-      throw new ApiError(0, 'Unable to reach the policy assistant. Please check your connection and try again.');
+      throw new ApiError(0, 'Unable to reach InfoTech Agent. Please check your connection and try again.');
     }
     if (!response.ok) {
       if (response.status === 401) {
