@@ -10,6 +10,7 @@ import jwt
 
 from app.core.config import get_settings
 from app.core.ems_auth import EMSIdentityVerifier
+from app.agents.semantic_routing import SemanticCategory, SemanticRoute
 from app.rag.index_lifecycle import IndexStatus
 from app.schemas.rag import RAGAnswer, SourceCitation
 from app.services.infotech_ems import InfoTechEMSReadClient
@@ -27,6 +28,29 @@ class RecordingRAG:
     def answer(self, question: str) -> RAGAnswer:
         self.questions.append(question)
         return RAGAnswer(answer="Policy answer", sources=[SourceCitation(document="XYZ_Leave_Attendance_Policy.pdf", page=1)])
+
+
+class GeneralSemanticRouter:
+    def __init__(self) -> None:
+        self.messages: list[str] = []
+
+    def classify(self, message: str) -> SemanticRoute:
+        self.messages.append(message)
+        return SemanticRoute(category=SemanticCategory.GENERAL, general_response="InfoTech Agent can help with that general question.")
+
+
+class FixedSemanticRouter:
+    def __init__(self, category: SemanticCategory, *, read_operation=None) -> None:
+        self.category = category
+        self.read_operation = read_operation
+
+    def classify(self, _: str) -> SemanticRoute:
+        return SemanticRoute(category=self.category, read_operation=self.read_operation)
+
+
+class UnavailableSemanticRouter:
+    def classify(self, _: str):
+        return None
 
 
 def token() -> str:
@@ -70,6 +94,7 @@ def configure(client, *, role="EMPLOYEE", read_status=200, manager_profile=None)
     rag = RecordingRAG()
     client.app.state.rag_service = rag
     client.app.state.rag_index_status = IndexStatus(available=True)
+    client.app.state.semantic_intent_router = UnavailableSemanticRouter()
     return rag, read_requests
 
 
@@ -103,21 +128,74 @@ def test_policy_remains_grounded_path_while_nonpolicy_intents_do_not_call_rag(cl
     rag, requests = configure(client)
     policy = client.post("/api/v1/agent/query", json={"message": "What is casual leave?"}, headers=headers())
     unsupported = client.post("/api/v1/agent/query", json={"message": "what is my leave balance?"}, headers=headers())
-    mutation = client.post("/api/v1/agent/query", json={"message": "apply casual leave tomorrow"}, headers=headers())
+    mutation = client.post("/api/v1/agent/query", json={"message": "apply leave tomorrow"}, headers=headers())
     confirmation = client.post("/api/v1/agent/query", json={"message": "confirm"}, headers=headers())
     cancellation = client.post("/api/v1/agent/query", json={"message": "cancel that"}, headers=headers())
     assert policy.json()["sources"] and rag.questions == ["What is casual leave?"]
     assert "authoritative entitlement" in unsupported.json()["answer"]
     assert mutation.json()["response_type"] == "clarification"
-    assert "reason" in mutation.json()["answer"].lower()
+    assert "leave type" in mutation.json()["answer"].lower()
     assert "no executable pending action" in confirmation.json()["answer"]
     assert "no pending action" in cancellation.json()["answer"]
     assert requests == []
 
 
+def test_leave_how_to_question_stays_on_the_grounded_policy_path(client):
+    rag, requests = configure(client)
+    response = client.post("/api/v1/agent/query", json={"message": "How can I apply casual leave?"}, headers=headers())
+    assert response.status_code == 200
+    assert response.json()["sources"]
+    assert rag.questions == ["How can I apply casual leave?"]
+    assert requests == []
+
+
+def test_semantic_general_conversation_handles_varied_requests_without_ems_or_rag(client):
+    rag, requests = configure(client)
+    classifier = GeneralSemanticRouter()
+    client.app.state.semantic_intent_router = classifier
+    prompts = [
+        "Hi", "How are you?", "What is Python?", "Explain RAG in simple terms.",
+        "Give me three tips for writing cleaner code.", "Thanks, that helped.",
+        "What can you do?", "Who are you?",
+    ]
+    for prompt in prompts:
+        response = client.post("/api/v1/agent/query", json={"message": prompt}, headers=headers())
+        assert response.status_code == 200
+        assert response.json()["answer"] == "InfoTech Agent can help with that general question."
+        assert response.json()["sources"] == [] and response.json()["action"] is None
+    assert classifier.messages == prompts
+    assert rag.questions == [] and requests == []
+
+
+def test_semantic_policy_and_unsupported_company_fact_keep_safe_boundaries(client):
+    rag, requests = configure(client)
+    client.app.state.semantic_intent_router = FixedSemanticRouter(SemanticCategory.POLICY)
+    policy = client.post("/api/v1/agent/query", json={"message": "Tell me about our internal leave rules"}, headers=headers())
+    assert policy.status_code == 200 and policy.json()["sources"] and rag.questions == ["Tell me about our internal leave rules"]
+    client.app.state.semantic_intent_router = FixedSemanticRouter(SemanticCategory.UNSUPPORTED)
+    unsupported = client.post("/api/v1/agent/query", json={"message": "Which AI tools does InfoTech permit?"}, headers=headers())
+    assert unsupported.status_code == 200
+    assert unsupported.json()["response_type"] == "clarification" and unsupported.json()["sources"] == []
+    assert requests == []
+
+
+def test_semantic_manager_paraphrase_uses_the_authoritative_fixed_read_tool(client):
+    manager = {**employee_payload("MANAGER"), "id": "87654321-4321-8765-4321-876543218765", "employee_code": "INF1002", "full_name": "Authoritative Manager"}
+    rag, requests = configure(client, manager_profile=manager)
+    from app.agents.semantic_routing import EMSReadOperation
+
+    client.app.state.semantic_intent_router = FixedSemanticRouter(
+        SemanticCategory.EMS_READ, read_operation=EMSReadOperation.MANAGER
+    )
+    response = client.post("/api/v1/agent/query", json={"message": "Who is my manger?", "conversation_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}, headers=headers())
+    assert response.status_code == 200 and "Authoritative Manager" in response.json()["answer"]
+    assert rag.questions == []
+    assert [request.url.path for request in requests] == ["/api/v1/employees/me/manager"]
+
+
 def test_manager_queries_use_the_fixed_self_hierarchy_read_path_without_rag(client):
     manager = {**employee_payload("MANAGER"), "id": "87654321-4321-8765-4321-876543218765", "employee_code": "INF1002", "full_name": "Authoritative Manager"}
-    for message in ("Who is my manager?", "Who's my manager?", "Tell me my manager", "What is my manager's name?"):
+    for message in ("Who is my manager?", "Who's my manager?", "Tell me my manager", "What is my manager's name?", "Who do I report to?", "Can you tell me who I report to?"):
         rag, requests = configure(client, manager_profile=manager)
         response = client.post("/api/v1/agent/query", json={"message": message}, headers=headers())
         assert response.status_code == 200

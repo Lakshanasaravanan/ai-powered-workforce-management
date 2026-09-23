@@ -21,7 +21,6 @@ def test_complete_bounded_apply_leave_forms_are_immutable_typed_inputs(message, 
 
 @pytest.mark.parametrize("message", [
     "Apply leave tomorrow.",
-    "Apply casual leave tomorrow.",
     "Take a day off tomorrow because I have an appointment.",
     "Apply casual leave next week because I need time.",
 ])
@@ -48,10 +47,10 @@ def test_month_name_dates_preserve_the_requested_calendar_day(message):
     "Apply for casual leave on 25 September 2026.",
     "Apply for casual leave on 25 Sep 2026.",
 ])
-def test_month_name_dates_are_recognized_even_when_the_reason_is_still_needed(message):
+def test_month_name_dates_are_recognized_with_a_safe_generic_request_reason(message):
     value, clarification = parse_apply_leave(message, today=date(2027, 1, 1))
-    assert value is None and clarification is not None
-    assert "reason" in clarification.lower() and "ambiguous" not in clarification.lower()
+    assert clarification is None
+    assert value is not None and value.reason == "Casual leave request"
 
 
 def test_numeric_and_impossible_dates_are_safely_clarified():
@@ -59,3 +58,30 @@ def test_numeric_and_impossible_dates_are_safely_clarified():
     impossible, impossible_clarification = parse_apply_leave("Apply casual leave on February 30, 2026 because of a family visit.")
     assert numeric is None and "ambiguous" in numeric_clarification.lower()
     assert impossible is None and "not valid" in impossible_clarification.lower()
+
+
+def test_today_and_clear_multi_day_duration_are_deterministically_resolved():
+    today = date(2026, 9, 23)
+    today_request, today_clarification = parse_apply_leave(
+        "Apply casual leave today because of an appointment.", today=today
+    )
+    multi_day, multi_day_clarification = parse_apply_leave(
+        "Apply two days medical leave starting from today.", today=today
+    )
+    assert today_clarification is None
+    assert today_request is not None and today_request.start_date == today_request.end_date == today
+    assert multi_day_clarification is None
+    assert multi_day is not None
+    assert multi_day.leave_type == "MEDICAL"
+    assert multi_day.start_date == today and multi_day.end_date == date(2026, 9, 24)
+    assert multi_day.reason == "Medical leave request"
+
+
+@pytest.mark.parametrize("message", [
+    "Apply zero days medical leave today.",
+    "Apply -2 days medical leave today.",
+    "Apply 32 days medical leave today.",
+])
+def test_invalid_duration_is_rejected_without_a_payload(message):
+    value, clarification = parse_apply_leave(message, today=date(2026, 9, 23))
+    assert value is None and clarification is not None

@@ -36,6 +36,8 @@ def test_local_ollama_launcher_sets_a_project_relative_backend_pythonpath():
     launcher = Path(__file__).resolve().parents[2] / "scripts" / "run_local_ollama.sh"
     contents = launcher.read_text(encoding="utf-8")
     assert 'export PYTHONPATH="$project_dir/backend${PYTHONPATH:+:$PYTHONPATH}"' in contents
+    assert 'export REDIS_ENABLED="${REDIS_ENABLED:-true}"' in contents
+    assert 'export REDIS_URL="${REDIS_URL:-redis://localhost:6379/0}"' in contents
     assert 'exec "$project_dir/.venv/bin/python" -m uvicorn app.main:app' in contents
 
 

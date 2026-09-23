@@ -10,6 +10,7 @@ from app.services.infotech_ems import EMSLeave, EMSManagerResult, EMSNotificatio
 
 
 class InfoTechIntent(StrEnum):
+    GENERAL_CONVERSATION = "general_conversation"
     POLICY_QA = "policy_qa"
     READ_ACTION = "read_action"
     MUTATION_REQUEST = "mutation_request"
@@ -42,11 +43,29 @@ class InfoTechIntentRouter:
     _confirmation = re.compile(r"^(?:yes(?:,?\s*confirm)?|confirm|go ahead)$", re.IGNORECASE)
     _cancellation = re.compile(r"^(?:cancel(?: that)?|never mind)$", re.IGNORECASE)
     _balance = re.compile(r"\b(?:leave balance|leaves? (?:do i|can i) have left|leaves? remaining|remaining (?:casual|medical|sick)? ?leaves?)\b", re.IGNORECASE)
+    _leave_how_to = re.compile(
+        r"^\s*(?:how\s+(?:can|do|should)\s+i|what(?:'s|\s+is)\s+the\s+process\s+to)\s+"
+        r"(?:apply|request|take)\b.*\b(?:leave|day off)\b",
+        re.IGNORECASE,
+    )
+    _natural_leave_request = re.compile(
+        r"\b(?:i\s+(?:need|want|would\s+appreciate)|please\s+(?:arrange|put\s+in)|could\s+i|can\s+i|could\s+you|can\s+you)\b.*\b(?:casual|medical|emergency)\s+leave\b",
+        re.IGNORECASE,
+    )
     _mutation = re.compile(r"\b(?:apply|request|take|approve|reject|mark)\b.*\b(?:leave|day off|notification|inbox)\b", re.IGNORECASE)
     _leave_decision = re.compile(r"^\s*(?:approve|reject)\b", re.IGNORECASE)
-    _my_manager = re.compile(r"(?:who(?:'s| is) my manager|tell me (?:who )?my manager|what is my manager's name)\??", re.IGNORECASE)
+    _my_manager = re.compile(
+        r"\b(?:who(?:'s|\s+is)?\s+my\s+(?:reporting\s+)?(?:manager|supervisor)|"
+        r"who\s+do\s+i\s+report\s+to|(?:can\s+you\s+)?tell\s+me\s+who\s+i\s+report\s+to|tell\s+me\s+(?:who\s+)?my\s+(?:reporting\s+)?manager|"
+        r"what\s+is\s+my\s+manager's\s+name)\b",
+        re.IGNORECASE,
+    )
     _unsupported = re.compile(r"\b(?:attendance|payroll|salary|delete[_\s]+employee|create\s+(?:an?\s+)?employee|edit\s+(?:an?\s+)?employee|deactivate\s+(?:an?\s+)?employee|another employee|someone else(?:'s)? (?:profile|leaves?)|employee_id|manager_id|call a tool|tool named|ignore your rules|call\s+get_[a-z_]+)\b", re.IGNORECASE)
-    _policy = re.compile(r"\b(?:what is|explain|does|policy|code of conduct|security policy|it security|casual leave|medical leave|day off)\b", re.IGNORECASE)
+    _policy = re.compile(
+        r"\b(?:company|our|infotech|workplace)\b.*\b(?:policy|leave|attendance|security|code of conduct)\b|"
+        r"\b(?:leave policy|casual leave|medical leave|emergency leave|day off|code of conduct|it security|security policy|attendance rules|policy)\b",
+        re.IGNORECASE,
+    )
 
     def route(self, message: str) -> InfoTechIntentDecision:
         normalized = " ".join(message.strip().lower().split())
@@ -56,10 +75,14 @@ class InfoTechIntentRouter:
             return InfoTechIntentDecision(InfoTechIntent.CANCELLATION)
         if self._leave_decision.match(normalized):
             return InfoTechIntentDecision(InfoTechIntent.LEAVE_DECISION_REQUEST)
-        if self._my_manager.fullmatch(normalized):
+        if self._my_manager.search(normalized):
             return InfoTechIntentDecision(InfoTechIntent.READ_ACTION, "get_my_manager")
         if self._balance.search(normalized):
             return InfoTechIntentDecision(InfoTechIntent.UNSUPPORTED, message="Leave balance is unavailable because InfoTech EMS does not yet have an authoritative entitlement or accrual engine.")
+        if self._leave_how_to.search(normalized):
+            return InfoTechIntentDecision(InfoTechIntent.POLICY_QA)
+        if self._natural_leave_request.search(normalized):
+            return InfoTechIntentDecision(InfoTechIntent.MUTATION_REQUEST)
         if self._mutation.search(normalized):
             return InfoTechIntentDecision(InfoTechIntent.MUTATION_REQUEST)
         if self._unsupported.search(normalized):
@@ -80,7 +103,7 @@ class InfoTechIntentRouter:
             return InfoTechIntentDecision(InfoTechIntent.READ_ACTION, "get_my_leaves")
         if normalized in {"show leave", "show leaves", "leave status", "my leave"}:
             return InfoTechIntentDecision(InfoTechIntent.CLARIFICATION, message="Do you want policy guidance, your leave requests, or—if you are a Manager—team leave requests?")
-        return InfoTechIntentDecision(InfoTechIntent.POLICY_QA)
+        return InfoTechIntentDecision(InfoTechIntent.GENERAL_CONVERSATION)
 
 
 def format_read_result(tool_name: str, result, *, decision_references: dict[str, str] | None = None) -> str:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from uuid import UUID, uuid4
 
 import fakeredis
@@ -9,11 +9,13 @@ import jwt
 
 from app.core.config import get_settings
 from app.core.ems_auth import EMSIdentityVerifier
+from app.agents.semantic_routing import SemanticCategory, SemanticRoute
 from app.services.infotech_pending_actions import (
     InfoTechActionName,
     InfoTechActionState,
     NonExecutingActionExecutor,
     RedisInfoTechPendingActionStore,
+    UnavailableInfoTechPendingActionStore,
 )
 
 
@@ -41,6 +43,11 @@ class RecordingApplyLeave:
     def reject_leave(self, leave, bearer_token, idempotency_key, correlation_id):
         self.calls.append(("reject", leave, bearer_token, idempotency_key, correlation_id))
         return object()
+
+
+class LeaveActionSemanticRouter:
+    def classify(self, _: str) -> SemanticRoute:
+        return SemanticRoute(category=SemanticCategory.EMS_ACTION_LEAVE)
 
 
 def bearer(employee_id: UUID = EMPLOYEE_ID) -> dict[str, str]:
@@ -149,6 +156,59 @@ def test_explicit_date_query_prepares_before_the_typed_ems_confirmation(client):
     assert confirmed.status_code == 200
     assert len(recorder.calls) == 1
     stored = store._load(store._client.get(store._key(UUID(action_id))))
+    assert stored.tool_name is InfoTechActionName.APPLY_LEAVE
+
+
+def test_today_multi_day_medical_query_prepares_without_calling_ems(client, monkeypatch):
+    store = configure(client)
+    recorder = client.app.state.infotech_ems_client
+    monkeypatch.setattr("app.agents.apply_leave.date", type("FixedDate", (), {"today": staticmethod(lambda: date(2026, 9, 23))}))
+    response = client.post(
+        "/api/v1/agent/query",
+        json={
+            "message": "Apply two days medical leave starting from today.",
+            "conversation_id": str(CONVERSATION_ID),
+        },
+        headers=bearer(),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["response_type"] == "action_proposal"
+    assert body["action"]["safe_display"]["date"] == "2026-09-23"
+    assert body["action"]["safe_display"]["end_date"] == "2026-09-24"
+    assert recorder.calls == []
+    stored = store._load(store._client.get(store._key(UUID(body["action"]["action_id"]))))
+    assert stored.validated_arguments["start_date"] == "2026-09-23"
+    assert stored.validated_arguments["end_date"] == "2026-09-24"
+
+
+def test_http_multi_day_proposal_requires_pending_action_storage_and_never_executes_before_confirmation(client, monkeypatch):
+    configure(client)
+    client.app.state.infotech_pending_actions = UnavailableInfoTechPendingActionStore()
+    monkeypatch.setattr("app.agents.apply_leave.date", type("FixedDate", (), {"today": staticmethod(lambda: date(2026, 9, 23))}))
+    response = client.post(
+        "/api/v1/agent/query",
+        json={"message": "apply two days medical leave for me starting from today", "conversation_id": str(CONVERSATION_ID)},
+        headers=bearer(),
+    )
+    assert response.status_code == 503
+    assert response.json()["error"]["message"] == "Action preparation is temporarily unavailable"
+    assert client.app.state.infotech_ems_client.calls == []
+
+
+def test_semantic_leave_paraphrase_prepares_a_typed_action_without_execution(client):
+    store = configure(client)
+    recorder = client.app.state.infotech_ems_client
+    client.app.state.semantic_intent_router = LeaveActionSemanticRouter()
+    response = client.post(
+        "/api/v1/agent/query",
+        json={"message": "I would appreciate casual leave tomorrow.", "conversation_id": str(CONVERSATION_ID)},
+        headers=bearer(),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["response_type"] == "action_proposal" and recorder.calls == []
+    stored = store._load(store._client.get(store._key(UUID(body["action"]["action_id"]))))
     assert stored.tool_name is InfoTechActionName.APPLY_LEAVE
 
 

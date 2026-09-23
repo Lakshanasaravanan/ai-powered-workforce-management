@@ -17,6 +17,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.agents.planner import DeterministicPlanner
+from app.agents.semantic_routing import SemanticIntentRouter
 from app.agents.service import AgentService
 from app.api.routes import actions, agent, auth, chat, health
 from app.core.config import get_settings
@@ -51,6 +52,7 @@ async def lifespan(_: FastAPI):
     settings = get_settings()
     configure_logging(settings.log_level)
     app.state.rag_service = create_rag_service(settings, VECTOR_STORE_DIR)
+    app.state.semantic_intent_router = SemanticIntentRouter(app.state.rag_service.generator.provider)
     if settings.vector_store_backend == "faiss":
         app.state.rag_index_status = index_status(settings, DOCUMENTS_DIR, VECTOR_STORE_DIR, SPARSE_INDEX_PATH)
     else:

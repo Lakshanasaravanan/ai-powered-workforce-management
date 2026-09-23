@@ -8,10 +8,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials
 
 from app.agents.infotech_intents import InfoTechIntent, InfoTechIntentRouter, format_read_result
+from app.agents.semantic_routing import READ_TOOL_BY_OPERATION, SemanticCategory
 from app.agents.models import PolicyExecutionContext, infotech_agent_context
 from app.agents.apply_leave import parse_apply_leave
 from app.agents.leave_decision import LeaveDecisionInput, parse_leave_decision
-from app.services.infotech_pending_actions import InfoTechActionName, to_public
+from app.services.infotech_pending_actions import InfoTechActionName, PendingActionError, PendingActionStoreUnavailable, to_public
 from app.services.infotech_decision_references import (
     DecisionReferenceBindingError,
     DecisionReferenceError,
@@ -51,6 +52,18 @@ def _read_error_message(error: EMSReadClientError) -> str:
     return "InfoTech EMS could not safely complete that request."
 
 
+def _semantic_route(request: Request, message: str):
+    """Resolve only a closed, schema-validated semantic route for unknown text."""
+    classifier = getattr(request.app.state, "semantic_intent_router", None)
+    return classifier.classify(message) if classifier is not None else None
+
+
+def _proposal_storage_error(exc: PendingActionError) -> HTTPException:
+    if isinstance(exc, PendingActionStoreUnavailable):
+        return HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Action preparation is temporarily unavailable")
+    return HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Action preparation could not be completed safely")
+
+
 @router.post("/query", response_model=PolicyQueryResponse)
 def query_policy(
     payload: PolicyQueryRequest,
@@ -69,6 +82,29 @@ def query_policy(
         conversation_id=payload.conversation_id or uuid4(),
     )
     decision = intent_router.route(payload.message)
+    if decision.intent is InfoTechIntent.GENERAL_CONVERSATION:
+        semantic = _semantic_route(request, payload.message)
+        if semantic is None:
+            return PolicyQueryResponse(
+                answer="I couldn’t safely classify that request. I can help with general questions, company policies, your available workforce information, or a supported leave request.",
+                sources=[], conversation_id=context.conversation_id, request_id=context.request_id, response_type="clarification",
+            )
+        if semantic.category is SemanticCategory.GENERAL:
+            return PolicyQueryResponse(
+                answer=semantic.general_response.strip(), sources=[], conversation_id=context.conversation_id,
+                request_id=context.request_id,
+            )
+        if semantic.category is SemanticCategory.POLICY:
+            decision = type(decision)(InfoTechIntent.POLICY_QA)
+        elif semantic.category is SemanticCategory.EMS_READ:
+            decision = type(decision)(InfoTechIntent.READ_ACTION, READ_TOOL_BY_OPERATION[semantic.read_operation])
+        elif semantic.category is SemanticCategory.EMS_ACTION_LEAVE:
+            decision = type(decision)(InfoTechIntent.MUTATION_REQUEST)
+        else:
+            return PolicyQueryResponse(
+                answer="I don’t have an authorized source for that company-specific request. I can help with documented policies, your available workforce information, or a supported leave request.",
+                sources=[], conversation_id=context.conversation_id, request_id=context.request_id, response_type="clarification",
+            )
     if decision.intent is InfoTechIntent.READ_ACTION:
         tool_context = infotech_agent_context(identity, context.request_id, context.conversation_id)
         try:
@@ -130,34 +166,40 @@ def query_policy(
             return PolicyQueryResponse(answer="That leave request is no longer eligible for a Manager decision. Please refresh pending team leave requests.", sources=[], conversation_id=context.conversation_id, request_id=context.request_id, response_type="clarification")
         action_name = InfoTechActionName.APPROVE_LEAVE if parsed.operation == "approve" else InfoTechActionName.REJECT_LEAVE
         action_input = LeaveDecisionInput(leave_id=leave.id, decision_note=parsed.decision_note)
-        action = request.app.state.infotech_pending_actions.create(
-            actor_employee_id=identity.employee_id,
-            conversation_id=context.conversation_id,
-            tool_name=action_name,
-            validated_arguments=action_input.model_dump(mode="json"),
-            target_entity_id=leave.id,
-            safe_display={
-                "title": f"{'Approve' if parsed.operation == 'approve' else 'Reject'} leave request",
-                "employee": f"{leave.employee.full_name} ({leave.employee.employee_code})",
-                "leave_type": leave.leave_type.title(),
-                "dates": f"{leave.start_date.isoformat()} to {leave.end_date.isoformat()}",
-                "status": "Pending",
-                "decision": parsed.operation.title(),
-                "decision_note": parsed.decision_note,
-            },
-        )
+        try:
+            action = request.app.state.infotech_pending_actions.create(
+                actor_employee_id=identity.employee_id,
+                conversation_id=context.conversation_id,
+                tool_name=action_name,
+                validated_arguments=action_input.model_dump(mode="json"),
+                target_entity_id=leave.id,
+                safe_display={
+                    "title": f"{'Approve' if parsed.operation == 'approve' else 'Reject'} leave request",
+                    "employee": f"{leave.employee.full_name} ({leave.employee.employee_code})",
+                    "leave_type": leave.leave_type.title(),
+                    "dates": f"{leave.start_date.isoformat()} to {leave.end_date.isoformat()}",
+                    "status": "Pending",
+                    "decision": parsed.operation.title(),
+                    "decision_note": parsed.decision_note,
+                },
+            )
+        except PendingActionError as exc:
+            raise _proposal_storage_error(exc) from exc
         public = to_public(action).model_dump(mode="json")
         return PolicyQueryResponse(answer="Please review and confirm this leave decision proposal.", sources=[], conversation_id=context.conversation_id, request_id=context.request_id, response_type="action_proposal", action=public)
     if decision.intent is InfoTechIntent.MUTATION_REQUEST:
         action_input, clarification = parse_apply_leave(payload.message)
         if clarification:
             return PolicyQueryResponse(answer=clarification, sources=[], conversation_id=context.conversation_id, request_id=context.request_id, response_type="clarification")
-        action = request.app.state.infotech_pending_actions.create(
-            actor_employee_id=identity.employee_id, conversation_id=context.conversation_id,
-            tool_name=InfoTechActionName.APPLY_LEAVE,
-            validated_arguments=action_input.model_dump(mode="json"),
-            safe_display={"title": f"Apply {action_input.leave_type.replace('_', ' ').title()} Leave", "date": action_input.start_date.isoformat(), "duration": action_input.duration.replace("_", " ").title(), "period": action_input.half_day_period.title() if action_input.half_day_period else None, "reason": action_input.reason},
-        )
+        try:
+            action = request.app.state.infotech_pending_actions.create(
+                actor_employee_id=identity.employee_id, conversation_id=context.conversation_id,
+                tool_name=InfoTechActionName.APPLY_LEAVE,
+                validated_arguments=action_input.model_dump(mode="json"),
+                safe_display={"title": f"Apply {action_input.leave_type.replace('_', ' ').title()} Leave", "date": action_input.start_date.isoformat(), "end_date": action_input.end_date.isoformat(), "duration": action_input.duration.replace("_", " ").title(), "period": action_input.half_day_period.title() if action_input.half_day_period else None, "reason": action_input.reason},
+            )
+        except PendingActionError as exc:
+            raise _proposal_storage_error(exc) from exc
         public = to_public(action).model_dump(mode="json")
         return PolicyQueryResponse(answer="Please review and confirm this leave proposal.", sources=[], conversation_id=context.conversation_id, request_id=context.request_id, response_type="action_proposal", action=public)
     if decision.intent is InfoTechIntent.CONFIRMATION:
