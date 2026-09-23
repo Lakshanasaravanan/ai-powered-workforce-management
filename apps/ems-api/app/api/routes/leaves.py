@@ -170,7 +170,12 @@ def create_leave(
 def my_leaves(
     user: Employee = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> list[LeaveResponse]:
-    requests = db.query(LeaveRequest).filter_by(employee_id=user.id).all()
+    requests = (
+        db.query(LeaveRequest)
+        .filter_by(employee_id=user.id)
+        .order_by(LeaveRequest.created_at.desc(), LeaveRequest.id.desc())
+        .all()
+    )
     return [leave_response(request, user) for request in requests]
 
 
@@ -180,9 +185,13 @@ def team_leaves(
 ) -> list[LeaveResponse]:
     if user.role is not Role.MANAGER:
         raise HTTPException(403, "Manager role required")
-    requests = db.query(LeaveRequest).join(
-        Employee, LeaveRequest.employee_id == Employee.id
-    ).filter(Employee.manager_id == user.id).all()
+    requests = (
+        db.query(LeaveRequest)
+        .join(Employee, LeaveRequest.employee_id == Employee.id)
+        .filter(Employee.manager_id == user.id)
+        .order_by(LeaveRequest.created_at.desc(), LeaveRequest.id.desc())
+        .all()
+    )
     return [leave_response(request, get_employee_or_404(db, request.employee_id)) for request in requests]
 
 

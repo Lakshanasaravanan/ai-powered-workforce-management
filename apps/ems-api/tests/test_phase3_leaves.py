@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
 from fastapi.testclient import TestClient
@@ -149,6 +149,23 @@ def test_leave_visibility_is_scoped_to_self_and_direct_manager_only():
     assert team.status_code == 200 and [item["id"] for item in team.json()] == [leave_id]
     assert client.get("/api/v1/leaves/team", headers=headers(other)).status_code == 403
     assert client.get("/api/v1/leaves/team", headers=headers(admin)).status_code == 403
+
+
+def test_leave_history_is_newest_submission_first_not_leave_start_date():
+    _, manager, employee, _ = setup()
+    older = create(employee, start_date="2027-10-20", end_date="2027-10-20")
+    newer = create(employee, start_date="2027-10-05", end_date="2027-10-05")
+    assert older.status_code == newer.status_code == 201
+
+    db = Session()
+    db.get(LeaveRequest, UUID(older.json()["id"])).created_at = datetime(2026, 9, 1, 9, 0)
+    db.get(LeaveRequest, UUID(newer.json()["id"])).created_at = datetime(2026, 9, 20, 9, 0)
+    db.commit()
+    db.close()
+
+    expected = [newer.json()["id"], older.json()["id"]]
+    assert [item["id"] for item in client.get("/api/v1/leaves/me", headers=headers(employee)).json()] == expected
+    assert [item["id"] for item in client.get("/api/v1/leaves/team", headers=headers(manager)).json()] == expected
 
 
 def test_medical_decision_metadata_is_automatic_without_approver():
