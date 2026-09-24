@@ -1,0 +1,75 @@
+import os
+os.environ['DATABASE_URL']='sqlite:///./phase2-test.db'
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+from app.main import app
+from app.db.session import Base,get_db
+from app.models.employee import Employee,Role
+from app.core.security import hash_password,token,verify_password
+import jwt
+from datetime import datetime,timedelta,timezone
+from app.core.config import Settings
+from app import seed
+
+engine=create_engine('sqlite://',connect_args={'check_same_thread':False},poolclass=StaticPool);Session=sessionmaker(engine);Base.metadata.create_all(engine)
+def db_override():
+ db=Session()
+ try:yield db
+ finally:db.close()
+app.dependency_overrides[get_db]=db_override
+client=TestClient(app)
+def make(code,role=Role.EMPLOYEE,active=True,onboard=True,manager_id=None):
+ db=Session();u=Employee(employee_code=code,full_name=code,company_email=f'{code}@infotech.local',role=role,designation='Engineer',department='Engineering',password_hash=hash_password('test-password'),temporary_password_hash=hash_password('temporary-password'),onboarding_completed=onboard,is_active=active,manager_id=manager_id);db.add(u);db.commit();db.refresh(u);db.close();return u
+def headers(user):return {'Authorization':'Bearer '+token(str(user.id))}
+def setup():
+ Base.metadata.drop_all(engine);Base.metadata.create_all(engine);return make('ADMIN',Role.ADMIN),make('MANAGER',Role.MANAGER),make('EMPLOYEE')
+def test_login_me_and_invalid_password():
+ _,_,u=setup();assert client.post('/api/v1/auth/login',json={'company_email':'EMPLOYEE@INFOTECH.LOCAL','password':'test-password'}).status_code==200;assert client.post('/api/v1/auth/login',json={'company_email':'employee@infotech.local','password':'wrong'}).status_code==401;assert client.post('/api/v1/auth/login',json={'employee_code':'EMPLOYEE','password':'test-password'}).status_code==401;assert client.get('/api/v1/auth/me',headers=headers(u)).json()['employee_code']=='EMPLOYEE';assert client.get('/api/v1/auth/me').status_code==401
+def test_first_login_invalidates_temp():
+ setup();u=make('NEW',onboard=False);body={'employee_code':'NEW','temporary_password':'temporary-password','new_password':'new-password'};assert client.post('/api/v1/auth/first-login',json=body).status_code==200;assert client.post('/api/v1/auth/first-login',json=body).status_code==401;assert client.post('/api/v1/auth/login',json={'company_email':'new@infotech.local','password':'new-password'}).status_code==200
+def test_admin_rbac_search_and_inactive():
+ admin,manager,u=setup();payload={'employee_code':'NEW','full_name':'New','company_email':'NEW@infotech.local','role':'EMPLOYEE','designation':'Engineer','department':'Engineering'};assert client.post('/api/v1/employees',json=payload,headers=headers(admin)).status_code==200;assert client.post('/api/v1/employees',json=payload,headers=headers(admin)).status_code==409;assert client.post('/api/v1/employees',json=payload,headers=headers(u)).status_code==403;assert client.get('/api/v1/employees/search?q=EMP',headers=headers(u)).status_code==200
+def test_inactive_and_direct_reports():
+ admin,manager,u=setup();db=Session();u.manager_id=manager.id;u.is_active=False;db.merge(u);db.commit();db.close();assert client.post('/api/v1/auth/login',json={'company_email':'employee@infotech.local','password':'test-password'}).status_code==401;assert client.get('/api/v1/auth/me',headers=headers(u)).status_code==401;assert len(client.get('/api/v1/employees/me/direct-reports',headers=headers(manager)).json())==0;assert client.get('/api/v1/employees/me/direct-reports',headers=headers(u)).status_code==401
+def test_my_manager_uses_authenticated_identity_only():
+ admin,manager,u=setup();db=Session();u.manager_id=manager.id;db.merge(u);db.commit();db.close();response=client.get('/api/v1/employees/me/manager?employee_id='+str(admin.id),headers=headers(u));assert response.status_code==200 and response.json()['manager']['id']==str(manager.id);assert client.get('/api/v1/employees/me/manager',headers=headers(admin)).json()=={'manager':None}
+def test_manager_validation_and_cycles():
+ admin,manager,u=setup();db=Session();u.manager_id=manager.id;db.merge(u);db.commit();assert client.patch('/api/v1/employees/'+str(manager.id),json={'manager_id':str(u.id)},headers=headers(admin)).status_code==422;assert client.patch('/api/v1/employees/'+str(u.id),json={'manager_id':'missing'},headers=headers(admin)).status_code==422;assert client.patch('/api/v1/employees/'+str(u.id),json={'manager_id':str(u.id)},headers=headers(admin)).status_code==422;db.close()
+def test_edit_status_and_jwt_rejections():
+ admin,manager,u=setup();assert client.get('/api/v1/auth/me',headers={'Authorization':'Bearer invalid'}).status_code==401;assert client.patch('/api/v1/employees/'+str(u.id),json={'designation':'AI Engineer','is_active':False},headers=headers(admin)).status_code==200;assert client.post('/api/v1/auth/login',json={'company_email':'employee@infotech.local','password':'test-password'}).status_code==401;assert client.patch('/api/v1/employees/'+str(u.id),json={'is_active':True},headers=headers(admin)).status_code==200;assert client.post('/api/v1/auth/login',json={'company_email':'employee@infotech.local','password':'test-password'}).status_code==200
+def test_password_storage_and_duplicate_fields():
+ admin,_,u=setup();db=Session();stored=db.get(Employee,u.id);assert stored.password_hash.startswith('$argon2') and stored.password_hash!='test-password';db.close();base={'employee_code':'NEW','full_name':'New','company_email':'NEW@infotech.local','role':'EMPLOYEE','designation':'Engineer','department':'Engineering'};assert client.post('/api/v1/employees',json=base,headers=headers(admin)).status_code==200;assert client.post('/api/v1/employees',json={**base,'company_email':'new@infotech.local'},headers=headers(admin)).status_code==409;assert client.post('/api/v1/employees',json={**base,'employee_code':'OTHER'},headers=headers(admin)).status_code==422
+def test_expired_and_malformed_subject_tokens():
+ _,_,u=setup();s=Settings();expired=jwt.encode({'sub':str(u.id),'exp':datetime.now(timezone.utc)-timedelta(seconds=1)},s.jwt_secret,algorithm=s.jwt_algorithm);bad=jwt.encode({'sub':'not-a-uuid','exp':datetime.now(timezone.utc)+timedelta(minutes=1)},s.jwt_secret,algorithm=s.jwt_algorithm);assert client.get('/api/v1/auth/me',headers={'Authorization':'Bearer '+expired}).status_code==401;assert client.get('/api/v1/auth/me',headers={'Authorization':'Bearer '+bad}).status_code==401
+def test_inactive_first_login_does_not_consume_credential():
+ _,_,u=setup();db=Session();u.onboarding_completed=False;u.is_active=False;u.temporary_password_hash=hash_password('temporary-password');before=u.password_hash;db.merge(u);db.commit();db.close();body={'employee_code':'EMPLOYEE','temporary_password':'temporary-password','new_password':'new-password'};assert client.post('/api/v1/auth/first-login',json=body).status_code==401;db=Session();saved=db.get(Employee,u.id);assert not saved.onboarding_completed and saved.password_hash==before and saved.temporary_password_hash;db.close()
+def test_multi_node_cycle_rejected_and_hierarchy_preserved():
+ admin,b,c=setup();db=Session();a=make('A',Role.MANAGER);db=Session();a.manager_id=b.id;b.manager_id=c.id;db.merge(a);db.merge(b);db.commit();db.close();assert client.patch('/api/v1/employees/'+str(c.id),json={'manager_id':str(a.id)},headers=headers(admin)).status_code==422;db=Session();assert db.get(Employee,a.id).manager_id==b.id and db.get(Employee,b.id).manager_id==c.id and db.get(Employee,c.id).manager_id is None;db.close()
+def test_seed_is_idempotent_and_uses_employee_email_convention(monkeypatch):
+ Base.metadata.drop_all(engine);Base.metadata.create_all(engine);monkeypatch.setattr(seed,'engine',engine);monkeypatch.setenv('DEV_SEED_PASSWORD','isolated-local-seed-password');seed.main(Session,create_schema=False);seed.main(Session,create_schema=False);db=Session();rows=db.query(Employee).all();by={x.employee_code:x for x in rows};assert len(rows)==3 and by['INF1001'].manager_id==by['INF1002'].id;assert by['INF1001'].company_email.split('@')[0]==by['INF1001'].employee_code and by['INF1002'].company_email.split('@')[0]==by['INF1002'].employee_code and by['ADM001'].role==Role.ADMIN;db.close()
+def test_seed_admin_password_recovery_is_explicit_and_does_not_reset_other_seeded_accounts(monkeypatch):
+ Base.metadata.drop_all(engine);Base.metadata.create_all(engine);monkeypatch.setattr(seed,'engine',engine)
+ monkeypatch.setenv('DEV_SEED_PASSWORD','first-local-seed-password');seed.main(Session,create_schema=False)
+ db=Session();admin=db.query(Employee).filter_by(employee_code='ADM001').one();employee=db.query(Employee).filter_by(employee_code='INF1001').one();employee_hash=employee.password_hash;db.close()
+ monkeypatch.delenv('DEV_SEED_PASSWORD');seed.main(Session,create_schema=False)
+ db=Session();admin=db.query(Employee).filter_by(employee_code='ADM001').one();assert verify_password('first-local-seed-password',admin.password_hash);db.close()
+ with pytest.raises(RuntimeError):seed.main(Session,create_schema=False,reset_dev_admin_password=True)
+ monkeypatch.setenv('DEV_SEED_PASSWORD','recovered-local-admin-password');seed.main(Session,create_schema=False,reset_dev_admin_password=True)
+ db=Session();admin=db.query(Employee).filter_by(employee_code='ADM001').one();employee=db.query(Employee).filter_by(employee_code='INF1001').one();assert verify_password('recovered-local-admin-password',admin.password_hash) and employee.password_hash==employee_hash and admin.onboarding_completed and admin.temporary_password_hash is None;db.close()
+
+def test_company_email_login_preserves_roles_and_rejects_raw_employee_code():
+ admin,manager,employee=setup();assert client.post('/api/v1/auth/login',json={'company_email':'employee@INFOTECH.LOCAL','password':'test-password'}).status_code==200;assert client.post('/api/v1/auth/login',json={'company_email':'manager@infotech.local','password':'test-password'}).status_code==200;assert client.post('/api/v1/auth/login',json={'company_email':'admin@infotech.local','password':'test-password'}).status_code==200;assert client.post('/api/v1/auth/login',json={'employee_code':employee.employee_code,'password':'test-password'}).status_code==401;assert admin.role==Role.ADMIN and manager.role==Role.MANAGER
+
+def test_archive_is_admin_only_preserves_history_and_blocks_authentication():
+ from app.models.audit import AuditEvent
+ admin,manager,employee=setup();assert client.delete('/api/v1/employees/'+str(employee.id),headers=headers(manager)).status_code==403;assert client.delete('/api/v1/employees/'+str(employee.id),headers=headers(admin)).status_code==200;db=Session();archived=db.get(Employee,employee.id);audit=db.query(AuditEvent).filter_by(target_id=employee.id,operation='archive_employee').one();assert not archived.is_active and archived.archived_at is not None and audit.actor_employee_id==admin.id;db.close();assert client.post('/api/v1/auth/login',json={'company_email':'employee@infotech.local','password':'test-password'}).status_code==401
+
+def test_archiving_manager_requires_direct_report_reassignment():
+ admin,manager,employee=setup();db=Session();employee.manager_id=manager.id;db.merge(employee);db.commit();db.close();assert client.delete('/api/v1/employees/'+str(manager.id),headers=headers(admin)).status_code==422
+
+def test_compensation_is_admin_only_and_effective_dated_without_overlaps():
+ from app.models.employee import CompensationConfiguration
+ admin,manager,employee=setup();first={'monthly_salary':'50000.00','overtime_hourly_rate':'250.50','late_deduction_amount':'100.00','effective_from':'2026-01-01'};second={**first,'monthly_salary':'55000.00','effective_from':'2026-07-01'};assert client.post('/api/v1/employees/'+str(employee.id)+'/compensation',json=first,headers=headers(employee)).status_code==403;assert client.post('/api/v1/employees/'+str(employee.id)+'/compensation',json=first,headers=headers(manager)).status_code==403;assert client.post('/api/v1/employees/'+str(employee.id)+'/compensation',json=first,headers=headers(admin)).status_code==200;assert client.post('/api/v1/employees/'+str(employee.id)+'/compensation',json={**first,'effective_from':'2026-03-01'},headers=headers(admin)).status_code==200;assert client.post('/api/v1/employees/'+str(employee.id)+'/compensation',json={**first,'effective_from':'2026-02-01'},headers=headers(admin)).status_code==409;assert client.post('/api/v1/employees/'+str(employee.id)+'/compensation',json=second,headers=headers(admin)).status_code==200;db=Session();records=db.query(CompensationConfiguration).filter_by(employee_id=employee.id).order_by(CompensationConfiguration.effective_from).all();assert len(records)==3 and str(records[0].effective_to)=='2026-02-28' and str(records[-1].effective_to)=='None';db.close()

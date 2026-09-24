@@ -5,31 +5,46 @@ from __future__ import annotations
 import logging
 import time
 from contextlib import asynccontextmanager
+from datetime import timedelta
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
+from starlette.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.agents.planner import DeterministicPlanner
+from app.agents.semantic_routing import SemanticIntentRouter
 from app.agents.service import AgentService
-from app.api.routes import auth, chat, health
+from app.api.routes import actions, agent, auth, chat, health
 from app.core.config import get_settings
+from app.core.ems_auth import EMSIdentityVerifier
 from app.core.logging import configure_logging, request_id_context
 from app.rag.ingestion import VECTOR_STORE_DIR
+from app.rag.ingestion import DOCUMENTS_DIR, SPARSE_INDEX_PATH
+from app.rag.index_lifecycle import IndexStatus, index_status
+from app.services.vector_store import create_vector_store, VectorStoreError
 from app.rag.service import RAGServiceError, create_rag_service
-from app.services.pending_actions import PendingActionStore
+from app.services.pending_actions import PendingActionStore, RedisPendingActionStore
 from app.services.slams import SLAMSWorkforceProvider
+from app.services.rate_limit import InMemoryRateLimiter, RedisRateLimiter
 from app.services.workforce import MockWorkforceProvider
+from app.services.infotech_ems import InfoTechEMSReadClient
+from app.tools.infotech_ems import build_infotech_read_registry
+from app.services.infotech_pending_actions import NonExecutingActionExecutor, RedisInfoTechPendingActionStore, UnavailableInfoTechPendingActionStore
+from app.services.infotech_decision_references import RedisInfoTechDecisionReferenceStore, UnavailableInfoTechDecisionReferenceStore
 from app.tools.actions import RegularizeAttendanceTool, RequestLeaveTool
 from app.tools.rag_tool import PolicyAnswerTool
 from app.tools.registry import ToolRegistry
-from app.tools.workforce import GetMyAttendanceSummaryTool, GetMyLeaveBalanceTool, GetMyProfileTool
+from app.tools.workforce import GetMyAttendanceRecordsTool, GetMyAttendanceSummaryTool, GetMyLeaveBalanceTool, GetMyProfileTool
 
 
 logger = logging.getLogger("agentic_rag.request")
+HTTP_REQUESTS = Counter("agentic_rag_http_requests_total", "HTTP requests", ["method", "route", "status"])
+HTTP_LATENCY = Histogram("agentic_rag_http_latency_seconds", "HTTP latency", ["method", "route"])
 
 
 @asynccontextmanager
@@ -37,9 +52,45 @@ async def lifespan(_: FastAPI):
     settings = get_settings()
     configure_logging(settings.log_level)
     app.state.rag_service = create_rag_service(settings, VECTOR_STORE_DIR)
+    app.state.semantic_intent_router = SemanticIntentRouter(app.state.rag_service.generator.provider)
+    if settings.vector_store_backend == "faiss":
+        app.state.rag_index_status = index_status(settings, DOCUMENTS_DIR, VECTOR_STORE_DIR, SPARSE_INDEX_PATH)
+    else:
+        try:
+            store = create_vector_store(settings, VECTOR_STORE_DIR)
+            store.validate_collection(settings.vector_store_dimension)
+            app.state.rag_index_status = IndexStatus(True)
+        except (AttributeError, VectorStoreError):
+            app.state.rag_index_status = IndexStatus(False, "Qdrant collection is unavailable or incompatible")
+    if not app.state.rag_index_status.available:
+        logger.error(
+            "rag_index_unavailable",
+            extra={"error_code": "index_unavailable", "index_reason": app.state.rag_index_status.reason},
+        )
+    app.state.ems_identity_verifier = EMSIdentityVerifier(settings)
+    app.state.infotech_ems_client = InfoTechEMSReadClient(settings)
+    app.state.infotech_read_registry = build_infotech_read_registry(app.state.infotech_ems_client)
     workforce = SLAMSWorkforceProvider.from_settings(settings) if settings.slams_enabled else MockWorkforceProvider()
     app.state.workforce_provider = workforce
-    pending_actions = PendingActionStore()
+    redis_client = None
+    if settings.redis_enabled:
+        import redis
+        try:
+            redis_client = redis.Redis.from_url(settings.redis_url, socket_connect_timeout=1, socket_timeout=1, decode_responses=True)
+            redis_client.ping()
+        except redis.RedisError as exc:
+            logger.error("redis_unavailable", extra={"dependency": "redis"})
+            raise RuntimeError("Required Redis dependency is unavailable") from exc
+        pending_actions = RedisPendingActionStore(redis_client, ttl=timedelta(seconds=settings.pending_action_ttl_seconds), execution_lease=timedelta(seconds=settings.pending_action_execution_lease_seconds))
+    else:
+        pending_actions = PendingActionStore(ttl=timedelta(seconds=settings.pending_action_ttl_seconds))
+    app.state.redis_client = redis_client
+    app.state.infotech_pending_actions = RedisInfoTechPendingActionStore(redis_client, ttl=timedelta(seconds=settings.pending_action_ttl_seconds)) if redis_client is not None else UnavailableInfoTechPendingActionStore()
+    app.state.infotech_decision_references = RedisInfoTechDecisionReferenceStore(
+        redis_client, ttl=timedelta(seconds=settings.decision_reference_ttl_seconds)
+    ) if redis_client is not None else UnavailableInfoTechDecisionReferenceStore()
+    app.state.infotech_pending_executor = NonExecutingActionExecutor()
+    app.state.rate_limiter = RedisRateLimiter(redis_client) if redis_client is not None else InMemoryRateLimiter()
     app.state.agent_service = AgentService(
         planner=DeterministicPlanner(),
         registry=ToolRegistry([
@@ -47,16 +98,20 @@ async def lifespan(_: FastAPI):
             GetMyProfileTool(workforce),
             GetMyLeaveBalanceTool(workforce),
             GetMyAttendanceSummaryTool(workforce),
+            GetMyAttendanceRecordsTool(workforce),
             RequestLeaveTool(pending_actions),
             RegularizeAttendanceTool(pending_actions),
         ]),
         pending_actions=pending_actions,
+        action_provider=workforce,
     )
     logger.info("application_started")
     yield
     close = getattr(workforce, "close", None)
     if close is not None:
         close()
+    if redis_client is not None:
+        redis_client.close()
     logger.info("application_stopped")
 
 
@@ -66,9 +121,24 @@ app = FastAPI(
     description="Standalone AI assistant service. Phase 1 foundation only.",
     lifespan=lifespan,
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_settings().cors_origins,
+    allow_credentials=False,
+    allow_methods=["POST"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+)
 app.include_router(health.router)
-app.include_router(auth.router)
+app.include_router(agent.router)
+app.include_router(actions.router)
+if get_settings().development_auth_enabled:
+    app.include_router(auth.router)
 app.include_router(chat.router)
+
+@app.get("/metrics", include_in_schema=False)
+def metrics():
+    from fastapi.responses import Response
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 def _request_id(value: str | None) -> str:
@@ -98,6 +168,8 @@ async def request_logging_middleware(request: Request, call_next):
         )
     latency_ms = round((time.perf_counter() - started_at) * 1000, 2)
     response.headers["X-Request-ID"] = request_id
+    HTTP_REQUESTS.labels(request.method, request.url.path, str(response.status_code)).inc()
+    HTTP_LATENCY.labels(request.method, request.url.path).observe(time.perf_counter() - started_at)
     logger.info(
         "request_completed",
         extra={

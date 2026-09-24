@@ -427,7 +427,9 @@ createDefaultLeaveBalance(harikkrishnan);
     // =========================================================
 
     private void createDefaultLeaveBalance(User user) {
-        boolean alreadyExists = leaveBalanceRepository.findByUserId(user.getId()).isPresent();
+        // Seed initialization runs in @PostConstruct, before transactional proxies are active.
+        // It only needs an existence check; mutation paths use the locked user-id lookup.
+        boolean alreadyExists = leaveBalanceRepository.findByUser(user).isPresent();
         if (!alreadyExists) {
             LeaveBalance balance = LeaveBalance.builder()
                     .user(user)

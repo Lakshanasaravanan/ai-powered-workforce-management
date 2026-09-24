@@ -2,6 +2,10 @@ package com.slams.service;
 
 import com.slams.dto.RegularizationRequest;
 import com.slams.dto.AttendanceAnalyticsResponse;
+import com.slams.dto.AttendanceRegularizationResponse;
+import com.slams.exception.BusinessRuleConflictException;
+import com.slams.exception.ResourceNotFoundException;
+import com.slams.exception.MutationRequestValidationException;
 import com.slams.model.*;
 import com.slams.repository.AttendanceRegularizationRepository;
 import com.slams.repository.AttendanceRepository;
@@ -31,6 +35,8 @@ public class AttendanceService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private IdempotencyService idempotencyService;
 
     @Value("${slams.attendance.cutoff-time}")
     private String cutoffTimeStr;
@@ -130,15 +136,30 @@ public class AttendanceService {
     }
 
     @Transactional
-    public AttendanceRegularization requestRegularization(String username, RegularizationRequest request) {
+    public AttendanceRegularizationResponse requestRegularization(String username, String idempotencyKey, RegularizationRequest request) {
+        validateIdempotencyKey(idempotencyKey);
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee is unavailable"));
+        String hash = PayloadHasher.sha256(request.getAttendanceId() + "|" + request.getRequestedInTime() + "|" + request.getRequestedOutTime() + "|" + request.getReason());
+        var result = idempotencyService.execute(idempotencyKey, user, "ATTENDANCE_REGULARIZE", hash, AttendanceRegularizationResponse.class,
+                () -> AttendanceRegularizationResponse.from(createRegularization(user, request), false));
+        AttendanceRegularizationResponse response = result.body();
+        return new AttendanceRegularizationResponse(response.regularizationRequestId(), response.attendanceId(), response.requestedInTime(),
+                response.requestedOutTime(), response.status(), response.requestedAt(), result.replay());
+    }
 
-        Attendance attendance = attendanceRepository.findById(request.getAttendanceId())
-                .orElseThrow(() -> new RuntimeException("Attendance not found"));
+    private AttendanceRegularization createRegularization(User user, RegularizationRequest request) {
+        Attendance attendance = attendanceRepository.findWithLockById(request.getAttendanceId())
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance is unavailable"));
 
         if (!attendance.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("You can only regularize your own attendance");
+            throw new ResourceNotFoundException("Attendance is unavailable");
+        }
+        if (request.getRequestedOutTime() != null && !request.getRequestedInTime().isBefore(request.getRequestedOutTime())) {
+            throw new BusinessRuleConflictException("INVALID_REGULARIZATION_TIME_RANGE", "Requested out time must be after requested in time");
+        }
+        if (regularizationRepository.existsByAttendanceIdAndStatus(attendance.getId(), LeaveStatus.PENDING)) {
+            throw new BusinessRuleConflictException("REGULARIZATION_ALREADY_PENDING", "A regularization request is already pending");
         }
 
         AttendanceRegularization reg = AttendanceRegularization.builder()
@@ -147,8 +168,14 @@ public class AttendanceService {
                 .requestedOutTime(request.getRequestedOutTime())
                 .reason(request.getReason())
                 .status(LeaveStatus.PENDING)
+                .requestedAt(java.time.LocalDateTime.now())
                 .build();
         return regularizationRepository.save(reg);
+    }
+
+    private static void validateIdempotencyKey(String key) {
+        if (key == null || key.length() > 64) throw new MutationRequestValidationException("IDEMPOTENCY_KEY_REQUIRED", "Idempotency-Key is required");
+        try { java.util.UUID.fromString(key); } catch (IllegalArgumentException exception) { throw new MutationRequestValidationException("IDEMPOTENCY_KEY_REQUIRED", "Idempotency-Key must be a UUID"); }
     }
 
     public List<AttendanceRegularization> getPendingRegularizationsForManager(String managerUsername) {
@@ -169,6 +196,9 @@ public class AttendanceService {
         
         AttendanceRegularization reg = regularizationRepository.findById(regularizationId)
                 .orElseThrow(() -> new RuntimeException("Regularization request not found"));
+        if (reg.getStatus() != LeaveStatus.PENDING) {
+            throw new BusinessRuleConflictException("INVALID_ACTION_STATE", "Only pending regularizations can be decided");
+        }
 
         reg.setStatus(decision);
         reg.setApprovedBy(manager);

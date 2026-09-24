@@ -92,8 +92,8 @@ def test_default_service_does_not_construct_optional_retrievers(monkeypatch, tmp
     def optional_component(*args, **kwargs):
         raise AssertionError("disabled optional component was constructed")
 
-    monkeypatch.setattr(service_module, "FaissVectorStore", lambda *_: FakeStore())
-    monkeypatch.setattr(service_module, "EmbeddingService", lambda *_: FakeEmbeddings())
+    monkeypatch.setattr(service_module, "create_vector_store", lambda *_: FakeStore())
+    monkeypatch.setattr(service_module, "EmbeddingService", lambda *_, **__: FakeEmbeddings())
     monkeypatch.setattr(service_module, "DenseRetriever", FakeDense)
     monkeypatch.setattr(service_module.BM25SparseRetriever, "from_artifact", optional_component)
     monkeypatch.setattr(service_module, "CrossEncoderReranker", optional_component)
@@ -106,12 +106,14 @@ def test_default_service_does_not_construct_optional_retrievers(monkeypatch, tmp
     class Context:
         def assemble(self, chunks):
             assert [item.id for item in chunks] == ["dense"]
-            return "Dense-only policy evidence", []
+            from app.rag.context import source_citations
+            return "Dense-only policy evidence", source_citations(chunks)
 
     class Generator:
         def generate(self, question, evidence):
             assert question == "leave policy" and evidence == "Dense-only policy evidence"
-            return "grounded answer"
+            from app.rag.generator import PolicyGenerationResult
+            return PolicyGenerationResult(answer="grounded answer", evidence_ids=["E1"])
 
     service.context, service.generator = Context(), Generator()
     assert service.answer("leave policy").answer == "grounded answer"

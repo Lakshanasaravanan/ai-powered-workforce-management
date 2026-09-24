@@ -7,7 +7,13 @@ from collections.abc import Callable
 from typing import Any
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+
+
+def _sentence_transformer_factory(model_name: str, **kwargs: object) -> Any:
+    """Avoid importing Torch until an embedding model is actually needed."""
+    from sentence_transformers import SentenceTransformer
+
+    return SentenceTransformer(model_name, **kwargs)
 
 
 class EmbeddingService:
@@ -17,20 +23,32 @@ class EmbeddingService:
         self,
         model_name: str,
         batch_size: int = 32,
-        model_factory: Callable[[str], Any] = SentenceTransformer,
+        model_factory: Callable[..., Any] = _sentence_transformer_factory,
+        device: str = "cpu",
+        cache_dir: str | None = None,
+        local_files_only: bool = False,
     ) -> None:
         self.model_name = model_name
         self.batch_size = batch_size
         self._model_factory = model_factory
+        self._device = device
         self._model: Any | None = None
         self._lock = threading.Lock()
+        self._cache_dir = cache_dir
+        self._local_files_only = local_files_only
 
     @property
     def model(self) -> Any:
         if self._model is None:
             with self._lock:
                 if self._model is None:
-                    self._model = self._model_factory(self.model_name)
+                    kwargs: dict[str, object] = {}
+                    if self._cache_dir:
+                        kwargs["cache_folder"] = self._cache_dir
+                    kwargs["device"] = self._device
+                    if self._local_files_only:
+                        kwargs["local_files_only"] = True
+                    self._model = self._model_factory(self.model_name, **kwargs)
         return self._model
 
     def encode(self, texts: list[str]) -> np.ndarray:
