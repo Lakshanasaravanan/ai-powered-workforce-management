@@ -1,6 +1,6 @@
 from alembic import context
 from app.db.session import Base
-from app.models.employee import Employee
+from app.models.employee import Employee, CompensationConfiguration
 from app.models.leave import LeaveRequest
 from app.models.notification import Notification
 from app.models.chat import ChatConversation, ChatParticipant, ChatMessage

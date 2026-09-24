@@ -16,7 +16,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export type Employee = { id: string; employee_code: string; full_name: string; company_email: string; role: string; designation: string; department: string; manager_id: string | null; is_active: boolean; };
+export type Employee = { id: string; employee_code: string; full_name: string; company_email: string; role: string; designation: string; department: string; manager_id: string | null; is_active: boolean; archived_at?: string | null; };
+export type CompensationConfiguration = { id: string; monthly_salary: string; overtime_hourly_rate: string; late_deduction_amount: string; effective_from: string; effective_to: string | null; };
 export type LeaveType = 'CASUAL' | 'MEDICAL' | 'EMERGENCY' | 'DAY_OFF';
 export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type LeaveDuration = 'FULL_DAY' | 'HALF_DAY';
@@ -63,6 +64,9 @@ export const employees = {
   search: (query: string) => request<Employee[]>(`/api/v1/employees/search?q=${encodeURIComponent(query)}`),
   create: (body: object) => request<Employee & { temporary_password: string }>('/api/v1/employees', { method: 'POST', body: JSON.stringify(body) }),
   update: (id: string, body: object) => request<Employee>(`/api/v1/employees/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  archive: (id: string) => request<{ ok: boolean }>(`/api/v1/employees/${id}`, { method: 'DELETE' }),
+  compensation: (id: string) => request<CompensationConfiguration[]>(`/api/v1/employees/${id}/compensation`),
+  setCompensation: (id: string, body: { monthly_salary: string; overtime_hourly_rate: string; late_deduction_amount: string; effective_from: string }) => request<CompensationConfiguration>(`/api/v1/employees/${id}/compensation`, { method: 'POST', body: JSON.stringify(body) }),
 };
 export const leaves = {
   mine: () => request<LeaveRequest[]>('/api/v1/leaves/me'), team: () => request<LeaveRequest[]>('/api/v1/leaves/team'),

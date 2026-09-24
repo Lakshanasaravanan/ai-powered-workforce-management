@@ -308,3 +308,13 @@ PYTHONPATH=. .venv/bin/python -m app.cleanup_development_data
 
 It removes only its documented allowlisted development records; do not use it as
 a general data-deletion tool.
+
+### Employee identity and compensation foundation
+
+Employees and Managers sign in with their case-insensitive company email
+(`employee_code@infotech.local`); employee codes remain immutable internal
+references. The separate Admin identity continues to use its existing company
+email. Employee archival is non-destructive and blocks future authentication;
+active direct reports must be reassigned before their manager can be archived.
+Compensation entries are Admin-only, decimal-valued, and effective-dated for
+future payroll work. They do not calculate payroll or daily rates.

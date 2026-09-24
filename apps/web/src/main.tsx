@@ -18,28 +18,11 @@ const dateOnly = (value: string) => new Date(`${value.slice(0, 10)}T00:00:00`);
 const labelRole = (role: string) => role[0] + role.slice(1).toLowerCase();
 
 function Login() {
-  const { login, user } = useAuth();
-  const navigate = useNavigate();
-  const [employeeCode, setEmployeeCode] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const { login, user } = useAuth(); const navigate = useNavigate();
+  const [companyEmail, setCompanyEmail] = useState(''); const [password, setPassword] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false); const [showPassword, setShowPassword] = useState(false);
   if (user) return <Navigate to="/" replace />;
-  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setBusy(true);
-    setError('');
-    try {
-      await login(employeeCode, password);
-      navigate('/');
-    } catch {
-      setError('Invalid credentials, inactive account, or unavailable API.');
-    } finally {
-      setBusy(false);
-    }
-  };
-  return <main className="auth-page"><section className="auth-layout"><aside className="auth-brand-panel"><div className="auth-brand"><span><Building2 size={22} /></span><strong>InfoTech</strong></div><div><p className="eyebrow">Employee workspace</p><h1>One workspace for your workday.</h1><p>Access your workplace tools, company calendar, notifications, and authenticated assistance in one place.</p></div><div className="auth-security-note"><ShieldCheck size={18} aria-hidden="true" /><span>Your session is authenticated for InfoTech Workspace.</span></div></aside><section className="auth-form-panel" aria-labelledby="sign-in-title"><div className="auth-form-heading"><span className="auth-form-icon"><LockKeyhole size={20} /></span><p className="eyebrow">Welcome back</p><h2 id="sign-in-title">Sign in to Workspace</h2><p>Use your Employee ID and password to continue.</p></div><form onSubmit={submit}><label htmlFor="employee-code">Employee ID<input id="employee-code" value={employeeCode} onChange={(event) => setEmployeeCode(event.target.value)} autoComplete="username" autoFocus disabled={busy} aria-describedby={error ? 'login-error' : undefined} required /></label><label htmlFor="password">Password<span className="auth-password-field"><input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" disabled={busy} aria-describedby={error ? 'login-error' : undefined} required /><button type="button" className="password-toggle" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((visible) => !visible)} disabled={busy}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></span></label>{error && <p id="login-error" className="error" role="alert">{error}</p>}<button className="auth-submit" disabled={busy}>{busy ? <><RefreshCw size={16} className="spin" /> Signing in</> : <>Sign in <ArrowRight size={16} /></>}</button></form><div className="auth-first-login"><KeyRound size={17} aria-hidden="true" /><div><strong>First time logging in?</strong><Link to="/first-login">Activate your account</Link></div></div></section></section></main>;
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); setBusy(true); setError(''); try { await login(companyEmail, password); navigate('/'); } catch { setError('Invalid credentials, inactive account, or unavailable API.'); } finally { setBusy(false); } };
+  return <main className="auth-page"><section className="auth-layout"><aside className="auth-brand-panel"><div className="auth-brand"><span><Building2 size={22} /></span><strong>InfoTech</strong></div><div><p className="eyebrow">Employee workspace</p><h1>One workspace for your workday.</h1><p>Access your workplace tools, company calendar, notifications, and authenticated assistance in one place.</p></div></aside><section className="auth-form-panel" aria-labelledby="sign-in-title"><div className="auth-form-heading"><span className="auth-form-icon"><LockKeyhole size={20} /></span><p className="eyebrow">Welcome back</p><h2 id="sign-in-title">Sign in to Workspace</h2><p>Use your company email and password to continue.</p></div><form onSubmit={submit}><label htmlFor="company-email">Company Email<input id="company-email" type="email" value={companyEmail} onChange={(event) => setCompanyEmail(event.target.value)} autoComplete="username" autoFocus disabled={busy} required /></label><label htmlFor="password">Password<span className="auth-password-field"><input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" disabled={busy} /><button type="button" className="password-toggle" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((visible) => !visible)} disabled={busy}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></span></label>{error && <p className="error" role="alert">{error}</p>}<button className="auth-submit" disabled={busy}>{busy ? <><RefreshCw size={16} className="spin" /> Signing in</> : <>Sign in <ArrowRight size={16} /></>}</button></form><div className="auth-first-login"><KeyRound size={17} aria-hidden="true" /><div><strong>First time logging in?</strong><Link to="/first-login">Activate your account</Link></div></div></section></section></main>;
 }
 
 function FirstLogin() {

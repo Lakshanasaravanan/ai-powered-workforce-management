@@ -1,5 +1,6 @@
 """Idempotent local-only employee seed; run with PYTHONPATH=. python -m app.seed."""
 import os
+from sqlalchemy import func
 from app.db.session import SessionLocal,Base,engine
 from app.models.employee import Employee,Role
 from app.core.security import hash_password
@@ -11,7 +12,7 @@ def main(session_factory=SessionLocal, create_schema=False, reset_dev_admin_pass
   entries=[('ADM001','InfoTech Admin','admin@infotech.local',Role.ADMIN,'AI Engineer','Platform'),('INF1002','Maya Manager','INF1002@infotech.local',Role.MANAGER,'Senior Engineer','Engineering'),('INF1001','Hari Employee','INF1001@infotech.local',Role.EMPLOYEE,'Junior Engineer','Engineering')]
   users={}
   for code,name,email,role,designation,department in entries:
-   u=db.query(Employee).filter_by(company_email=email).first()
+   u=db.query(Employee).filter(func.lower(Employee.company_email)==email.lower()).first()
    if not u:
     if not seed_password: raise RuntimeError('DEV_SEED_PASSWORD is required to initialize development seed accounts')
     u=Employee(employee_code=code,full_name=name,company_email=email,role=role,designation=designation,department=department,password_hash=hash_password(seed_password),onboarding_completed=True,is_active=True);db.add(u);db.flush()

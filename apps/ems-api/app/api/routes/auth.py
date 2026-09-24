@@ -5,6 +5,7 @@ from uuid import UUID
 import jwt
 from app.db.session import get_db
 from app.models.employee import Employee
+from sqlalchemy import func
 from app.core.config import Settings
 from app.core.security import verify,hash_password,token
 router=APIRouter(prefix='/api/v1/auth'); bearer=HTTPBearer()
@@ -17,7 +18,8 @@ def current(credentials:HTTPAuthorizationCredentials=Depends(bearer),db:Session=
  return user
 @router.post('/login')
 def login(body:dict,db:Session=Depends(get_db)):
- user=db.query(Employee).filter_by(employee_code=body.get('employee_code')).first()
+ email=str(body.get('company_email','')).strip().lower()
+ user=db.query(Employee).filter(func.lower(Employee.company_email)==email).first()
  if not user or not user.is_active or not user.onboarding_completed or not verify(body.get('password',''),user.password_hash):raise HTTPException(401,'Invalid credentials')
  return {'access_token':token(str(user.id)),'token_type':'bearer','employee':summary(user)}
 @router.post('/first-login')
