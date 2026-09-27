@@ -7,9 +7,10 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user
 from app.db.session import get_db
-from app.models.attendance import AttendanceRecord
+from app.models.attendance import AttendanceRecord, OvertimeSession
 from app.models.employee import Employee, Role
 from app.services.holidays import holidays_in_range
+from app.services import attendance as workflow
 
 
 router = APIRouter(prefix="/api/v1/attendance", tags=["attendance"])
@@ -43,7 +44,7 @@ def _record_payload(record: AttendanceRecord) -> dict:
         late_minutes = max(0, int((datetime.combine(record.attendance_date, arrived) - datetime.combine(record.attendance_date, WORKDAY_START)).total_seconds() // 60))
     worked_minutes = None
     if check_in and check_out:
-        worked_minutes = max(0, int((check_out - check_in).total_seconds() // 60))
+        worked_minutes = workflow.regular_minutes(record)
     return {
         "id": str(record.id),
         "attendance_date": record.attendance_date.isoformat(),
@@ -79,3 +80,14 @@ def own_attendance(start: date, end: date, db: Session = Depends(get_db), user: 
 @router.get("/employees/{employee_id}")
 def employee_attendance(employee_id: UUID, start: date, end: date, db: Session = Depends(get_db), user: Employee = Depends(get_current_user)):
     return _feed(db, _authorize_target(db, user, employee_id), start, end)
+
+def _self_record(record): return _record_payload(record)
+def _ot(session): return {'id':str(session.id),'attendance_date':session.attendance_date.isoformat(),'check_in_at':session.check_in_at.isoformat(),'check_out_at':session.check_out_at.isoformat() if session.check_out_at else None,'raw_minutes':int(((session.check_out_at or session.check_in_at)-session.check_in_at).total_seconds()//60)}
+@router.post('/me/check-in')
+def regular_check_in(db:Session=Depends(get_db),user:Employee=Depends(get_current_user)): return _self_record(workflow.check_in(db,user))
+@router.post('/me/check-out')
+def regular_check_out(db:Session=Depends(get_db),user:Employee=Depends(get_current_user)): return _self_record(workflow.check_out(db,user))
+@router.post('/me/overtime/check-in')
+def overtime_check_in(db:Session=Depends(get_db),user:Employee=Depends(get_current_user)): return _ot(workflow.ot_in(db,user))
+@router.post('/me/overtime/check-out')
+def overtime_check_out(db:Session=Depends(get_db),user:Employee=Depends(get_current_user)): return _ot(workflow.ot_out(db,user))

@@ -14,6 +14,7 @@ from app.models.attendance import AttendanceRecord, AttendanceSource, Attendance
 from app.models.employee import Employee, Role
 from app.models.holiday import CompanyHoliday
 from app.models.leave import LeaveRequest, LeaveStatus, LeaveType, LeaveDuration
+from app.services import attendance as workflow
 
 
 engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
@@ -94,3 +95,17 @@ def test_attendance_holidays_are_displayed_without_fake_records():
     holidays = {row["date"]: row["name"] for row in response.json()["holidays"]}
     assert holidays["2025-04-06"] == "Sunday" and holidays["2025-04-12"] == "2nd Saturday" and holidays["2025-04-26"] == "4th Saturday" and holidays["2025-04-14"] == "Company day"
     assert response.json()["records"] == []
+
+
+def test_regular_and_overtime_state_machines_use_injected_business_clock():
+    admin, manager, direct, _, _ = setup(); db = Session()
+    at = lambda hour, minute=0: lambda: datetime(2025, 4, 2, hour, minute)
+    record = workflow.check_in(db, direct, at(9)); assert record.regular_check_in_at.hour == 9
+    with pytest.raises(Exception): workflow.check_in(db, direct, at(9, 1))
+    with pytest.raises(Exception): workflow.ot_in(db, direct, at(16, 59))
+    session = workflow.ot_in(db, direct, at(17)); closed = workflow.ot_out(db, direct, at(18)); assert closed.check_out_at.hour == 18
+    checked_out = workflow.check_out(db, direct, at(18)); assert workflow.regular_minutes(checked_out) == 480
+    with pytest.raises(Exception): workflow.check_out(db, direct, at(18, 1))
+    with pytest.raises(Exception): workflow.check_in(db, admin, at(9))
+    assert workflow.continuation_notifications(db, at(17)) == 0
+    db.close()
