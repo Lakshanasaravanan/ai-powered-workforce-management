@@ -7,6 +7,7 @@ from app.models.chat import ChatConversation, ChatParticipant, ChatMessage
 from app.models.calendar import CalendarEvent
 from app.models.holiday import CompanyHoliday
 from app.models.attendance import AttendanceRecord
+from app.models.payroll import PayrollSnapshot
 from app.core.config import Settings
 config=context.config
 config.set_main_option('sqlalchemy.url', Settings().database_url.replace('+asyncpg', '+psycopg'))
