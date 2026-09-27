@@ -61,6 +61,7 @@ function isPolicyAnswer(value: unknown): value is PolicyAnswer {
 
 export const employees = {
   list: () => request<Employee[]>('/api/v1/employees'),
+  directReports: () => request<Employee[]>('/api/v1/employees/me/direct-reports'),
   search: (query: string) => request<Employee[]>(`/api/v1/employees/search?q=${encodeURIComponent(query)}`),
   create: (body: object) => request<Employee & { temporary_password: string }>('/api/v1/employees', { method: 'POST', body: JSON.stringify(body) }),
   update: (id: string, body: object) => request<Employee>(`/api/v1/employees/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
@@ -91,6 +92,11 @@ export const chat = {
 export type CalendarItem={id:string;title:string;event_type:string;scope?:'PRIVATE'|'COMPANY';start_at:string;end_at:string;all_day:boolean;kind:string;description?:string|null;location?:string|null;is_default?:boolean;deletable?:boolean};
 export type CompanyHoliday={id:string;holiday_date:string;name:string;is_default:boolean;deletable:boolean};
 export const calendar={feed:(start:string,end:string)=>request<CalendarItem[]>(`/api/v1/calendar/feed?start=${start}&end=${end}`),get:(id:string)=>request<CalendarItem>(`/api/v1/calendar/events/${id}`),create:(body:object)=>request<CalendarItem>('/api/v1/calendar/events',{method:'POST',body:JSON.stringify(body)}),update:(id:string,body:object)=>request<CalendarItem>(`/api/v1/calendar/events/${id}`,{method:'PATCH',body:JSON.stringify(body)}),delete:(id:string)=>request<{ok:boolean}>(`/api/v1/calendar/events/${id}`,{method:'DELETE'}),holidays:(start:string,end:string)=>request<CompanyHoliday[]>(`/api/v1/calendar/holidays?start=${start}&end=${end}`),createHoliday:(body:{holiday_date:string;name:string})=>request<CompanyHoliday>('/api/v1/calendar/holidays',{method:'POST',body:JSON.stringify(body)}),deleteHoliday:(id:string)=>request<{ok:boolean}>(`/api/v1/calendar/holidays/${id}`,{method:'DELETE'})};
+
+export type AttendanceStatus = 'PRESENT' | 'LEAVE' | 'ABSENT';
+export type AttendanceRecord = { id: string; attendance_date: string; status: AttendanceStatus; source: 'FACE' | 'APPROVED_LEAVE' | 'ADMIN_OVERRIDE'; regular_check_in_at: string | null; regular_check_out_at: string | null; leave_request_id: string | null; leave_type: string | null; late_minutes: number | null; worked_minutes: number | null; };
+export type AttendanceFeed = { employee: Pick<Employee, 'id' | 'employee_code' | 'full_name' | 'role'>; records: AttendanceRecord[]; holidays: { date: string; name: string }[]; };
+export const attendance = { mine: (start: string, end: string) => request<AttendanceFeed>(`/api/v1/attendance/me?start=${start}&end=${end}`), employee: (id: string, start: string, end: string) => request<AttendanceFeed>(`/api/v1/attendance/employees/${id}?start=${start}&end=${end}`) };
 
 export const policyAssistant = {
   async query(message: string, conversationId?: string): Promise<PolicyAnswer> {

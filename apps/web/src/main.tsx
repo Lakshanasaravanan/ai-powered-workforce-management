@@ -5,6 +5,7 @@ import { ArrowRight, Bell, Bot, Building2, CalendarCheck, CalendarDays, ChevronR
 import Agent from './Agent';
 import Chat from './Chat';
 import Calendar from './Calendar';
+import Attendance from './Attendance';
 import { AuthProvider, useAuth } from './auth';
 import Employees from './Employees';
 import Inbox from './Inbox';
@@ -119,6 +120,7 @@ function Home() {
 type NavigationItem = { to: string; label: string; icon: typeof LayoutDashboard; adminOnly?: boolean };
 const navigation: NavigationItem[] = [
   { to: '/', label: 'Home', icon: LayoutDashboard },
+  { to: '/attendance', label: 'Attendance', icon: CalendarCheck },
   { to: '/chat', label: 'Chat', icon: MessageCircle },
   { to: '/calendar', label: 'Calendar', icon: CalendarDays },
   { to: '/leave', label: 'Leave', icon: ClipboardList },
@@ -141,7 +143,7 @@ function Workspace() {
     <button className="mobile-menu-button" type="button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? <X /> : <Menu />}</button>
     <aside className={`workspace-sidebar ${menuOpen ? 'is-open' : ''}`} aria-label="Workspace navigation"><div className="brand"><span className="brand-mark" aria-hidden="true">IT</span><div><strong>InfoTech</strong><small>Workspace</small></div></div><nav className="primary-navigation" aria-label="Primary">{navigation.filter((item) => !item.adminOnly || user?.role === 'ADMIN').map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} end={to === '/'}><Icon size={19} aria-hidden="true" /><span>{label}</span>{to === '/inbox' && unread > 0 && <b className="badge">{unread > 99 ? '99+' : unread}</b>}</NavLink>)}</nav><div className="sidebar-footer"><div className="sidebar-profile"><span className="profile-avatar" aria-hidden="true">{user?.full_name?.split(' ').map((part) => part[0]).join('').slice(0, 2) || 'IT'}</span><div><strong>{user?.full_name}</strong><small>{user?.employee_code}</small><span className="role-badge">{labelRole(user?.role ?? 'EMPLOYEE')}</span></div></div><button className="sidebar-logout" type="button" onClick={logout}><LogOut size={17} aria-hidden="true" /> <span>Log out</span></button></div></aside>
     {menuOpen && <button className="navigation-backdrop" type="button" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
-    <div className="workspace-content"><Routes><Route path="/" element={<Home />} /><Route path="/chat" element={<Chat />} /><Route path="/calendar" element={<Calendar />} /><Route path="/leave" element={<Leave onNotificationChange={() => void refreshUnread()} />} /><Route path="/inbox" element={<Inbox onUnreadChange={() => void refreshUnread()} />} /><Route path="/agent" element={<Agent />} /><Route path="/employees" element={user?.role === 'ADMIN' ? <Employees /> : <Navigate to="/" replace />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></div>
+    <div className="workspace-content"><Routes><Route path="/" element={<Home />} /><Route path="/attendance" element={<Attendance />} /><Route path="/chat" element={<Chat />} /><Route path="/calendar" element={<Calendar />} /><Route path="/leave" element={<Leave onNotificationChange={() => void refreshUnread()} />} /><Route path="/inbox" element={<Inbox onUnreadChange={() => void refreshUnread()} />} /><Route path="/agent" element={<Agent />} /><Route path="/employees" element={user?.role === 'ADMIN' ? <Employees /> : <Navigate to="/" replace />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></div>
   </div>;
 }
 
