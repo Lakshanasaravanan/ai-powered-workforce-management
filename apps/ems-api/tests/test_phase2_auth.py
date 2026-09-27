@@ -21,6 +21,11 @@ def db_override():
  finally:db.close()
 app.dependency_overrides[get_db]=db_override
 client=TestClient(app)
+@pytest.fixture(autouse=True)
+def restore_test_database_override():
+ app.dependency_overrides[get_db]=db_override
+ yield
+ app.dependency_overrides[get_db]=db_override
 def make(code,role=Role.EMPLOYEE,active=True,onboard=True,manager_id=None):
  db=Session();u=Employee(employee_code=code,full_name=code,company_email=f'{code}@infotech.local',role=role,designation='Engineer',department='Engineering',password_hash=hash_password('test-password'),temporary_password_hash=hash_password('temporary-password'),onboarding_completed=onboard,is_active=active,manager_id=manager_id);db.add(u);db.commit();db.refresh(u);db.close();return u
 def headers(user):return {'Authorization':'Bearer '+token(str(user.id))}

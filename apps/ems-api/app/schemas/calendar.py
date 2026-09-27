@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.models.calendar import EventType
@@ -9,3 +9,8 @@ class EventWrite(BaseModel):
  def dates(self):
   if self.end_at<self.start_at: raise ValueError('end_at must not be before start_at')
   return self
+
+class HolidayWrite(BaseModel):
+ model_config=ConfigDict(extra='forbid')
+ holiday_date:date
+ name:str=Field(min_length=1,max_length=160)

@@ -372,3 +372,7 @@ table { width: 100%; border-collapse: collapse; background: var(--surface); } th
 @media (max-width: 620px) {
   .employees-page-header { align-items: stretch; }.employees-page-header > div:last-child { display: grid; grid-template-columns: minmax(0, 1fr) 38px; }.employees-page-header > div:last-child button { width: 100%; }.temporary-credential, .employee-editor-card > header, .employee-directory > header { align-items: stretch; flex-direction: column; }.temporary-credential > button { width: 100%; }.employee-form-grid { grid-template-columns: 1fr; }.employee-manager-field { grid-column: auto; }.employee-editor-actions { display: grid; grid-template-columns: 1fr 1fr; }.employee-editor-actions button { width: 100%; }.employee-search { width: 100%; }.employee-directory table { min-width: 760px; }
 }
+/* Company holidays are intentionally distinct from employee leave projections. */
+.calendar-event-pill.holiday { border-left-color: var(--accent); background: var(--accent-surface); color: var(--accent); }
+.agenda-item.holiday { border-left: 2px solid var(--accent); }
+@media (max-width: 720px) { .calendar-event-pill.holiday { background: var(--accent); color: transparent; } }

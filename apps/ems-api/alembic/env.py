@@ -5,6 +5,7 @@ from app.models.leave import LeaveRequest
 from app.models.notification import Notification
 from app.models.chat import ChatConversation, ChatParticipant, ChatMessage
 from app.models.calendar import CalendarEvent
+from app.models.holiday import CompanyHoliday
 from app.core.config import Settings
 config=context.config
 config.set_main_option('sqlalchemy.url', Settings().database_url.replace('+asyncpg', '+psycopg'))
