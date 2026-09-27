@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -16,9 +16,17 @@ from app.models.audit import AuditEvent, AuditOutcome, AuditSource
 from app.models.idempotency import MutationIdempotency
 from app.services.idempotency import key_hash, leave_fingerprint, leave_decision_fingerprint
 from app.services.leave_attendance import project_approved_leave
+from app.services.holidays import is_working_day
 
 
 router = APIRouter(prefix="/api/v1/leaves", tags=["leaves"])
+
+def has_working_day(db: Session, start, end) -> bool:
+    day = start
+    while day <= end:
+        if is_working_day(db, day): return True
+        day += timedelta(days=1)
+    return False
 
 
 def leave_response(
@@ -89,6 +97,8 @@ def create_leave(
     The source header changes only audit provenance, never authorization: the
     authenticated EMS employee remains the sole requester.
     """
+    if not has_working_day(db, body.start_date, body.end_date):
+        raise HTTPException(422, "The selected leave period contains no company working days.")
     is_agent = agent_source == "1"
     if is_agent and not idempotency_key:
         raise HTTPException(400, "Idempotency-Key is required for agent leave requests")

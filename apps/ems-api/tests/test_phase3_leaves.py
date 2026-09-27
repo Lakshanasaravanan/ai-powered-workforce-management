@@ -14,6 +14,7 @@ from app.api.routes.leaves import apply_manager_decision
 from app.models.employee import Employee, Role
 from app.models.leave import DecisionSource, LeaveRequest, LeaveStatus
 from app.models.notification import Notification, NotificationCategory
+from app.models.holiday import CompanyHoliday
 
 
 engine = create_engine(
@@ -412,3 +413,17 @@ def test_inbox_is_jwt_private_and_read_operations_are_scoped_and_idempotent():
     ).status_code == 200
     assert client.post("/api/v1/notifications/read-all", headers=headers(manager)).json() == {"updated_count": 2}
     assert client.get("/api/v1/notifications/unread-count", headers=headers(other)).json() == {"unread_count": 1}
+
+
+def test_leave_requires_at_least_one_authoritative_working_day():
+    _, manager, employee, _ = setup()
+    db = Session(); db.add(CompanyHoliday(holiday_date=date(2026, 10, 6), name="Company day", created_by=manager.id)); db.commit(); db.close()
+    for day in ("2026-10-04", "2026-10-10", "2026-10-24", "2026-10-06"):
+        response = create(employee, start_date=day, end_date=day)
+        assert response.status_code == 422
+    assert create(employee, start_date="2026-10-03", end_date="2026-10-03").status_code == 201
+    assert create(employee, start_date="2026-10-17", end_date="2026-10-17").status_code == 201
+    assert create(employee, start_date="2026-10-31", end_date="2026-10-31").status_code == 201
+    assert create(employee, start_date="2026-10-02", end_date="2026-10-04").status_code == 201
+    assert create(employee, leave_type="MEDICAL", start_date="2026-10-04", end_date="2026-10-04").status_code == 422
+    db = Session(); assert db.query(LeaveRequest).filter_by(start_date=date(2026, 10, 4)).count() == 0; db.close()
