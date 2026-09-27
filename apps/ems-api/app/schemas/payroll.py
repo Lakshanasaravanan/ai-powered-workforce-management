@@ -15,6 +15,22 @@ class CompensationPeriod(BaseModel):
     late_deduction_amount: Decimal
 
 
+class PayrollDay(BaseModel):
+    date: str
+    classification: str
+    regular_qualifying_minutes: int
+    arrival_delay_minutes: int
+    regular_deficit_minutes: int
+    raw_overtime_minutes: int
+    deficit_recovery_minutes: int
+    unrecovered_deficit_minutes: int
+    paid_overtime_minutes: int
+    late_deduction_applied: bool
+    late_deduction_amount: Decimal
+    absence_deduction: Decimal
+    overtime_pay: Decimal
+
+
 class PayrollPreview(BaseModel):
     employee_id: str
     employee_code: str
@@ -35,3 +51,17 @@ class PayrollPreview(BaseModel):
     overtime_hourly_rate: Decimal
     late_deduction_amount: Decimal
     compensation_periods: list[CompensationPeriod]
+    total_regular_qualifying_minutes: int
+    total_regular_deficit_minutes: int
+    total_deficit_recovery_minutes: int
+    total_unrecovered_deficit_minutes: int
+    total_raw_overtime_minutes: int
+    total_paid_overtime_minutes: int
+    late_deduction_days: int
+    total_late_deduction: Decimal
+    absence_deduction_days: int
+    total_absence_deduction: Decimal
+    total_overtime_pay: Decimal
+    regular_salary_after_absence: Decimal
+    payable_salary_preview: Decimal
+    daily_breakdown: list[PayrollDay]
