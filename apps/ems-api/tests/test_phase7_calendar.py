@@ -126,7 +126,7 @@ def test_calendar_authentication_crud_validation_and_creator_identity():
     assert client.get(f"/api/v1/calendar/events/{event_id}").status_code == 401
     assert client.patch(f"/api/v1/calendar/events/{event_id}", json=event_body()).status_code == 401
     assert client.delete(f"/api/v1/calendar/events/{event_id}").status_code == 401
-    assert client.get(f"/api/v1/calendar/events/{event_id}", headers=auth(employee)).status_code == 200
+    assert client.get(f"/api/v1/calendar/events/{event_id}", headers=auth(employee)).status_code == 404
     db = Session()
     assert db.get(CalendarEvent, UUID(event_id)).created_by == manager.id
     db.close()
@@ -146,7 +146,7 @@ def test_calendar_event_date_range_and_multiday_intersection():
     intersecting = create_event(manager, title="Multi day", start_at="2025-04-02T09:00", end_at="2025-04-04T17:00")
     outside = create_event(manager, title="Outside", start_at="2025-05-01T09:00", end_at="2025-05-01T10:00")
     assert intersecting.status_code == outside.status_code == 200
-    result = feed(employee, "2025-04-03", "2025-04-03")
+    result = feed(manager, "2025-04-03", "2025-04-03")
     assert result.status_code == 200
     ids = {item["id"] for item in result.json()}
     assert intersecting.json()["id"] in ids
@@ -177,3 +177,38 @@ def test_private_leave_projections_are_not_event_resources():
     leave = add_leave(employee, LeaveStatus.APPROVED, date(2025, 4, 10), date(2025, 4, 10))
     response = client.get(f"/api/v1/calendar/events/{leave.id}", headers=auth(employee))
     assert response.status_code == 404
+
+
+def test_calendar_event_scopes_enforce_private_privacy_and_company_authority():
+    admin, manager, employee, other = setup()
+    private = create_event(employee, title="Private", scope="PRIVATE")
+    assert private.status_code == 200
+    private_id = private.json()["id"]
+    assert client.get(f"/api/v1/calendar/events/{private_id}", headers=auth(employee)).status_code == 200
+    assert client.patch(f"/api/v1/calendar/events/{private_id}", json=event_body(title="Private updated", scope="PRIVATE"), headers=auth(employee)).status_code == 200
+    assert client.get(f"/api/v1/calendar/events/{private_id}", headers=auth(other)).status_code == 404
+    assert client.get(f"/api/v1/calendar/events/{private_id}", headers=auth(manager)).status_code == 404
+    assert client.get(f"/api/v1/calendar/events/{private_id}", headers=auth(admin)).status_code == 404
+    assert client.patch(f"/api/v1/calendar/events/{private_id}", json=event_body(title="Stolen", scope="PRIVATE"), headers=auth(other)).status_code == 403
+    assert client.delete(f"/api/v1/calendar/events/{private_id}", headers=auth(other)).status_code == 403
+    assert client.patch(f"/api/v1/calendar/events/{private_id}", json=event_body(scope="COMPANY"), headers=auth(employee)).status_code == 403
+    manager_private = create_event(manager, title="Manager private", scope="PRIVATE")
+    assert manager_private.status_code == 200
+    assert client.get(f"/api/v1/calendar/events/{manager_private.json()['id']}", headers=auth(manager)).status_code == 200
+    assert client.get(f"/api/v1/calendar/events/{manager_private.json()['id']}", headers=auth(other)).status_code == 404
+    assert client.post("/api/v1/calendar/events", json={**event_body(scope="PRIVATE"), "created_by": str(admin.id)}, headers=auth(employee)).status_code == 422
+    assert client.post("/api/v1/calendar/events", json={**event_body(scope="PRIVATE"), "employee_id": str(admin.id)}, headers=auth(employee)).status_code == 422
+    assert client.post("/api/v1/calendar/events", json=event_body(scope="COMPANY"), headers=auth(employee)).status_code == 403
+    assert client.post("/api/v1/calendar/events", json=event_body(scope="COMPANY"), headers=auth(manager)).status_code == 403
+    company = create_event(admin, title="Company", scope="COMPANY")
+    assert company.status_code == 200
+    company_id = company.json()["id"]
+    assert company_id in {row["id"] for row in feed(employee).json()}
+    assert company_id in {row["id"] for row in feed(manager).json()}
+    assert client.patch(f"/api/v1/calendar/events/{company_id}", json=event_body(title="Not allowed", scope="COMPANY"), headers=auth(employee)).status_code == 403
+    assert client.delete(f"/api/v1/calendar/events/{company_id}", headers=auth(manager)).status_code == 403
+    assert client.patch(f"/api/v1/calendar/events/{company_id}", json=event_body(title="Changed", scope="COMPANY"), headers=auth(admin)).status_code == 200
+    assert client.delete(f"/api/v1/calendar/events/{company_id}", headers=auth(admin)).status_code == 200
+    assert client.post("/api/v1/calendar/events", json=event_body(title="   ", scope="PRIVATE"), headers=auth(employee)).status_code == 422
+    assert client.post("/api/v1/calendar/events", json=event_body(start_at="2025-04-02T10:00", end_at="2025-04-02T10:00", scope="PRIVATE"), headers=auth(employee)).status_code == 422
+    assert client.delete(f"/api/v1/calendar/events/{private_id}", headers=auth(employee)).status_code == 200

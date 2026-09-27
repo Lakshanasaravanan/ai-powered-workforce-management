@@ -376,3 +376,9 @@ table { width: 100%; border-collapse: collapse; background: var(--surface); } th
 .calendar-event-pill.holiday { border-left-color: var(--accent); background: var(--accent-surface); color: var(--accent); }
 .agenda-item.holiday { border-left: 2px solid var(--accent); }
 @media (max-width: 720px) { .calendar-event-pill.holiday { background: var(--accent); color: transparent; } }
+/* Calendar event scopes are deliberately distinct without changing leave or holiday presentation. */
+.calendar-event-pill.private { border-left-color: #9783c7; background: #272136; color: #d7c9fa; }
+.calendar-event-pill.company { border-left-color: var(--info); background: var(--info-surface); color: var(--info); }
+.agenda-item.private { border-left: 2px solid #9783c7; }.agenda-item.private > span { color: #d7c9fa; }
+.agenda-item.company { border-left: 2px solid var(--info); }.agenda-item.company > span { color: var(--info); }
+@media (max-width: 720px) { .calendar-event-pill.private { background: #9783c7; color: transparent; }.calendar-event-pill.company { background: var(--info); color: transparent; } }
