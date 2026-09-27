@@ -18,6 +18,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export type Employee = { id: string; employee_code: string; full_name: string; company_email: string; role: string; designation: string; department: string; manager_id: string | null; is_active: boolean; archived_at?: string | null; };
 export type CompensationConfiguration = { id: string; monthly_salary: string; overtime_hourly_rate: string; late_deduction_amount: string; effective_from: string; effective_to: string | null; };
+export type PayrollCompensationPeriod = { effective_from: string; effective_to: string; working_days: number; monthly_salary: string; derived_daily_rate: string; prorated_salary_foundation: string; overtime_hourly_rate: string; late_deduction_amount: string; };
+export type PayrollPreview = { employee_id: string; employee_code: string; employee_name: string; year: number; month: number; working_days: number; present_days: number; paid_leave_days: number; explicit_absent_days: number; missing_attendance_days: number; regular_worked_minutes: number; regular_records_without_completed_checkout: number; raw_overtime_minutes: number; open_overtime_sessions: number; monthly_salary: string; derived_daily_rate: string; overtime_hourly_rate: string; late_deduction_amount: string; compensation_periods: PayrollCompensationPeriod[]; };
 export type LeaveType = 'CASUAL' | 'MEDICAL' | 'EMERGENCY' | 'DAY_OFF';
 export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type LeaveDuration = 'FULL_DAY' | 'HALF_DAY';
@@ -68,6 +70,9 @@ export const employees = {
   archive: (id: string) => request<{ ok: boolean }>(`/api/v1/employees/${id}`, { method: 'DELETE' }),
   compensation: (id: string) => request<CompensationConfiguration[]>(`/api/v1/employees/${id}/compensation`),
   setCompensation: (id: string, body: { monthly_salary: string; overtime_hourly_rate: string; late_deduction_amount: string; effective_from: string }) => request<CompensationConfiguration>(`/api/v1/employees/${id}/compensation`, { method: 'POST', body: JSON.stringify(body) }),
+};
+export const payroll = {
+  preview: (id: string, year: number, month: number) => request<PayrollPreview>(`/api/v1/payroll/${id}?year=${year}&month=${month}`),
 };
 export const leaves = {
   mine: () => request<LeaveRequest[]>('/api/v1/leaves/me'), team: () => request<LeaveRequest[]>('/api/v1/leaves/team'),

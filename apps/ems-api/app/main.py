@@ -10,6 +10,7 @@ from app.api.routes.notifications import router as notification_router
 from app.api.routes.chat import router as chat_router
 from app.api.routes.calendar import router as calendar_router
 from app.api.routes.attendance import router as attendance_router
+from app.api.routes.payroll import router as payroll_router
 from app.services.websocket_tickets import RedisWebSocketTicketStore
 app=FastAPI(title='InfoTech Workspace EMS API',version='v1')
 settings=Settings()
@@ -31,3 +32,4 @@ app.include_router(notification_router)
 app.include_router(chat_router)
 app.include_router(calendar_router)
 app.include_router(attendance_router)
+app.include_router(payroll_router)
