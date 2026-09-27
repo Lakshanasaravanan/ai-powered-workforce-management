@@ -7,10 +7,12 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user
 from app.db.session import get_db
-from app.models.attendance import AttendanceRecord, OvertimeSession
+from app.models.attendance import AttendanceRecord, OvertimeSession, AttendanceStatus, AttendanceSource
 from app.models.employee import Employee, Role
 from app.services.holidays import holidays_in_range
 from app.services import attendance as workflow
+from app.services.holidays import is_working_day
+from app.models.audit import AuditEvent, AuditOutcome, AuditSource
 
 
 router = APIRouter(prefix="/api/v1/attendance", tags=["attendance"])
@@ -80,6 +82,28 @@ def own_attendance(start: date, end: date, db: Session = Depends(get_db), user: 
 @router.get("/employees/{employee_id}")
 def employee_attendance(employee_id: UUID, start: date, end: date, db: Session = Depends(get_db), user: Employee = Depends(get_current_user)):
     return _feed(db, _authorize_target(db, user, employee_id), start, end)
+
+@router.patch('/employees/{employee_id}/{attendance_date}/admin-correction')
+def admin_correction(employee_id: UUID, attendance_date: date, body: dict, db: Session = Depends(get_db), user: Employee = Depends(get_current_user)):
+    if user.role != Role.ADMIN: raise HTTPException(403, 'Administrator role required')
+    subject = _subject_or_422(db, employee_id)
+    reason = str(body.get('reason', '')).strip()
+    if not reason: raise HTTPException(422, 'A correction reason is required')
+    try: status = AttendanceStatus(body['status'])
+    except (KeyError, ValueError): raise HTTPException(422, 'Invalid attendance status')
+    def parse(value): return datetime.fromisoformat(value) if value else None
+    try: check_in, check_out = parse(body.get('regular_check_in_at')), parse(body.get('regular_check_out_at'))
+    except ValueError: raise HTTPException(422, 'Invalid attendance timestamp')
+    if (check_in and check_in.date() != attendance_date) or (check_out and check_out.date() != attendance_date): raise HTTPException(422, 'Attendance timestamps must match the attendance date')
+    if check_in and check_out and check_out < check_in: raise HTTPException(422, 'Check out must be after check in')
+    if status == AttendanceStatus.PRESENT and not is_working_day(db, attendance_date): raise HTTPException(422, 'Present attendance cannot be created on a non-working day')
+    item = db.query(AttendanceRecord).filter_by(employee_id=subject.id, attendance_date=attendance_date).one_or_none()
+    if item and item.status == AttendanceStatus.LEAVE and item.source == AttendanceSource.APPROVED_LEAVE and item.leave_request_id: raise HTTPException(409, 'Approved leave attendance cannot be corrected here')
+    before = None if not item else {'status':item.status.value,'regular_check_in_at':item.regular_check_in_at.isoformat() if item.regular_check_in_at else None,'regular_check_out_at':item.regular_check_out_at.isoformat() if item.regular_check_out_at else None}
+    if not item: item = AttendanceRecord(employee_id=subject.id, attendance_date=attendance_date, status=status, source=AttendanceSource.ADMIN_OVERRIDE); db.add(item); db.flush()
+    item.status=status; item.regular_check_in_at=check_in; item.regular_check_out_at=check_out; item.source=AttendanceSource.ADMIN_OVERRIDE; item.leave_request_id=None; item.leave_type=None; item.admin_modified_by=user.id; item.admin_modified_at=datetime.now(); item.admin_modification_reason=reason
+    after={'employee_id':str(subject.id),'attendance_date':attendance_date.isoformat(),'reason':reason,'status':status.value,'regular_check_in_at':check_in.isoformat() if check_in else None,'regular_check_out_at':check_out.isoformat() if check_out else None}
+    db.add(AuditEvent(actor_employee_id=user.id,operation='admin_correct_attendance',target_type='ATTENDANCE_RECORD',target_id=item.id,source=AuditSource.UI,outcome=AuditOutcome.SUCCEEDED,before_state=before,after_state=after)); db.commit(); db.refresh(item); return _record_payload(item)
 
 def _self_record(record): return _record_payload(record)
 def _ot(session): return {'id':str(session.id),'attendance_date':session.attendance_date.isoformat(),'check_in_at':session.check_in_at.isoformat(),'check_out_at':session.check_out_at.isoformat() if session.check_out_at else None,'raw_minutes':int(((session.check_out_at or session.check_in_at)-session.check_in_at).total_seconds()//60)}

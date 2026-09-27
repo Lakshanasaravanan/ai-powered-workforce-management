@@ -13,6 +13,7 @@ from app.main import app
 from app.models.attendance import AttendanceRecord, AttendanceSource, AttendanceStatus
 from app.models.employee import Employee, Role
 from app.models.holiday import CompanyHoliday
+from app.models.audit import AuditEvent
 from app.models.leave import LeaveRequest, LeaveStatus, LeaveType, LeaveDuration
 from app.services import attendance as workflow
 from app.services.leave_attendance import project_approved_leave
@@ -119,3 +120,17 @@ def test_approved_leave_projects_working_days_idempotently_without_overwriting_a
     rows = db.query(AttendanceRecord).filter_by(employee_id=direct.id).all(); assert len(rows) == 1 and rows[0].attendance_date == date(2025, 4, 11) and rows[0].status == AttendanceStatus.LEAVE and rows[0].source == AttendanceSource.APPROVED_LEAVE and rows[0].leave_request_id == request.id
     project_approved_leave(db, request); db.commit(); assert db.query(AttendanceRecord).filter_by(employee_id=direct.id).count() == 1
     db.close()
+
+
+def test_admin_attendance_correction_is_audited_and_protects_leave_and_holidays():
+    admin, manager, direct, _, _ = setup(); endpoint = f"/api/v1/attendance/employees/{direct.id}/2025-04-02/admin-correction"
+    body = {"status":"PRESENT","regular_check_in_at":"2025-04-02T09:00:00","regular_check_out_at":"2025-04-02T18:00:00","reason":"Terminal failure"}
+    assert client.patch(endpoint, json=body).status_code == 401
+    assert client.patch(endpoint, json=body, headers=auth(direct)).status_code == 403
+    assert client.patch(endpoint, json=body, headers=auth(manager)).status_code == 403
+    assert client.patch(endpoint, json={**body,"reason":" "}, headers=auth(admin)).status_code == 422
+    corrected = client.patch(endpoint, json=body, headers=auth(admin)); assert corrected.status_code == 200 and corrected.json()["source"] == "ADMIN_OVERRIDE" and corrected.json()["worked_minutes"] == 480
+    db=Session(); audit=db.query(AuditEvent).filter_by(operation="admin_correct_attendance").one(); assert audit.actor_employee_id == admin.id and audit.after_state["reason"] == "Terminal failure" and audit.after_state["attendance_date"] == "2025-04-02"; db.close()
+    assert client.patch(f"/api/v1/attendance/employees/{direct.id}/2025-04-06/admin-correction",json=body|{"regular_check_in_at":"2025-04-06T09:00:00","regular_check_out_at":"2025-04-06T17:00:00"},headers=auth(admin)).status_code == 422
+    assert client.patch(endpoint,json=body|{"regular_check_out_at":"2025-04-01T17:00:00"},headers=auth(admin)).status_code == 422
+    assert client.patch(f"/api/v1/attendance/employees/{admin.id}/2025-04-02/admin-correction",json=body,headers=auth(admin)).status_code == 422
