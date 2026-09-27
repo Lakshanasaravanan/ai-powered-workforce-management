@@ -15,6 +15,7 @@ from app.services.notifications import create_notification
 from app.models.audit import AuditEvent, AuditOutcome, AuditSource
 from app.models.idempotency import MutationIdempotency
 from app.services.idempotency import key_hash, leave_fingerprint, leave_decision_fingerprint
+from app.services.leave_attendance import project_approved_leave
 
 
 router = APIRouter(prefix="/api/v1/leaves", tags=["leaves"])
@@ -119,6 +120,8 @@ def create_leave(
     )
     db.add(request)
     db.flush()
+    if automatically_approved:
+        project_approved_leave(db, request)
     manager = db.get(Employee, user.manager_id) if user.manager_id else None
     manager_notification_delivered = bool(manager and manager.is_active)
     if manager_notification_delivered:
@@ -274,6 +277,8 @@ def decide_leave(
         db.rollback()
         raise HTTPException(409, "Leave request was already decided")
     db.refresh(request)
+    if status is LeaveStatus.APPROVED:
+        project_approved_leave(db, request)
     action = "approved" if status is LeaveStatus.APPROVED else "rejected"
     note_suffix = f" Note: {body.decision_note}" if body.decision_note else ""
     create_notification(

@@ -189,7 +189,7 @@ def test_direct_manager_can_approve_all_approval_required_leave_types():
     _, manager, employee, _ = setup()
     for leave_type, overrides in (
         ("CASUAL", {}),
-        ("EMERGENCY", {}),
+        ("EMERGENCY", {"start_date": "2026-10-06", "end_date": "2026-10-07"}),
         (
             "DAY_OFF",
             {
@@ -255,7 +255,7 @@ def test_manager_hierarchy_decision_scope_and_medical_protection():
         json={},
         headers=headers(senior),
     ).status_code == 200
-    medical = create(employee, leave_type="MEDICAL")
+    medical = create(employee, leave_type="MEDICAL", start_date="2026-10-06", end_date="2026-10-07")
     medical_endpoint = f"/api/v1/leaves/{medical.json()['id']}"
     before = client.get(medical_endpoint, headers=headers(manager)).json()
     assert client.post(f"{medical_endpoint}/approve", json={}, headers=headers(manager)).status_code == 409

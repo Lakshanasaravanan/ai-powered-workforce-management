@@ -15,6 +15,7 @@ from app.models.employee import Employee, Role
 from app.models.holiday import CompanyHoliday
 from app.models.leave import LeaveRequest, LeaveStatus, LeaveType, LeaveDuration
 from app.services import attendance as workflow
+from app.services.leave_attendance import project_approved_leave
 
 
 engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
@@ -108,4 +109,13 @@ def test_regular_and_overtime_state_machines_use_injected_business_clock():
     with pytest.raises(Exception): workflow.check_out(db, direct, at(18, 1))
     with pytest.raises(Exception): workflow.check_in(db, admin, at(9))
     assert workflow.continuation_notifications(db, at(17)) == 0
+    db.close()
+
+
+def test_approved_leave_projects_working_days_idempotently_without_overwriting_attendance():
+    _, manager, direct, _, _ = setup(); db = Session()
+    request = LeaveRequest(employee_id=direct.id, leave_type=LeaveType.CASUAL, status=LeaveStatus.APPROVED, start_date=date(2025, 4, 11), end_date=date(2025, 4, 14), duration=LeaveDuration.FULL_DAY, reason='Approved', approval_required=False)
+    db.add(request); db.flush(); db.add(CompanyHoliday(holiday_date=date(2025, 4, 14), name='Holiday', created_by=manager.id)); project_approved_leave(db, request); db.commit()
+    rows = db.query(AttendanceRecord).filter_by(employee_id=direct.id).all(); assert len(rows) == 1 and rows[0].attendance_date == date(2025, 4, 11) and rows[0].status == AttendanceStatus.LEAVE and rows[0].source == AttendanceSource.APPROVED_LEAVE and rows[0].leave_request_id == request.id
+    project_approved_leave(db, request); db.commit(); assert db.query(AttendanceRecord).filter_by(employee_id=direct.id).count() == 1
     db.close()
