@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-09-28T10:52:29.640585+00:00",
+  "git_commit": "b9c96a69b1d89507288501d515a93287ac677f8a",
+  "benchmark_sha256": "26591e805a076bb78b8673c86c1cc51f9c66f1b16c5f24da1e947a95e88a7409",
+  "benchmark": {
+    "questions": 68,
+    "answerable": 60,
+    "unanswerable": 8,
+    "held_out": 16
+  },
+  "corpus": {
+    "documents": 5,
+    "chunks": 795,
+    "sources": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_IT_Security_Policy.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ]
+  },
+  "retrieval": {
+    "dense": {
+      "chunk": {
+        "count": 60,
+        "recall": {
+          "1": 0.0,
+          "3": 0.016666666666666666,
+          "5": 0.016666666666666666,
+          "10": 0.03333333333333333
+        },
+        "precision": {
+          "1": 0.0,
+          "3": 0.005555555555555555,
+          "5": 0.0033333333333333335,
+          "10": 0.0033333333333333335
+        },
+        "hit_rate": {
+          "1": 0.0,
+          "3": 0.016666666666666666,
+          "5": 0.016666666666666666,
+          "10": 0.03333333333333333
+        },
+        "mrr": 0.007638888888888889,
+        "map": 0.007638888888888889
+      },
+      "document": {
+        "count": 60,
+        "recall": {
+          "1": 0.8416666666666667,
+          "3": 0.9583333333333334,
+          "5": 0.975,
+          "10": 0.975
+        },
+        "precision": {
+          "1": 0.8833333333333333,
+          "3": 0.34444444444444444,
+          "5": 0.21000000000000002,
+          "10": 0.10500000000000001
+        },
+        "hit_rate": {
+          "1": 0.8833333333333333,
+          "3": 0.9666666666666667,
+          "5": 0.9833333333333333,
+          "10": 0.9833333333333333
+        },
+        "mrr": 0.9255555555555556,
+        "map": 0.9172222222222223
+      }
+    },
+    "hybrid": {
+      "chunk": {
+        "count": 60,
+        "recall": {
+          "1": 0.016666666666666666,
+          "3": 0.03333333333333333,
+          "5": 0.03333333333333333,
+          "10": 0.06666666666666667
+        },
+        "precision": {
+          "1": 0.016666666666666666,
+          "3": 0.01111111111111111,
+          "5": 0.006666666666666667,
+          "10": 0.006666666666666667
+        },
+        "hit_rate": {
+          "1": 0.016666666666666666,
+          "3": 0.03333333333333333,
+          "5": 0.03333333333333333,
+          "10": 0.06666666666666667
+        },
+        "mrr": 0.02626984126984127,
+        "map": 0.02626984126984127
+      },
+      "document": {
+        "count": 60,
+        "recall": {
+          "1": 0.825,
+          "3": 0.9666666666666667,
+          "5": 0.9833333333333333,
+          "10": 0.9833333333333333
+        },
+        "precision": {
+          "1": 0.8666666666666667,
+          "3": 0.35,
+          "5": 0.21333333333333335,
+          "10": 0.10666666666666667
+        },
+        "hit_rate": {
+          "1": 0.8666666666666667,
+          "3": 0.9666666666666667,
+          "5": 0.9833333333333333,
+          "10": 0.9833333333333333
+        },
+        "mrr": 0.9180555555555555,
+        "map": 0.9180555555555555
+      }
+    }
+  },
+  "generation": {
+    "generated_at": "2026-09-28T10:52:20.138162+00:00",
+    "status": "NOT_EXECUTED",
+    "reason": "No local Ollama provider was configured or running; Phase 21 does not initiate paid OpenRouter generation.",
+    "configuration": {
+      "provider": "openrouter",
+      "model": "openai/gpt-4.1-mini",
+      "temperature": 0,
+      "retrieval_k": 5,
+      "reranking_enabled": false
+    },
+    "benchmark": {
+      "questions": 68,
+      "hash": "26591e805a076bb78b8673c86c1cc51f9c66f1b16c5f24da1e947a95e88a7409"
+    },
+    "metrics": {
+      "faithfulness": null,
+      "answer_correctness": null,
+      "answer_relevance": null,
+      "citation_precision": null,
+      "citation_coverage": null,
+      "correct_document_citation_rate": null,
+      "abstention_rate": null,
+      "hallucination_rate": null,
+      "end_to_end_success": null
+    },
+    "per_question": []
+  },
+  "methodology": {
+    "labels": "Static labels were derived from indexed PDF text and metadata before retrieval; rankings never update labels.",
+    "ap_convention": "For each answerable query, AP is the sum of precision at each retrieved relevant rank divided by the number of independently labeled relevant chunks.",
+    "generation_status": "NOT_EXECUTED"
+  }
+}

@@ -1,0 +1,1454 @@
+[
+  {
+    "id": "xyz_code_of_conduct_001",
+    "question": "What guidance does the company policy provide about XYZ Technologies \u2014 Code of Conduct?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      1
+    ],
+    "relevant_chunk_ids": [
+      "chunk_f2f961c85702a36e09582529"
+    ],
+    "reference_answer": "XYZ Technologies \u2014 Code of Conduct Synthetic internal knowledge-base document for the employee AI assistant Important: This is synthetic content created for a college final-year project. It is not a real company's policy and is not legal, HR, medical, or security advice.",
+    "reference_evidence": [
+      "XYZ Technologies \u2014 Code of Conduct"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_002",
+    "question": "What does the policy say about Honesty \u2014 Operational Guidance?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      2
+    ],
+    "relevant_chunk_ids": [
+      "chunk_c85f6556fe9fe7110971f654"
+    ],
+    "reference_answer": "Integrity and Professional Conduct Honesty \u2014 Operational Guidance This section defines the XYZ Technologies approach to honesty within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to honesty. Current employee records, applicable approvals, and the latest published policy should be considered b",
+    "reference_evidence": [
+      "Honesty \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_003",
+    "question": "Which policy guidance applies to Professional Judgment \u2014 Operational Guidance?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      3
+    ],
+    "relevant_chunk_ids": [
+      "chunk_e3ff498fef2027c726155439"
+    ],
+    "reference_answer": "Integrity and Professional Conduct Professional Judgment \u2014 Operational Guidance This section defines the XYZ Technologies approach to professional judgment within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to professional judgment. Current employee records, applicable approvals, and the late",
+    "reference_evidence": [
+      "Professional Judgment \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_004",
+    "question": "How should employees handle Accurate Records \u2014 Operational Guidance under company policy?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      4
+    ],
+    "relevant_chunk_ids": [
+      "chunk_b8142ee0036454bf66459267"
+    ],
+    "reference_answer": "Integrity and Professional Conduct Accurate Records \u2014 Operational Guidance This section defines the XYZ Technologies approach to accurate records within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to accurate records. Current employee records, applicable approvals, and the latest published po",
+    "reference_evidence": [
+      "Accurate Records \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_005",
+    "question": "Summarize the policy rule for Responsible Communication \u2014 Operational Guidance.",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      5
+    ],
+    "relevant_chunk_ids": [
+      "chunk_da4ee663e277921944685263"
+    ],
+    "reference_answer": "Integrity and Professional Conduct Responsible Communication \u2014 Operational Guidance This section defines the XYZ Technologies approach to responsible communication within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to responsible communication. Current employee records, applicable approvals, ",
+    "reference_evidence": [
+      "Responsible Communication \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_code_of_conduct_006",
+    "question": "What responsibility is described for Dignity \u2014 Operational Guidance?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      10
+    ],
+    "relevant_chunk_ids": [
+      "chunk_56749db3aa7c4773b460af9f"
+    ],
+    "reference_answer": "Respectful Workplace Dignity \u2014 Operational Guidance This section defines the XYZ Technologies approach to dignity within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to dignity. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed",
+    "reference_evidence": [
+      "Dignity \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_007",
+    "question": "Where can staff find guidance on Harassment Prevention \u2014 Operational Guidance?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      11
+    ],
+    "relevant_chunk_ids": [
+      "chunk_8ba2f7138529daa988e962a2"
+    ],
+    "reference_answer": "Respectful Workplace Harassment Prevention \u2014 Operational Guidance This section defines the XYZ Technologies approach to harassment prevention within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to harassment prevention. Current employee records, applicable approvals, and the latest published policy should b",
+    "reference_evidence": [
+      "Harassment Prevention \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_008",
+    "question": "Explain the company's approach to Inclusive Behavior \u2014 Operational Guidance.",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      12
+    ],
+    "relevant_chunk_ids": [
+      "chunk_db6fe4cf3d4347a53108a4e5"
+    ],
+    "reference_answer": "Respectful Workplace Inclusive Behavior \u2014 Operational Guidance This section defines the XYZ Technologies approach to inclusive behavior within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to inclusive behavior. Current employee records, applicable approvals, and the latest published policy should be conside",
+    "reference_evidence": [
+      "Inclusive Behavior \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_009",
+    "question": "In practical terms, how is Professional Boundaries \u2014 Operational Guidance addressed?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      13
+    ],
+    "relevant_chunk_ids": [
+      "chunk_43c070c99f0b4e88cb2bf485"
+    ],
+    "reference_answer": "Respectful Workplace Professional Boundaries \u2014 Operational Guidance This section defines the XYZ Technologies approach to professional boundaries within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to professional boundaries. Current employee records, applicable approvals, and the latest published policy sh",
+    "reference_evidence": [
+      "Professional Boundaries \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_code_of_conduct_010",
+    "question": "What does the policy say about Outsiede Activities \u2014 Operational Guidance?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      18
+    ],
+    "relevant_chunk_ids": [
+      "chunk_f65ca3dc135f9dcd24331fe2"
+    ],
+    "reference_answer": "Conflicts of Interest Outside Activities \u2014 Operational Guidance This section defines the XYZ Technologies approach to outside activities within the area of conflicts of interest. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to outside activities. Current employee records, applicable approvals, and the latest published policy should be consi",
+    "reference_evidence": [
+      "Outside Activities \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "typo_robustness",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_code_of_conduct_011",
+    "question": "Does a similarly named rule override the published guidance on Gifts \u2014 Operational Guidance?",
+    "category": "code_of_conduct",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      19
+    ],
+    "relevant_chunk_ids": [
+      "chunk_6872afdc469ea7740f5cbb36"
+    ],
+    "reference_answer": "Conflicts of Interest Gifts \u2014 Operational Guidance This section defines the XYZ Technologies approach to gifts within the area of conflicts of interest. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to gifts. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed. Fo",
+    "reference_evidence": [
+      "Gifts \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "hard_negative",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_001",
+    "question": "What guidance does the company policy provide about Handbook?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      1
+    ],
+    "relevant_chunk_ids": [
+      "chunk_fcb7688c1fe2f08ddaa49596"
+    ],
+    "reference_answer": "XYZ Technologies \u2014 Employee Policies Handbook Synthetic internal knowledge-base document for the employee AI assistant Important: This is synthetic content created for a college final-year project. It is not a real company's policy and is not legal, HR, medical, or security advice.",
+    "reference_evidence": [
+      "Handbook"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_002",
+    "question": "What does the policy say about Working Hours \u2014 Operational Guidance?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      2
+    ],
+    "relevant_chunk_ids": [
+      "chunk_7250b0a500ff91192ffcf69a"
+    ],
+    "reference_answer": "Employment and Workplace Standards Working Hours \u2014 Operational Guidance This section defines the XYZ Technologies approach to working hours within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to working hours. Current employee records, applicable approvals, and the latest published policy shou",
+    "reference_evidence": [
+      "Working Hours \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_003",
+    "question": "Which policy guidance applies to Probation \u2014 Operational Guidance?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      3
+    ],
+    "relevant_chunk_ids": [
+      "chunk_98029c496ec25bcf0627609a"
+    ],
+    "reference_answer": "Employment and Workplace Standards Probation \u2014 Operational Guidance This section defines the XYZ Technologies approach to probation within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to probation. Current employee records, applicable approvals, and the latest published policy should be consid",
+    "reference_evidence": [
+      "Probation \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_004",
+    "question": "How should employees handle Employment Records \u2014 Operational Guidance under company policy?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      4
+    ],
+    "relevant_chunk_ids": [
+      "chunk_4b08045caf1c0a940d50130d"
+    ],
+    "reference_answer": "Employment and Workplace Standards Employment Records \u2014 Operational Guidance This section defines the XYZ Technologies approach to employment records within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to employment records. Current employee records, applicable approvals, and the latest publis",
+    "reference_evidence": [
+      "Employment Records \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_005",
+    "question": "Summarize the policy rule for Professional Standards \u2014 Operational Guidance.",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      5
+    ],
+    "relevant_chunk_ids": [
+      "chunk_19b186ab5206b563e30e9ebf"
+    ],
+    "reference_answer": "Employment and Workplace Standards Professional Standards \u2014 Operational Guidance This section defines the XYZ Technologies approach to professional standards within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to professional standards. Current employee records, applicable approvals, and the l",
+    "reference_evidence": [
+      "Professional Standards \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_employee_policies_006",
+    "question": "What responsibility is described for Annual Leave \u2014 Operational Guidance?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      10
+    ],
+    "relevant_chunk_ids": [
+      "chunk_dcde21c58b34d6124694bf13"
+    ],
+    "reference_answer": "Leave and Time Off Annual Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to annual leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to annual leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request i",
+    "reference_evidence": [
+      "Annual Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_007",
+    "question": "Where can staff find guidance on Casual Leave \u2014 Operational Guidance?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      11
+    ],
+    "relevant_chunk_ids": [
+      "chunk_1be0b6a8f732808234ea5316"
+    ],
+    "reference_answer": "Leave and Time Off Casual Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to casual leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to casual leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request i",
+    "reference_evidence": [
+      "Casual Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_008",
+    "question": "Explain the company's approach to Medical Leave \u2014 Operational Guidance.",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      12
+    ],
+    "relevant_chunk_ids": [
+      "chunk_163929e7577f16045c2f5541"
+    ],
+    "reference_answer": "Leave and Time Off Medical Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to medical leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to medical leave. Current employee records, applicable approvals, and the latest published policy should be considered before a reques",
+    "reference_evidence": [
+      "Medical Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_009",
+    "question": "In practical terms, how is Special Leave \u2014 Operational Guidance addressed?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      13
+    ],
+    "relevant_chunk_ids": [
+      "chunk_f621c3672128b6917a57088f"
+    ],
+    "reference_answer": "Leave and Time Off Special Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to special leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to special leave. Current employee records, applicable approvals, and the latest published policy should be considered before a reques",
+    "reference_evidence": [
+      "Special Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_employee_policies_010",
+    "question": "What does the policy say about Attendance \u2014 Operatieonal Guidance?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      18
+    ],
+    "relevant_chunk_ids": [
+      "chunk_806305e6f85b0b246ebf7730"
+    ],
+    "reference_answer": "Attendance and Timesheets Attendance \u2014 Operational Guidance This section defines the XYZ Technologies approach to attendance within the area of attendance and timesheets. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to attendance. Current employee records, applicable approvals, and the latest published policy should be considered before a r",
+    "reference_evidence": [
+      "Attendance \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "typo_robustness",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_employee_policies_011",
+    "question": "Does a similarly named rule override the published guidance on Late Arrival \u2014 Operational Guidance?",
+    "category": "employee_policies",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      19
+    ],
+    "relevant_chunk_ids": [
+      "chunk_2cf1b9c464cef684a1d26136"
+    ],
+    "reference_answer": "Attendance and Timesheets Late Arrival \u2014 Operational Guidance This section defines the XYZ Technologies approach to late arrival within the area of attendance and timesheets. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to late arrival. Current employee records, applicable approvals, and the latest published policy should be considered befo",
+    "reference_evidence": [
+      "Late Arrival \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "hard_negative",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_001",
+    "question": "What guidance does the company policy provide about Security Policy?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      1
+    ],
+    "relevant_chunk_ids": [
+      "chunk_8a6c18db40f1e15c2469c0d4"
+    ],
+    "reference_answer": "XYZ Technologies \u2014 IT and Information Security Policy Synthetic internal knowledge-base document for the employee AI assistant Important: This is synthetic content created for a college final-year project. It is not a real company's policy and is not legal, HR, medical, or security advice.",
+    "reference_evidence": [
+      "Security Policy"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_002",
+    "question": "What does the policy say about Passwords \u2014 Operational Guidance?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      2
+    ],
+    "relevant_chunk_ids": [
+      "chunk_3b5bfbc1fcab1e5fa3a41ae8"
+    ],
+    "reference_answer": "Account Security Passwords \u2014 Operational Guidance This section defines the XYZ Technologies approach to passwords within the area of account security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to passwords. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed. ",
+    "reference_evidence": [
+      "Passwords \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_003",
+    "question": "Which policy guidance applies to Mfa \u2014 Operational Guidance?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      3
+    ],
+    "relevant_chunk_ids": [
+      "chunk_a3af9361e325f3492aac93b8"
+    ],
+    "reference_answer": "Account Security Mfa \u2014 Operational Guidance This section defines the XYZ Technologies approach to mfa within the area of account security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to mfa. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed. For mfa, the stand",
+    "reference_evidence": [
+      "Mfa \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_004",
+    "question": "How should employees handle Account Sharing \u2014 Operational Guidance under company policy?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      4
+    ],
+    "relevant_chunk_ids": [
+      "chunk_02e7a78316ff6a0a519c58fb"
+    ],
+    "reference_answer": "Account Security Account Sharing \u2014 Operational Guidance This section defines the XYZ Technologies approach to account sharing within the area of account security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to account sharing. Current employee records, applicable approvals, and the latest published policy should be considered before a requ",
+    "reference_evidence": [
+      "Account Sharing \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_005",
+    "question": "Summarize the policy rule for Authentication \u2014 Operational Guidance.",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      5
+    ],
+    "relevant_chunk_ids": [
+      "chunk_5235b2e8f38a07ec8e3baa79"
+    ],
+    "reference_answer": "Account Security Authentication \u2014 Operational Guidance This section defines the XYZ Technologies approach to authentication within the area of account security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to authentication. Current employee records, applicable approvals, and the latest published policy should be considered before a request",
+    "reference_evidence": [
+      "Authentication \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_it_security_policy_006",
+    "question": "What responsibility is described for Company Laptops \u2014 Operational Guidance?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      10
+    ],
+    "relevant_chunk_ids": [
+      "chunk_daacf2edabc31fae4388ad9d"
+    ],
+    "reference_answer": "Device Security Company Laptops \u2014 Operational Guidance This section defines the XYZ Technologies approach to company laptops within the area of device security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to company laptops. Current employee records, applicable approvals, and the latest published policy should be considered before a reques",
+    "reference_evidence": [
+      "Company Laptops \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_007",
+    "question": "Where can staff find guidance on Screen Locking \u2014 Operational Guidance?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      11
+    ],
+    "relevant_chunk_ids": [
+      "chunk_6799a9d81c69394b4cfa8d62"
+    ],
+    "reference_answer": "Device Security Screen Locking \u2014 Operational Guidance This section defines the XYZ Technologies approach to screen locking within the area of device security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to screen locking. Current employee records, applicable approvals, and the latest published policy should be considered before a request i",
+    "reference_evidence": [
+      "Screen Locking \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_008",
+    "question": "Explain the company's approach to Encryption \u2014 Operational Guidance.",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      12
+    ],
+    "relevant_chunk_ids": [
+      "chunk_8f767bfacd4ed3e51538c7af"
+    ],
+    "reference_answer": "Device Security Encryption \u2014 Operational Guidance This section defines the XYZ Technologies approach to encryption within the area of device security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to encryption. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed.",
+    "reference_evidence": [
+      "Encryption \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_009",
+    "question": "In practical terms, how is Device Reporting \u2014 Operational Guidance addressed?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      13
+    ],
+    "relevant_chunk_ids": [
+      "chunk_ff634a8dacbecc22b20556cd"
+    ],
+    "reference_answer": "Device Security Device Reporting \u2014 Operational Guidance This section defines the XYZ Technologies approach to device reporting within the area of device security. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to device reporting. Current employee records, applicable approvals, and the latest published policy should be considered before a req",
+    "reference_evidence": [
+      "Device Reporting \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_it_security_policy_010",
+    "question": "What does the policy say about Least Prievilege \u2014 Operational Guidance?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      18
+    ],
+    "relevant_chunk_ids": [
+      "chunk_0343521f9070b1502590428d"
+    ],
+    "reference_answer": "Access Control Least Privilege \u2014 Operational Guidance This section defines the XYZ Technologies approach to least privilege within the area of access control. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to least privilege. Current employee records, applicable approvals, and the latest published policy should be considered before a request ",
+    "reference_evidence": [
+      "Least Privilege \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "typo_robustness",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_it_security_policy_011",
+    "question": "Does a similarly named rule override the published guidance on Role-Based Access \u2014 Operational Guidance?",
+    "category": "it_security_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      19
+    ],
+    "relevant_chunk_ids": [
+      "chunk_d212d1b97ec0913986b44bc8"
+    ],
+    "reference_answer": "Access Control Role-Based Access \u2014 Operational Guidance This section defines the XYZ Technologies approach to role-based access within the area of access control. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to role-based access. Current employee records, applicable approvals, and the latest published policy should be considered before a re",
+    "reference_evidence": [
+      "Role-Based Access \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "hard_negative",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_001",
+    "question": "What guidance does the company policy provide about Policy?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      1
+    ],
+    "relevant_chunk_ids": [
+      "chunk_b333df0a658af4564af3b9fc"
+    ],
+    "reference_answer": "XYZ Technologies \u2014 Leave and Attendance Policy Synthetic internal knowledge-base document for the employee AI assistant Important: This is synthetic content created for a college final-year project. It is not a real company's policy and is not legal, HR, medical, or security advice.",
+    "reference_evidence": [
+      "Policy"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_002",
+    "question": "What does the policy say about Annual Leave \u2014 Operational Guidance?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      2
+    ],
+    "relevant_chunk_ids": [
+      "chunk_8e33f345d6c5fe0f77fafbf7"
+    ],
+    "reference_answer": "Leave Categories Annual Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to annual leave within the area of leave categories. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to annual leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request is co",
+    "reference_evidence": [
+      "Annual Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_003",
+    "question": "Which policy guidance applies to Casual Leave \u2014 Operational Guidance?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      3
+    ],
+    "relevant_chunk_ids": [
+      "chunk_03cbe252d19f5f91a4f09de5"
+    ],
+    "reference_answer": "Leave Categories Casual Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to casual leave within the area of leave categories. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to casual leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request is co",
+    "reference_evidence": [
+      "Casual Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_004",
+    "question": "How should employees handle Medical Leave \u2014 Operational Guidance under company policy?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      4
+    ],
+    "relevant_chunk_ids": [
+      "chunk_082dbeb90514bfeecd3be1f6"
+    ],
+    "reference_answer": "Leave Categories Medical Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to medical leave within the area of leave categories. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to medical leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request is",
+    "reference_evidence": [
+      "Medical Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_005",
+    "question": "Summarize the policy rule for Parental Leave \u2014 Operational Guidance.",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      5
+    ],
+    "relevant_chunk_ids": [
+      "chunk_30fc305f19b1643a22d51598"
+    ],
+    "reference_answer": "Leave Categories Parental Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to parental leave within the area of leave categories. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to parental leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request",
+    "reference_evidence": [
+      "Parental Leave \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_006",
+    "question": "What responsibility is described for Accrual \u2014 Operational Guidance?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      10
+    ],
+    "relevant_chunk_ids": [
+      "chunk_bb5199a1715483fb0c423c1e"
+    ],
+    "reference_answer": "Leave Balances Accrual \u2014 Operational Guidance This section defines the XYZ Technologies approach to accrual within the area of leave balances. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to accrual. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed. For accrua",
+    "reference_evidence": [
+      "Accrual \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_007",
+    "question": "Where can staff find guidance on Carry-Forward \u2014 Operational Guidance?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      11
+    ],
+    "relevant_chunk_ids": [
+      "chunk_8760f84be8979f9f7e9cf2a0"
+    ],
+    "reference_answer": "Leave Balances Carry-Forward \u2014 Operational Guidance This section defines the XYZ Technologies approach to carry-forward within the area of leave balances. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to carry-forward. Current employee records, applicable approvals, and the latest published policy should be considered before a request is com",
+    "reference_evidence": [
+      "Carry-Forward \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_008",
+    "question": "Explain the company's approach to Balance Checks \u2014 Operational Guidance.",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      12
+    ],
+    "relevant_chunk_ids": [
+      "chunk_c69298a7af4c10190a6cf637"
+    ],
+    "reference_answer": "Leave Balances Balance Checks \u2014 Operational Guidance This section defines the XYZ Technologies approach to balance checks within the area of leave balances. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to balance checks. Current employee records, applicable approvals, and the latest published policy should be considered before a request is ",
+    "reference_evidence": [
+      "Balance Checks \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_009",
+    "question": "In practical terms, how is Negative Balances \u2014 Operational Guidance addressed?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      13
+    ],
+    "relevant_chunk_ids": [
+      "chunk_9906c183a0c6f1fb4ca71943"
+    ],
+    "reference_answer": "Leave Balances Negative Balances \u2014 Operational Guidance This section defines the XYZ Technologies approach to negative balances within the area of leave balances. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to negative balances. Current employee records, applicable approvals, and the latest published policy should be considered before a re",
+    "reference_evidence": [
+      "Negative Balances \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_010",
+    "question": "What does the policy say about Advance Notiece \u2014 Operational Guidance?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      18
+    ],
+    "relevant_chunk_ids": [
+      "chunk_cd60029392492cac2b96d0c7"
+    ],
+    "reference_answer": "Applying for Leave Advance Notice \u2014 Operational Guidance This section defines the XYZ Technologies approach to advance notice within the area of applying for leave. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to advance notice. Current employee records, applicable approvals, and the latest published policy should be considered before a req",
+    "reference_evidence": [
+      "Advance Notice \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "typo_robustness",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_leave_attendance_policy_011",
+    "question": "Does a similarly named rule override the published guidance on Same-Day Requests \u2014 Operational Guidance?",
+    "category": "leave_attendance_policy",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      19
+    ],
+    "relevant_chunk_ids": [
+      "chunk_d77a2d86732dbd56c0412e0d"
+    ],
+    "reference_answer": "Applying for Leave Same-Day Requests \u2014 Operational Guidance This section defines the XYZ Technologies approach to same-day requests within the area of applying for leave. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to same-day requests. Current employee records, applicable approvals, and the latest published policy should be considered bef",
+    "reference_evidence": [
+      "Same-Day Requests \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "hard_negative",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_001",
+    "question": "What guidance does the company policy provide about Handbook?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      1
+    ],
+    "relevant_chunk_ids": [
+      "chunk_f9409e28fd0027853b74d661"
+    ],
+    "reference_answer": "XYZ Technologies \u2014 Workforce Management Handbook Synthetic internal knowledge-base document for the employee AI assistant Important: This is synthetic content created for a college final-year project. It is not a real company's policy and is not legal, HR, medical, or security advice.",
+    "reference_evidence": [
+      "Handbook"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_002",
+    "question": "What does the policy say about Skills \u2014 Operational Guidance?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      2
+    ],
+    "relevant_chunk_ids": [
+      "chunk_7f0a53d9bb1864300b001621"
+    ],
+    "reference_answer": "Employee Profiles Skills \u2014 Operational Guidance This section defines the XYZ Technologies approach to skills within the area of employee profiles. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to skills. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed. For ski",
+    "reference_evidence": [
+      "Skills \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_003",
+    "question": "Which policy guidance applies to Experience \u2014 Operational Guidance?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      3
+    ],
+    "relevant_chunk_ids": [
+      "chunk_c3edc974df60d1b753a5b4ca"
+    ],
+    "reference_answer": "Employee Profiles Experience \u2014 Operational Guidance This section defines the XYZ Technologies approach to experience within the area of employee profiles. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to experience. Current employee records, applicable approvals, and the latest published policy should be considered before a request is comple",
+    "reference_evidence": [
+      "Experience \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_004",
+    "question": "How should employees handle Department \u2014 Operational Guidance under company policy?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      4
+    ],
+    "relevant_chunk_ids": [
+      "chunk_119692a7c85fca1dd6a8c7ed"
+    ],
+    "reference_answer": "Employee Profiles Department \u2014 Operational Guidance This section defines the XYZ Technologies approach to department within the area of employee profiles. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to department. Current employee records, applicable approvals, and the latest published policy should be considered before a request is comple",
+    "reference_evidence": [
+      "Department \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_005",
+    "question": "Summarize the policy rule for Profile Updates \u2014 Operational Guidance.",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      5
+    ],
+    "relevant_chunk_ids": [
+      "chunk_d447a63a905dd7dd2e289cc8"
+    ],
+    "reference_answer": "Employee Profiles Profile Updates \u2014 Operational Guidance This section defines the XYZ Technologies approach to profile updates within the area of employee profiles. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to profile updates. Current employee records, applicable approvals, and the latest published policy should be considered before a re",
+    "reference_evidence": [
+      "Profile Updates \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_006",
+    "question": "What responsibility is described for Allocation Percentage \u2014 Operational Guidance?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      10
+    ],
+    "relevant_chunk_ids": [
+      "chunk_8f5d35d9d0e1b82e3fcee7ec"
+    ],
+    "reference_answer": "Project Allocation Allocation Percentage \u2014 Operational Guidance This section defines the XYZ Technologies approach to allocation percentage within the area of project allocation. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to allocation percentage. Current employee records, applicable approvals, and the latest published policy should be co",
+    "reference_evidence": [
+      "Allocation Percentage \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_007",
+    "question": "Where can staff find guidance on Project Assignment \u2014 Operational Guidance?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      11
+    ],
+    "relevant_chunk_ids": [
+      "chunk_101262a08f61324d38c64f8b"
+    ],
+    "reference_answer": "Project Allocation Project Assignment \u2014 Operational Guidance This section defines the XYZ Technologies approach to project assignment within the area of project allocation. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to project assignment. Current employee records, applicable approvals, and the latest published policy should be considered ",
+    "reference_evidence": [
+      "Project Assignment \u2014 Operational Guidance"
+    ],
+    "difficulty": "direct",
+    "question_type": "direct",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_008",
+    "question": "Explain the company's approach to Bench Status \u2014 Operational Guidance.",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      12
+    ],
+    "relevant_chunk_ids": [
+      "chunk_1e05cd1b442751e71e1b5f26"
+    ],
+    "reference_answer": "Project Allocation Bench Status \u2014 Operational Guidance This section defines the XYZ Technologies approach to bench status within the area of project allocation. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to bench status. Current employee records, applicable approvals, and the latest published policy should be considered before a request i",
+    "reference_evidence": [
+      "Bench Status \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_009",
+    "question": "In practical terms, how is Release Dates \u2014 Operational Guidance addressed?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      13
+    ],
+    "relevant_chunk_ids": [
+      "chunk_7f366c63bfa2ce572b9ecb6a"
+    ],
+    "reference_answer": "Project Allocation Release Dates \u2014 Operational Guidance This section defines the XYZ Technologies approach to release dates within the area of project allocation. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to release dates. Current employee records, applicable approvals, and the latest published policy should be considered before a reques",
+    "reference_evidence": [
+      "Release Dates \u2014 Operational Guidance"
+    ],
+    "difficulty": "medium",
+    "question_type": "paraphrase",
+    "split": "development"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_010",
+    "question": "What does the policy say about Skiell Levels \u2014 Operational Guidance?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      18
+    ],
+    "relevant_chunk_ids": [
+      "chunk_a76960972c34862e4338da06"
+    ],
+    "reference_answer": "Skills and Competencies Skill Levels \u2014 Operational Guidance This section defines the XYZ Technologies approach to skill levels within the area of skills and competencies. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to skill levels. Current employee records, applicable approvals, and the latest published policy should be considered before a",
+    "reference_evidence": [
+      "Skill Levels \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "typo_robustness",
+    "split": "held_out"
+  },
+  {
+    "id": "xyz_workforce_management_handbook_011",
+    "question": "Does a similarly named rule override the published guidance on Certifications \u2014 Operational Guidance?",
+    "category": "workforce_management_handbook",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      19
+    ],
+    "relevant_chunk_ids": [
+      "chunk_6bfeb254738fb5df636ddcd8"
+    ],
+    "reference_answer": "Skills and Competencies Certifications \u2014 Operational Guidance This section defines the XYZ Technologies approach to certifications within the area of skills and competencies. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to certifications. Current employee records, applicable approvals, and the latest published policy should be considered be",
+    "reference_evidence": [
+      "Certifications \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "hard_negative",
+    "split": "development"
+  },
+  {
+    "id": "multi_document_001",
+    "question": "Compare the policy guidance on Personal Relationships \u2014 Operational Guidance and Timesheets \u2014 Operational Guidance.",
+    "category": "multi_document",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "relevant_pages": [
+      20,
+      20
+    ],
+    "relevant_chunk_ids": [
+      "chunk_98f42de8da2a0d9d6e1aae99",
+      "chunk_3fab8bdea127fd5a6ce5795c"
+    ],
+    "reference_answer": "Conflicts of Interest Personal Relationships \u2014 Operational Guidance This section defines the XYZ Technologies approach to personal relationships within the area of conflicts of interest. The purpose is to provide employees with a consistent reference Attendance and Timesheets Timesheets \u2014 Operational Guidance This section defines the XYZ Technologies approach to timesheets within the area of attendance and timesheets. The purpose is to provide employees with a consistent reference when using the ",
+    "reference_evidence": [
+      "Personal Relationships \u2014 Operational Guidance",
+      "Timesheets \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "multi_document",
+    "split": "held_out"
+  },
+  {
+    "id": "multi_document_002",
+    "question": "Compare the policy guidance on Timesheets \u2014 Operational Guidance and Access Reviews \u2014 Operational Guidance.",
+    "category": "multi_document",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "relevant_pages": [
+      20,
+      20
+    ],
+    "relevant_chunk_ids": [
+      "chunk_3fab8bdea127fd5a6ce5795c",
+      "chunk_27ab73124820a39f0e726370"
+    ],
+    "reference_answer": "Attendance and Timesheets Timesheets \u2014 Operational Guidance This section defines the XYZ Technologies approach to timesheets within the area of attendance and timesheets. The purpose is to provide employees with a consistent reference when using the  Access Control Access Reviews \u2014 Operational Guidance This section defines the XYZ Technologies approach to access reviews within the area of access control. The purpose is to provide employees with a consistent reference when using the employee assis",
+    "reference_evidence": [
+      "Timesheets \u2014 Operational Guidance",
+      "Access Reviews \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "multi_document",
+    "split": "held_out"
+  },
+  {
+    "id": "multi_document_003",
+    "question": "Compare the policy guidance on Access Reviews \u2014 Operational Guidance and Date Ranges \u2014 Operational Guidance.",
+    "category": "multi_document",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_IT_Security_Policy.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "relevant_pages": [
+      20,
+      20
+    ],
+    "relevant_chunk_ids": [
+      "chunk_27ab73124820a39f0e726370",
+      "chunk_8a9585cf77adfd165e017dcc"
+    ],
+    "reference_answer": "Access Control Access Reviews \u2014 Operational Guidance This section defines the XYZ Technologies approach to access reviews within the area of access control. The purpose is to provide employees with a consistent reference when using the employee assis Applying for Leave Date Ranges \u2014 Operational Guidance This section defines the XYZ Technologies approach to date ranges within the area of applying for leave. The purpose is to provide employees with a consistent reference when using the employee ass",
+    "reference_evidence": [
+      "Access Reviews \u2014 Operational Guidance",
+      "Date Ranges \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "multi_document",
+    "split": "held_out"
+  },
+  {
+    "id": "multi_document_004",
+    "question": "Compare the policy guidance on Date Ranges \u2014 Operational Guidance and Skill Verification \u2014 Operational Guidance.",
+    "category": "multi_document",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "relevant_pages": [
+      20,
+      20
+    ],
+    "relevant_chunk_ids": [
+      "chunk_8a9585cf77adfd165e017dcc",
+      "chunk_9626d322092c0e4e684908d5"
+    ],
+    "reference_answer": "Applying for Leave Date Ranges \u2014 Operational Guidance This section defines the XYZ Technologies approach to date ranges within the area of applying for leave. The purpose is to provide employees with a consistent reference when using the employee ass Skills and Competencies Skill Verification \u2014 Operational Guidance This section defines the XYZ Technologies approach to skill verification within the area of skills and competencies. The purpose is to provide employees with a consistent reference whe",
+    "reference_evidence": [
+      "Date Ranges \u2014 Operational Guidance",
+      "Skill Verification \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "multi_document",
+    "split": "held_out"
+  },
+  {
+    "id": "multi_document_005",
+    "question": "Compare the policy guidance on Skill Verification \u2014 Operational Guidance and Personal Relationships \u2014 Operational Guidance.",
+    "category": "multi_document",
+    "answerable": true,
+    "relevant_documents": [
+      "XYZ_Workforce_Management_Handbook.pdf",
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "relevant_pages": [
+      20,
+      20
+    ],
+    "relevant_chunk_ids": [
+      "chunk_9626d322092c0e4e684908d5",
+      "chunk_98f42de8da2a0d9d6e1aae99"
+    ],
+    "reference_answer": "Skills and Competencies Skill Verification \u2014 Operational Guidance This section defines the XYZ Technologies approach to skill verification within the area of skills and competencies. The purpose is to provide employees with a consistent reference whe Conflicts of Interest Personal Relationships \u2014 Operational Guidance This section defines the XYZ Technologies approach to personal relationships within the area of conflicts of interest. The purpose is to provide employees with a consistent reference",
+    "reference_evidence": [
+      "Skill Verification \u2014 Operational Guidance",
+      "Personal Relationships \u2014 Operational Guidance"
+    ],
+    "difficulty": "hard",
+    "question_type": "multi_document",
+    "split": "held_out"
+  },
+  {
+    "id": "unanswerable_001",
+    "question": "What is the exact remaining leave balance for an employee?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "development"
+  },
+  {
+    "id": "unanswerable_002",
+    "question": "What bank account receives payroll?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "development"
+  },
+  {
+    "id": "unanswerable_003",
+    "question": "Who is my current manager?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "development"
+  },
+  {
+    "id": "unanswerable_004",
+    "question": "What is the company office parking allocation?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "development"
+  },
+  {
+    "id": "unanswerable_005",
+    "question": "What is my attendance yesterday?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "held_out"
+  },
+  {
+    "id": "unanswerable_006",
+    "question": "What is the next salary payment amount?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "development"
+  },
+  {
+    "id": "unanswerable_007",
+    "question": "Which employee has the highest overtime?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "development"
+  },
+  {
+    "id": "unanswerable_008",
+    "question": "What is the company stock-price policy?",
+    "category": "unanswerable",
+    "answerable": false,
+    "relevant_documents": [],
+    "relevant_pages": [],
+    "relevant_chunk_ids": [],
+    "reference_answer": "The provided company policy documents do not contain this information.",
+    "reference_evidence": [],
+    "difficulty": "hard",
+    "question_type": "unanswerable",
+    "split": "development"
+  }
+]

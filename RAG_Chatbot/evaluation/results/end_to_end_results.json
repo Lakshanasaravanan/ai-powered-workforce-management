@@ -1,0 +1,4 @@
+{
+  "status": "NOT_EXECUTED",
+  "reason": "Generation evaluation was not safely executed; no end-to-end score can be calculated."
+}
