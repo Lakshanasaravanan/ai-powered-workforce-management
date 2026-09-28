@@ -11,7 +11,7 @@ from app.models.employee import Employee,Role
 from app.models.leave import LeaveRequest,LeaveStatus
 from app.models.audit import AuditEvent,AuditSource,AuditOutcome
 from app.schemas.calendar import EventWrite,HolidayWrite
-from app.services.holidays import holidays_in_range,is_default_company_holiday
+from app.services.holidays import holidays_in_range,is_default_company_holiday,is_working_day,default_holiday_name
 router=APIRouter(prefix='/api/v1/calendar',tags=['calendar'])
 def event(e):return {'id':str(e.id),'title':e.title,'description':e.description,'event_type':e.event_type.value,'scope':e.scope.value,'start_at':e.start_at,'end_at':e.end_at,'all_day':e.all_day,'location':e.location,'created_by':str(e.created_by),'kind':'EVENT'}
 def owner(e,u):
@@ -32,6 +32,12 @@ def feed(start:date,end:date,db:Session=Depends(get_db),user:Employee=Depends(ge
 def holidays(start:date,end:date,db:Session=Depends(get_db),_:Employee=Depends(get_current_user)):
  if end<start:raise HTTPException(422,'Invalid date range')
  return holidays_in_range(db,start,end)
+@router.get('/working-day')
+def working_day(day:date,db:Session=Depends(get_db),_:Employee=Depends(get_current_user)):
+ """Expose EMS-owned working-day policy without leaking holiday internals."""
+ custom=db.query(CompanyHoliday).filter_by(holiday_date=day).first()
+ if is_working_day(db,day): return {'date':day.isoformat(),'is_working_day':True,'reason':None}
+ return {'date':day.isoformat(),'is_working_day':False,'reason':custom.name if custom else default_holiday_name(day)}
 @router.post('/holidays')
 def create_holiday(body:HolidayWrite,db:Session=Depends(get_db),user:Employee=Depends(get_current_user)):
  if user.role != Role.ADMIN:raise HTTPException(403,'Not authorized')

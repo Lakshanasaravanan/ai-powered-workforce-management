@@ -19,7 +19,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.agents.planner import DeterministicPlanner
 from app.agents.semantic_routing import SemanticIntentRouter
 from app.agents.service import AgentService
-from app.api.routes import actions, agent, auth, chat, health
+from app.api.routes import actions, agent, auth, chat, conversations, health
 from app.core.config import get_settings
 from app.core.ems_auth import EMSIdentityVerifier
 from app.core.logging import configure_logging, request_id_context
@@ -36,6 +36,7 @@ from app.services.infotech_ems import InfoTechEMSReadClient
 from app.tools.infotech_ems import build_infotech_read_registry
 from app.services.infotech_pending_actions import NonExecutingActionExecutor, RedisInfoTechPendingActionStore, UnavailableInfoTechPendingActionStore
 from app.services.infotech_decision_references import RedisInfoTechDecisionReferenceStore, UnavailableInfoTechDecisionReferenceStore
+from app.services.infotech_conversations import RedisAgentConversationStore, UnavailableAgentConversationStore
 from app.tools.actions import RegularizeAttendanceTool, RequestLeaveTool
 from app.tools.rag_tool import PolicyAnswerTool
 from app.tools.registry import ToolRegistry
@@ -86,6 +87,9 @@ async def lifespan(_: FastAPI):
         pending_actions = PendingActionStore(ttl=timedelta(seconds=settings.pending_action_ttl_seconds))
     app.state.redis_client = redis_client
     app.state.infotech_pending_actions = RedisInfoTechPendingActionStore(redis_client, ttl=timedelta(seconds=settings.pending_action_ttl_seconds)) if redis_client is not None else UnavailableInfoTechPendingActionStore()
+    app.state.infotech_conversations = RedisAgentConversationStore(
+        redis_client, pending_ttl=timedelta(seconds=settings.pending_action_ttl_seconds)
+    ) if redis_client is not None else UnavailableAgentConversationStore()
     app.state.infotech_decision_references = RedisInfoTechDecisionReferenceStore(
         redis_client, ttl=timedelta(seconds=settings.decision_reference_ttl_seconds)
     ) if redis_client is not None else UnavailableInfoTechDecisionReferenceStore()
@@ -131,6 +135,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(agent.router)
 app.include_router(actions.router)
+app.include_router(conversations.router)
 if get_settings().development_auth_enabled:
     app.include_router(auth.router)
 app.include_router(chat.router)

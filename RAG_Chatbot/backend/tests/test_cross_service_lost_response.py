@@ -111,7 +111,9 @@ def test_concurrent_confirmation_creates_one_real_ems_leave(ems):
     database, base = ems
     store = RedisInfoTechPendingActionStore(fakeredis.FakeRedis(decode_responses=True), execution_lease=timedelta(seconds=60))
     conversation = UUID("99999999-9999-4999-8999-999999999994")
-    leave = ApplyLeaveInput(leave_type="CASUAL", start_date="2028-01-16", end_date="2028-01-16", duration="FULL_DAY", reason="concurrent recovery")
+    # 2028-01-17 is a Monday; the prior Sunday fixture is correctly rejected
+    # by EMS's authoritative no-working-day leave validation.
+    leave = ApplyLeaveInput(leave_type="CASUAL", start_date="2028-01-17", end_date="2028-01-17", duration="FULL_DAY", reason="concurrent recovery")
     action = store.create(actor_employee_id=ACTOR, conversation_id=conversation, tool_name=InfoTechActionName.APPLY_LEAVE, validated_arguments=leave.model_dump(mode="json"), safe_display={"title": "Apply Casual Leave"})
     settings = get_settings().model_copy(update={"ems_api_base_url": base, "ems_jwt_secret": SECRET, "ems_jwt_algorithm": "HS256"})
     token = jwt.encode({"sub": str(ACTOR), "exp": datetime.now(timezone.utc) + timedelta(minutes=5)}, SECRET, algorithm="HS256")

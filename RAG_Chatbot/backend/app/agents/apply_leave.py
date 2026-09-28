@@ -119,3 +119,29 @@ def parse_apply_leave(message: str, today: date | None = None) -> tuple[ApplyLea
         duration="FULL_DAY",
         reason=reason_text,
     ), None
+
+
+def extract_leave_slots(message: str, today: date | None = None) -> dict[str, str]:
+    """Extract only explicitly supplied values for a collecting leave action.
+
+    This intentionally does not guess a reason from a one-word leave type,
+    which is what keeps a follow-up such as ``medical`` in its conversation.
+    """
+    text = " ".join(message.lower().split())
+    slots: dict[str, str] = {}
+    for leave_type in ("casual", "medical", "emergency"):
+        if re.search(rf"\b{leave_type}(?:\s+leave)?\b", text):
+            slots["leave_type"] = leave_type.upper()
+            break
+    explicit, error = _explicit_date(message)
+    if error is None:
+        resolved = explicit or _relative_date(text, today or date.today())
+        if resolved is not None:
+            slots["start_date"] = resolved.isoformat()
+            slots["end_date"] = resolved.isoformat()
+    reason = re.search(r"\bbecause\s+(.+?)[.!]?$", message.strip(), re.IGNORECASE)
+    if reason and reason.group(1).strip():
+        slots["reason"] = reason.group(1).strip()
+    elif not slots and text and not re.search(r"\b(?:apply|leave|request|take|actually|not)\b", text):
+        slots["reason"] = message.strip()
+    return slots

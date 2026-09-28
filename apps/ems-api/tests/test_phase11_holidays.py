@@ -90,6 +90,16 @@ def test_holiday_reads_are_authenticated_and_include_defaults_in_calendar_feed()
     assert item["all_day"] is True and item["is_default"] is True and item["deletable"] is False
 
 
+def test_authenticated_working_day_read_exposes_only_authoritative_day_status():
+    _, _, employee = setup()
+    assert client.get("/api/v1/calendar/working-day?day=2025-03-08").status_code == 401
+    second_saturday = client.get("/api/v1/calendar/working-day?day=2025-03-08", headers=auth(employee))
+    weekday = client.get("/api/v1/calendar/working-day?day=2025-03-10", headers=auth(employee))
+    assert second_saturday.status_code == weekday.status_code == 200
+    assert second_saturday.json()["is_working_day"] is False
+    assert weekday.json() == {"date": "2025-03-10", "is_working_day": True, "reason": None}
+
+
 def test_admin_custom_holiday_lifecycle_authorization_and_uniqueness():
     admin, manager, employee = setup()
     body = {"holiday_date": "2025-03-10", "name": "Founders Day"}

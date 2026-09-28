@@ -35,6 +35,9 @@ export type ChatConversation = { id: string; type: 'DIRECT' | 'GROUP'; name: str
 export type PolicyCitation = { document: string; page: number; section: string | null; subsection: string | null };
 export type AgentAction = { action_id: string; tool_name: 'apply_leave' | 'approve_leave' | 'reject_leave'; safe_display: Record<string, string | null>; created_at: string; expires_at: string; state: string };
 export type PolicyAnswer = { answer: string; sources: PolicyCitation[]; conversation_id: string; request_id: string | null; response_type?: 'message' | 'clarification' | 'action_proposal'; action?: AgentAction | null };
+export type AgentConversationSummary = { id: string; title: string; created_at: string; updated_at: string };
+export type AgentConversationMessage = { id: string; role: 'user' | 'assistant'; content: string; created_at: string; sources?: PolicyCitation[]; action?: AgentAction | null; result?: string | null };
+export type AgentConversation = AgentConversationSummary & { messages: AgentConversationMessage[]; pending?: unknown | null };
 export type ActionResult = { action_id: string; state: string; message: string; conversation_id: string; request_id: string | null };
 
 function agentErrorMessage(status: number): string {
@@ -109,6 +112,25 @@ export type AttendanceFeed = { employee: Pick<Employee, 'id' | 'employee_code' |
 export const attendance = { mine: (start: string, end: string) => request<AttendanceFeed>(`/api/v1/attendance/me?start=${start}&end=${end}`), employee: (id: string, start: string, end: string) => request<AttendanceFeed>(`/api/v1/attendance/employees/${id}?start=${start}&end=${end}`), checkIn: () => request<AttendanceRecord>('/api/v1/attendance/me/check-in',{method:'POST'}), checkOut: () => request<AttendanceRecord>('/api/v1/attendance/me/check-out',{method:'POST'}), overtimeIn: () => request<{id:string}>('/api/v1/attendance/me/overtime/check-in',{method:'POST'}), overtimeOut: () => request<{id:string}>('/api/v1/attendance/me/overtime/check-out',{method:'POST'}), correct: (id:string, day:string, body:object) => request<AttendanceRecord>(`/api/v1/attendance/employees/${id}/${day}/admin-correction`,{method:'PATCH',body:JSON.stringify(body)}) };
 
 export const policyAssistant = {
+  async conversations(): Promise<AgentConversationSummary[]> {
+    const response = await fetch(`${agentBase}/api/v1/agent/conversations`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('infotech_token') ?? ''}` } });
+    if (!response.ok) throw new ApiError(response.status, agentErrorMessage(response.status));
+    return response.json() as Promise<AgentConversationSummary[]>;
+  },
+  async createConversation(): Promise<AgentConversationSummary> {
+    const response = await fetch(`${agentBase}/api/v1/agent/conversations`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem('infotech_token') ?? ''}` }, body: JSON.stringify({}) });
+    if (!response.ok) throw new ApiError(response.status, agentErrorMessage(response.status));
+    return response.json() as Promise<AgentConversationSummary>;
+  },
+  async conversation(id: string): Promise<AgentConversation> {
+    const response = await fetch(`${agentBase}/api/v1/agent/conversations/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('infotech_token') ?? ''}` } });
+    if (!response.ok) throw new ApiError(response.status, agentErrorMessage(response.status));
+    return response.json() as Promise<AgentConversation>;
+  },
+  async deleteConversation(id: string): Promise<void> {
+    const response = await fetch(`${agentBase}/api/v1/agent/conversations/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${sessionStorage.getItem('infotech_token') ?? ''}` } });
+    if (!response.ok) throw new ApiError(response.status, agentErrorMessage(response.status));
+  },
   async query(message: string, conversationId?: string): Promise<PolicyAnswer> {
     let response: Response;
     try {

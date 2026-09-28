@@ -1,6 +1,6 @@
-import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { BookOpen, Bot, CheckCircle2, ChevronRight, CircleAlert, ClipboardCheck, LoaderCircle, Send, ShieldCheck, Sparkles, X } from 'lucide-react';
-import { ApiError, type AgentAction, type PolicyCitation, policyAssistant } from './lib/api';
+import { ApiError, type AgentAction, type AgentConversationSummary, type PolicyCitation, policyAssistant } from './lib/api';
 
 type AgentMessage = { id: string; role: 'employee' | 'assistant'; content: string; sources?: PolicyCitation[]; action?: AgentAction; result?: string };
 
@@ -36,7 +36,33 @@ export default function Agent() {
   const [error, setError] = useState<string>();
   const [retryMessage, setRetryMessage] = useState<string>();
   const [actionPending, setActionPending] = useState<string>();
+  const [conversations, setConversations] = useState<AgentConversationSummary[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const loadHistory = async () => {
+    setHistoryLoading(true);
+    try { setConversations(await policyAssistant.conversations()); }
+    catch (caught) { setError(errorMessage(caught)); }
+    finally { setHistoryLoading(false); }
+  };
+  useEffect(() => { void loadHistory(); }, []);
+
+  const selectConversation = async (id: string) => {
+    setPending(true); setError(undefined);
+    try {
+      const conversation = await policyAssistant.conversation(id);
+      setConversationId(conversation.id);
+      setMessages(conversation.messages.map((item) => ({ id: item.id, role: item.role === 'user' ? 'employee' : 'assistant', content: item.content, sources: item.sources, action: item.action ?? undefined, result: item.result ?? undefined })));
+    } catch (caught) { setError(errorMessage(caught)); }
+    finally { setPending(false); }
+  };
+  const newChat = async () => {
+    setPending(true); setError(undefined);
+    try { const item = await policyAssistant.createConversation(); setConversationId(item.id); setMessages([]); setConversations((current) => [item, ...current]); }
+    catch (caught) { setError(errorMessage(caught)); }
+    finally { setPending(false); }
+  };
 
   const ask = async (rawMessage: string) => {
     const message = rawMessage.trim();
@@ -50,6 +76,7 @@ export default function Agent() {
       const response = await policyAssistant.query(message, conversationId);
       setConversationId(response.conversation_id);
       setMessages((current) => [...current, { id: crypto.randomUUID(), role: 'assistant', content: response.answer, sources: response.sources, action: response.action ?? undefined }]);
+      void loadHistory();
     } catch (caught) {
       setError(errorMessage(caught));
       setRetryMessage(message);
@@ -89,10 +116,13 @@ export default function Agent() {
 
   return <main className="workspace-page agent-workspace">
     <header className="page-header agent-page-header"><div><p className="eyebrow">Authenticated workplace assistant</p><h1>InfoTech Agent</h1><p className="muted">Ask grounded policy questions, retrieve your workforce information, or review a prepared action.</p></div><div className="agent-header-mark" aria-label="InfoTech Agent"><Bot size={21} aria-hidden="true" /></div></header>
-    <section className="agent-panel" aria-label="InfoTech Agent conversation">
+    <section className="agent-panel agent-panel-with-history" aria-label="InfoTech Agent conversation">
+      <aside className="agent-history" aria-label="Agent conversations"><button type="button" className="button-secondary" onClick={() => void newChat()} disabled={pending}>New Chat</button>{historyLoading ? <p className="muted">Loading conversations…</p> : <div>{conversations.map((item) => <button type="button" key={item.id} className={conversationId === item.id ? 'agent-history-item selected' : 'agent-history-item'} onClick={() => void selectConversation(item.id)}><strong>{item.title}</strong><small>{new Date(item.updated_at).toLocaleDateString()}</small></button>)}</div>}</aside>
+      <div className="agent-main">
       <div className="agent-conversation" aria-live="polite">{messages.length === 0 ? <div className="agent-welcome"><span className="agent-welcome-icon"><Sparkles size={25} /></span><h2>How can I help?</h2><p>I can answer company-policy questions, look up your manager, or prepare an available workforce action for your review.</p><div className="agent-suggestions" aria-label="Example prompts">{suggestions.map((suggestion) => <button key={suggestion} type="button" className="button-secondary" onClick={() => useSuggestion(suggestion)}>{suggestion}<ChevronRight size={15} aria-hidden="true" /></button>)}</div></div> : <div className="agent-message-list">{messages.map((message) => <article key={message.id} className={'agent-message ' + message.role}><header><span className="agent-message-avatar" aria-hidden="true">{message.role === 'employee' ? 'You' : <Bot size={15} />}</span><strong>{message.role === 'employee' ? 'You' : 'InfoTech Agent'}</strong></header><div className="agent-message-content"><p>{message.content}</p>{message.action && <ActionCard action={message.action} pending={actionPending === message.action.action_id} onConfirm={() => void executeAction(message.id, message.action!, 'confirm')} onCancel={() => void executeAction(message.id, message.action!, 'cancel')} />}{message.result && <div className="agent-action-result"><CheckCircle2 size={16} aria-hidden="true" /><span>{message.result}</span></div>}{message.role === 'assistant' && message.sources && message.sources.length > 0 && <CitationList sources={message.sources} />}</div></article>)}{pending && <article className="agent-message assistant agent-thinking"><header><span className="agent-message-avatar" aria-hidden="true"><Bot size={15} /></span><strong>InfoTech Agent</strong></header><div className="agent-thinking-content"><LoaderCircle size={17} className="spin" /><span>Preparing a response…</span></div></article>}</div>}</div>
       {error && <div className="agent-error error" role="alert"><CircleAlert size={17} aria-hidden="true" /><span>{error}</span>{retryMessage && <button type="button" className="button-secondary button-small" onClick={() => void ask(retryMessage)} disabled={pending}>Try again</button>}<button type="button" className="agent-error-dismiss" aria-label="Dismiss error" onClick={() => setError(undefined)}><X size={16} /></button></div>}
       <form className="agent-composer" onSubmit={submit}><label htmlFor="policy-question">Ask InfoTech Agent</label><textarea id="policy-question" ref={inputRef} value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={keyDown} placeholder="Ask about a policy or your workplace…" rows={3} disabled={pending} /><div><small>Enter to send · Shift + Enter for a new line</small><button type="submit" disabled={pending || !draft.trim()}>{pending ? <><LoaderCircle size={16} className="spin" /> Thinking</> : <><Send size={16} /> Send</>}</button></div></form>
+      </div>
     </section>
   </main>;
 }

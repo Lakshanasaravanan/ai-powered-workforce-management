@@ -20,8 +20,13 @@ def test_environment(monkeypatch: pytest.MonkeyPatch):
 @pytest.fixture
 def client() -> TestClient:
     from app.main import app
+    import fakeredis
+    from app.services.infotech_conversations import RedisAgentConversationStore
 
     with TestClient(app) as test_client:
+        test_client.app.state.infotech_conversations = RedisAgentConversationStore(
+            fakeredis.FakeRedis(decode_responses=True)
+        )
         yield test_client
 
 

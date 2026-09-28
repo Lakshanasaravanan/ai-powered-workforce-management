@@ -128,6 +128,13 @@ class EMSUnreadCount(BaseModel):
     unread_count: int = Field(ge=0)
 
 
+class EMSWorkingDay(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    date: date
+    is_working_day: bool
+    reason: str | None = None
+
+
 class InfoTechEMSReadClient:
     """Explicit EMS reads only; no mutation or arbitrary-path surface exists."""
 
@@ -210,6 +217,13 @@ class InfoTechEMSReadClient:
             raise EMSContractError("EMS returned an invalid response")
         return [self._parse(EMSProfile, item) for item in payload]
 
+    def search_employees(self, query: str, bearer_token: str) -> list[EMSProfile]:
+        from urllib.parse import quote
+        payload = self._get(f"/api/v1/employees/search?q={quote(query, safe='')}", bearer_token)
+        if not isinstance(payload, list):
+            raise EMSContractError("EMS returned an invalid response")
+        return [self._parse(EMSProfile, item) for item in payload]
+
     def get_team_leaves(self, bearer_token: str) -> list[EMSLeave]:
         payload = self._get("/api/v1/leaves/team", bearer_token)
         if not isinstance(payload, list):
@@ -219,6 +233,31 @@ class InfoTechEMSReadClient:
     def get_leave(self, leave_id: UUID, bearer_token: str) -> EMSLeave:
         """Fixed exact-ID read used internally to preflight a stored decision target."""
         return self._parse(EMSLeave, self._get(f"/api/v1/leaves/{leave_id}", bearer_token))
+
+    def get_working_day(self, day: date, bearer_token: str) -> EMSWorkingDay:
+        return self._parse(EMSWorkingDay, self._get(f"/api/v1/calendar/working-day?day={day.isoformat()}", bearer_token))
+
+    def get_attendance(self, employee_id: UUID | None, start: date, end: date, bearer_token: str) -> dict:
+        path = f"/api/v1/attendance/me?start={start.isoformat()}&end={end.isoformat()}" if employee_id is None else f"/api/v1/attendance/employees/{employee_id}?start={start.isoformat()}&end={end.isoformat()}"
+        payload = self._get(path, bearer_token)
+        if not isinstance(payload, dict):
+            raise EMSContractError("EMS returned an invalid response")
+        return payload
+
+    def get_payroll_preview(self, employee_id: UUID, year: int, month: int, bearer_token: str) -> dict:
+        payload = self._get(f"/api/v1/payroll/{employee_id}?year={year}&month={month}", bearer_token)
+        if not isinstance(payload, dict): raise EMSContractError("EMS returned an invalid response")
+        return payload
+
+    def get_finalized_payroll(self, employee_id: UUID, year: int, month: int, bearer_token: str) -> dict:
+        payload = self._get(f"/api/v1/payroll/{employee_id}/finalized?year={year}&month={month}", bearer_token)
+        if not isinstance(payload, dict): raise EMSContractError("EMS returned an invalid response")
+        return payload
+
+    def get_finalized_payroll_history(self, employee_id: UUID, bearer_token: str) -> list[dict]:
+        payload = self._get(f"/api/v1/payroll/{employee_id}/finalized-history", bearer_token)
+        if not isinstance(payload, list) or not all(isinstance(item, dict) for item in payload): raise EMSContractError("EMS returned an invalid response")
+        return payload
 
     def apply_leave(self, leave: object, bearer_token: str, idempotency_key: str, correlation_id: str | None) -> EMSLeave:
         """Only consequential operation exposed by this client; endpoint is fixed."""
