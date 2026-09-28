@@ -61,3 +61,24 @@ class HybridRetriever:
         timings.total_retrieval_ms = (perf_counter() - started) * 1000
         logger.info("retrieval_completed", extra={"dense_candidate_count": len(dense), "sparse_candidate_count": len(sparse), "fused_candidate_count": len(candidates), "final_candidate_count": len(final), "hybrid_enabled": self.hybrid_enabled, "rerank_enabled": self.rerank_enabled, **timings.model_dump()})
         return RetrievalResult(chunks=final, timings=timings, dense_candidate_count=len(dense), sparse_candidate_count=len(sparse), fused_candidate_count=len(candidates), hybrid_enabled=self.hybrid_enabled and self.sparse is not None, rerank_enabled=self.rerank_enabled)
+
+
+class SparseOnlyRetriever:
+    """Production adapter for the local BM25 path selected in Phase 22."""
+
+    def __init__(self, sparse: BM25SparseRetriever, top_k: int) -> None:
+        self.sparse, self.top_k = sparse, top_k
+
+    def retrieve(self, query: str, metadata_filter: MetadataFilter | None = None) -> RetrievalResult:
+        started = perf_counter()
+        chunks = self.sparse.retrieve(query, self.top_k, metadata_filter)
+        final = [item.model_copy(update={"final_rank": rank}) for rank, item in enumerate(chunks, start=1)]
+        total_ms = (perf_counter() - started) * 1000
+        return RetrievalResult(
+            chunks=final,
+            timings=RetrievalTimings(sparse_search_ms=total_ms, total_retrieval_ms=total_ms),
+            sparse_candidate_count=len(chunks),
+            fused_candidate_count=len(chunks),
+            hybrid_enabled=False,
+            rerank_enabled=False,
+        )

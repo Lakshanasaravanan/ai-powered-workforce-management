@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-09-28T10:52:20.138162+00:00",
+  "status": "NOT_EXECUTED",
+  "reason": "No local Ollama provider was configured or running; Phase 21 does not initiate paid OpenRouter generation.",
+  "configuration": {
+    "provider": "openrouter",
+    "model": "openai/gpt-4.1-mini",
+    "temperature": 0,
+    "retrieval_k": 5,
+    "reranking_enabled": false
+  },
+  "benchmark": {
+    "questions": 68,
+    "hash": "26591e805a076bb78b8673c86c1cc51f9c66f1b16c5f24da1e947a95e88a7409"
+  },
+  "metrics": {
+    "faithfulness": null,
+    "answer_correctness": null,
+    "answer_relevance": null,
+    "citation_precision": null,
+    "citation_coverage": null,
+    "correct_document_citation_rate": null,
+    "abstention_rate": null,
+    "hallucination_rate": null,
+    "end_to_end_success": null
+  },
+  "per_question": []
+}

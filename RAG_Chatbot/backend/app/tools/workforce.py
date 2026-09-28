@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.agents.models import ExecutionContext
 from app.schemas.agent import ToolCategory, ToolPermission
-from app.schemas.workforce import AttendancePeriod, AttendanceSummary, EmployeeProfile, LeaveBalance
+from app.schemas.workforce import AttendancePeriod, AttendanceRecord, AttendanceSummary, EmployeeProfile, LeaveBalance
 from app.services.workforce import WorkforceProvider
 from app.tools.base import Tool, ToolSpec
 
@@ -51,3 +51,9 @@ class GetMyAttendanceSummaryTool(Tool):
 
     def execute(self, context: ExecutionContext, tool_input: AttendanceSummaryInput) -> AttendanceSummary:
         return self.provider.get_attendance_summary(context.employee_id, tool_input.period, context.request_id)
+
+class GetMyAttendanceRecordsTool(Tool):
+    spec = ToolSpec(name="get_my_attendance_records", description="Read the authenticated employee's attendance records.", category=ToolCategory.SELF_READ, permission=ToolPermission.SELF_READ)
+    input_model = EmptyInput
+    def __init__(self, provider: WorkforceProvider) -> None: self.provider = provider
+    def execute(self, context: ExecutionContext, tool_input: EmptyInput) -> list[AttendanceRecord]: return self.provider.get_attendance_records(context.employee_id, context.request_id)

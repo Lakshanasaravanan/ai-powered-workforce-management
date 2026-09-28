@@ -1,0 +1,1262 @@
+[
+  {
+    "id": "xyz_code_of_conduct_001",
+    "question": "What guidance does the company policy provide about XYZ Technologies \u2014 Code of Conduct?",
+    "reference_answer": "XYZ Technologies \u2014 Code of Conduct Synthetic internal knowledge-base document for the employee AI assistant Important: This is synthetic content created for a college final-year project. It is not a real company's policy and is not legal, HR, medical, or security advice.",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        1
+      ],
+      "chunks": [
+        "chunk_f2f961c85702a36e09582529"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_f2f961c85702a36e09582529",
+      "chunk_4ace4fae7d3536cce51d64f1",
+      "chunk_29e13f39ac3bb1f6068d07c6",
+      "chunk_f5267fb86f5f2ae9a5620cb0",
+      "chunk_5e3d5ac1bcc95887be2a22ad",
+      "chunk_f558d31a475e1a699c990b03",
+      "chunk_a6db38dede893f3e30c1d186",
+      "chunk_098a56b8566d83c573f3027a",
+      "chunk_273ed0f5466ba05c88174dba",
+      "chunk_50e09f371d9a4fae93a84a89"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 1.0,
+        "3": 1.0,
+        "5": 1.0,
+        "10": 1.0
+      },
+      "precision": {
+        "1": 1.0,
+        "3": 0.3333333333333333,
+        "5": 0.2,
+        "10": 0.1
+      },
+      "hit": {
+        "1": 1.0,
+        "3": 1.0,
+        "5": 1.0,
+        "10": 1.0
+      },
+      "rr": 1.0,
+      "ap": 1.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_002",
+    "question": "What does the policy say about Honesty \u2014 Operational Guidance?",
+    "reference_answer": "Integrity and Professional Conduct Honesty \u2014 Operational Guidance This section defines the XYZ Technologies approach to honesty within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to honesty. Current employee records, applicable approvals, and the latest published policy should be considered b",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        2
+      ],
+      "chunks": [
+        "chunk_c85f6556fe9fe7110971f654"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_f558d31a475e1a699c990b03",
+      "chunk_b03334a091d47cda33a44a7b",
+      "chunk_5e3d5ac1bcc95887be2a22ad",
+      "chunk_2db3145facb0484df572d414",
+      "chunk_09791052db7b6ae7d562ead6",
+      "chunk_50e09f371d9a4fae93a84a89",
+      "chunk_0e868b743da2f6161c72f696",
+      "chunk_112535ae78d8f4ede8e9c45b",
+      "chunk_13b92b36973f9f6e8a642239",
+      "chunk_39c2c4f31d9c1c69772e4b51"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_003",
+    "question": "Which policy guidance applies to Professional Judgment \u2014 Operational Guidance?",
+    "reference_answer": "Integrity and Professional Conduct Professional Judgment \u2014 Operational Guidance This section defines the XYZ Technologies approach to professional judgment within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to professional judgment. Current employee records, applicable approvals, and the late",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        3
+      ],
+      "chunks": [
+        "chunk_e3ff498fef2027c726155439"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_18b85a2e97c9784832e4c984",
+      "chunk_7673853158db1442f0300f4f",
+      "chunk_86288c4f5964eef751001cb1",
+      "chunk_f558d31a475e1a699c990b03",
+      "chunk_5e3d5ac1bcc95887be2a22ad",
+      "chunk_d675d8e04993155e80443eb6",
+      "chunk_31327326c2aad069074b8a5e",
+      "chunk_66b704216bacc2cf8bb63b47",
+      "chunk_6e9e8b4df7eb3094b2e187c6",
+      "chunk_6ce5ccf413c0d37e9878fe97"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_004",
+    "question": "How should employees handle Accurate Records \u2014 Operational Guidance under company policy?",
+    "reference_answer": "Integrity and Professional Conduct Accurate Records \u2014 Operational Guidance This section defines the XYZ Technologies approach to accurate records within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to accurate records. Current employee records, applicable approvals, and the latest published po",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        4
+      ],
+      "chunks": [
+        "chunk_b8142ee0036454bf66459267"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_IT_Security_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf",
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_4ace4fae7d3536cce51d64f1",
+      "chunk_f5267fb86f5f2ae9a5620cb0",
+      "chunk_0e868b743da2f6161c72f696",
+      "chunk_2678ed027016e64052cece90",
+      "chunk_da1f501dc38c0164f379e2e6",
+      "chunk_1286348344e8d71da8dbf05b",
+      "chunk_21ff2f806530a89445268434",
+      "chunk_b2f30190264b85af8c338816",
+      "chunk_d1ea8828e4db880f52c48f2a",
+      "chunk_e75f630cb4ef869454d8e278"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_005",
+    "question": "Summarize the policy rule for Responsible Communication \u2014 Operational Guidance.",
+    "reference_answer": "Integrity and Professional Conduct Responsible Communication \u2014 Operational Guidance This section defines the XYZ Technologies approach to responsible communication within the area of integrity and professional conduct. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to responsible communication. Current employee records, applicable approvals, ",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        5
+      ],
+      "chunks": [
+        "chunk_da4ee663e277921944685263"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_5e3d5ac1bcc95887be2a22ad",
+      "chunk_407dd674fc1cae83ebf59b18",
+      "chunk_43d5ccffd2c188155d318a12",
+      "chunk_9bb90db4f2c8108917a914ac",
+      "chunk_829b42fa19324eeb0cad03d3",
+      "chunk_6ce5ccf413c0d37e9878fe97",
+      "chunk_f558d31a475e1a699c990b03",
+      "chunk_50e09f371d9a4fae93a84a89",
+      "chunk_73bb52f7ed9e8580313ec9ef",
+      "chunk_2db3145facb0484df572d414"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_006",
+    "question": "What responsibility is described for Dignity \u2014 Operational Guidance?",
+    "reference_answer": "Respectful Workplace Dignity \u2014 Operational Guidance This section defines the XYZ Technologies approach to dignity within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to dignity. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        10
+      ],
+      "chunks": [
+        "chunk_56749db3aa7c4773b460af9f"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf",
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_2db3145facb0484df572d414",
+      "chunk_7f66ea7ae9318387ee7d9f50",
+      "chunk_06af02f5aea4b5bacad55d36",
+      "chunk_0dce1bc6f807f4cc1003f626",
+      "chunk_5e3d5ac1bcc95887be2a22ad",
+      "chunk_f558d31a475e1a699c990b03",
+      "chunk_6ce5ccf413c0d37e9878fe97",
+      "chunk_f2f961c85702a36e09582529",
+      "chunk_9027775fa22079be2c852e17",
+      "chunk_f9409e28fd0027853b74d661"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_007",
+    "question": "Where can staff find guidance on Harassment Prevention \u2014 Operational Guidance?",
+    "reference_answer": "Respectful Workplace Harassment Prevention \u2014 Operational Guidance This section defines the XYZ Technologies approach to harassment prevention within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to harassment prevention. Current employee records, applicable approvals, and the latest published policy should b",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        11
+      ],
+      "chunks": [
+        "chunk_8ba2f7138529daa988e962a2"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf",
+      "XYZ_IT_Security_Policy.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_829b42fa19324eeb0cad03d3",
+      "chunk_00896c4769be466717be1ab7",
+      "chunk_2db3145facb0484df572d414",
+      "chunk_0dce1bc6f807f4cc1003f626",
+      "chunk_4d32830807493654f2fc362a",
+      "chunk_6ce5ccf413c0d37e9878fe97",
+      "chunk_b6e78891f183eba5b9083bbd",
+      "chunk_2b1acc15faa32f3e225f5632",
+      "chunk_7673853158db1442f0300f4f",
+      "chunk_5e3d5ac1bcc95887be2a22ad"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_008",
+    "question": "Explain the company's approach to Inclusive Behavior \u2014 Operational Guidance.",
+    "reference_answer": "Respectful Workplace Inclusive Behavior \u2014 Operational Guidance This section defines the XYZ Technologies approach to inclusive behavior within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to inclusive behavior. Current employee records, applicable approvals, and the latest published policy should be conside",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        12
+      ],
+      "chunks": [
+        "chunk_db6fe4cf3d4347a53108a4e5"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_6ce5ccf413c0d37e9878fe97",
+      "chunk_c71da494f03e363902ab018b",
+      "chunk_7d3353d4f7b15c25fd545be6",
+      "chunk_1e13469e36f53598866a5736",
+      "chunk_ee2aae6c98adb430fecef2df",
+      "chunk_7f6ded7c889966df009e26c3",
+      "chunk_2db3145facb0484df572d414",
+      "chunk_4ace4fae7d3536cce51d64f1",
+      "chunk_abfbeb06c96d091b10eed9af",
+      "chunk_bc0df99128866de9c03539b5"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_009",
+    "question": "In practical terms, how is Professional Boundaries \u2014 Operational Guidance addressed?",
+    "reference_answer": "Respectful Workplace Professional Boundaries \u2014 Operational Guidance This section defines the XYZ Technologies approach to professional boundaries within the area of respectful workplace. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to professional boundaries. Current employee records, applicable approvals, and the latest published policy sh",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        13
+      ],
+      "chunks": [
+        "chunk_43c070c99f0b4e88cb2bf485"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_7673853158db1442f0300f4f",
+      "chunk_18b85a2e97c9784832e4c984",
+      "chunk_86288c4f5964eef751001cb1",
+      "chunk_d6f07ea45375126407b70164",
+      "chunk_f558d31a475e1a699c990b03",
+      "chunk_5e3d5ac1bcc95887be2a22ad",
+      "chunk_7f6ded7c889966df009e26c3",
+      "chunk_ceac2a8117ff0ece9dd0bfa6",
+      "chunk_2db3145facb0484df572d414",
+      "chunk_25362e8aa27abfff14b0f74a"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_010",
+    "question": "What does the policy say about Outsiede Activities \u2014 Operational Guidance?",
+    "reference_answer": "Conflicts of Interest Outside Activities \u2014 Operational Guidance This section defines the XYZ Technologies approach to outside activities within the area of conflicts of interest. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to outside activities. Current employee records, applicable approvals, and the latest published policy should be consi",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        18
+      ],
+      "chunks": [
+        "chunk_f65ca3dc135f9dcd24331fe2"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_7f6ded7c889966df009e26c3",
+      "chunk_30ec508b6e6073b6767e5473",
+      "chunk_2f6f29fc129e05d67b44c82a",
+      "chunk_6b1bb2360c590a961b0ab3fc",
+      "chunk_65964c3e66102411099b72de",
+      "chunk_09791052db7b6ae7d562ead6",
+      "chunk_3feeeca5dea024be3c19d829",
+      "chunk_112535ae78d8f4ede8e9c45b",
+      "chunk_619faa984cef3aeabfd9bf0b",
+      "chunk_13b92b36973f9f6e8a642239"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_code_of_conduct_011",
+    "question": "Does a similarly named rule override the published guidance on Gifts \u2014 Operational Guidance?",
+    "reference_answer": "Conflicts of Interest Gifts \u2014 Operational Guidance This section defines the XYZ Technologies approach to gifts within the area of conflicts of interest. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to gifts. Current employee records, applicable approvals, and the latest published policy should be considered before a request is completed. Fo",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Code_of_Conduct.pdf"
+      ],
+      "pages": [
+        19
+      ],
+      "chunks": [
+        "chunk_6872afdc469ea7740f5cbb36"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_8c2baa9432d3ebc044cd99f1",
+      "chunk_b876eaddedfd6bc6e6b554bf",
+      "chunk_2db3145facb0484df572d414",
+      "chunk_e46659fdc52ca64dd0bc153d",
+      "chunk_eec88bd08b377a4ad262e90c",
+      "chunk_90aadf4b569d278ae471aee4",
+      "chunk_2b1acc15faa32f3e225f5632",
+      "chunk_6e9e8b4df7eb3094b2e187c6",
+      "chunk_ceac2a8117ff0ece9dd0bfa6",
+      "chunk_06af02f5aea4b5bacad55d36"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_001",
+    "question": "What guidance does the company policy provide about Handbook?",
+    "reference_answer": "XYZ Technologies \u2014 Employee Policies Handbook Synthetic internal knowledge-base document for the employee AI assistant Important: This is synthetic content created for a college final-year project. It is not a real company's policy and is not legal, HR, medical, or security advice.",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        1
+      ],
+      "chunks": [
+        "chunk_fcb7688c1fe2f08ddaa49596"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_IT_Security_Policy.pdf",
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_4ace4fae7d3536cce51d64f1",
+      "chunk_f5267fb86f5f2ae9a5620cb0",
+      "chunk_fcb7688c1fe2f08ddaa49596",
+      "chunk_1e13469e36f53598866a5736",
+      "chunk_12d870b80f97fe11f10b4fcb",
+      "chunk_f6404c3f6de001ceb7aa180f",
+      "chunk_e821be88c19431cd80008e6e",
+      "chunk_ee2aae6c98adb430fecef2df",
+      "chunk_7d3353d4f7b15c25fd545be6",
+      "chunk_f9409e28fd0027853b74d661"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 1.0,
+        "5": 1.0,
+        "10": 1.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.3333333333333333,
+        "5": 0.2,
+        "10": 0.1
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 1.0,
+        "5": 1.0,
+        "10": 1.0
+      },
+      "rr": 0.3333333333333333,
+      "ap": 0.3333333333333333
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_002",
+    "question": "What does the policy say about Working Hours \u2014 Operational Guidance?",
+    "reference_answer": "Employment and Workplace Standards Working Hours \u2014 Operational Guidance This section defines the XYZ Technologies approach to working hours within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to working hours. Current employee records, applicable approvals, and the latest published policy shou",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        2
+      ],
+      "chunks": [
+        "chunk_7250b0a500ff91192ffcf69a"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_fcb57abd724e00cc255d3824",
+      "chunk_40b5ab759fa752d29ae0061c",
+      "chunk_e008c9561870b90c130a717c",
+      "chunk_1f7280f4a9412b672fd3235c",
+      "chunk_84cb5f911fb5e0b0a5654162",
+      "chunk_874f7a039a85c0b60080734d",
+      "chunk_b6c1b301970cd68a313c821b",
+      "chunk_38541fd66c1fa5d4e6f810b6",
+      "chunk_90aadf4b569d278ae471aee4",
+      "chunk_4455d2595969ca6f6e4a119d"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_003",
+    "question": "Which policy guidance applies to Probation \u2014 Operational Guidance?",
+    "reference_answer": "Employment and Workplace Standards Probation \u2014 Operational Guidance This section defines the XYZ Technologies approach to probation within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to probation. Current employee records, applicable approvals, and the latest published policy should be consid",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        3
+      ],
+      "chunks": [
+        "chunk_98029c496ec25bcf0627609a"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf",
+      "XYZ_IT_Security_Policy.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_9027775fa22079be2c852e17",
+      "chunk_d675d8e04993155e80443eb6",
+      "chunk_2b1acc15faa32f3e225f5632",
+      "chunk_8c483d6ce61290b2e4ebab57",
+      "chunk_2db3145facb0484df572d414",
+      "chunk_06af02f5aea4b5bacad55d36",
+      "chunk_22ff357525b4b11b1386e5ad",
+      "chunk_0dce1bc6f807f4cc1003f626",
+      "chunk_2dcfa07548f7e43041a84de6",
+      "chunk_03778558633fb74caf6f97e4"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_004",
+    "question": "How should employees handle Employment Records \u2014 Operational Guidance under company policy?",
+    "reference_answer": "Employment and Workplace Standards Employment Records \u2014 Operational Guidance This section defines the XYZ Technologies approach to employment records within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to employment records. Current employee records, applicable approvals, and the latest publis",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        4
+      ],
+      "chunks": [
+        "chunk_4b08045caf1c0a940d50130d"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Code_of_Conduct.pdf",
+      "XYZ_IT_Security_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_1286348344e8d71da8dbf05b",
+      "chunk_4ace4fae7d3536cce51d64f1",
+      "chunk_f5267fb86f5f2ae9a5620cb0",
+      "chunk_2678ed027016e64052cece90",
+      "chunk_b2f30190264b85af8c338816",
+      "chunk_d1ea8828e4db880f52c48f2a",
+      "chunk_e75f630cb4ef869454d8e278",
+      "chunk_a84042b3bf4238a83a84c54f",
+      "chunk_c4f79cd544d1de7eb5d617f1",
+      "chunk_d399387914b2f78f6e44785c"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_005",
+    "question": "Summarize the policy rule for Professional Standards \u2014 Operational Guidance.",
+    "reference_answer": "Employment and Workplace Standards Professional Standards \u2014 Operational Guidance This section defines the XYZ Technologies approach to professional standards within the area of employment and workplace standards. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to professional standards. Current employee records, applicable approvals, and the l",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        5
+      ],
+      "chunks": [
+        "chunk_19b186ab5206b563e30e9ebf"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Code_of_Conduct.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_86288c4f5964eef751001cb1",
+      "chunk_18b85a2e97c9784832e4c984",
+      "chunk_4df841a57a21f26c3b89fed2",
+      "chunk_31327326c2aad069074b8a5e",
+      "chunk_7673853158db1442f0300f4f",
+      "chunk_9027775fa22079be2c852e17",
+      "chunk_03778558633fb74caf6f97e4",
+      "chunk_d6f07ea45375126407b70164",
+      "chunk_fcb57abd724e00cc255d3824",
+      "chunk_1286348344e8d71da8dbf05b"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_006",
+    "question": "What responsibility is described for Annual Leave \u2014 Operational Guidance?",
+    "reference_answer": "Leave and Time Off Annual Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to annual leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to annual leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request i",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        10
+      ],
+      "chunks": [
+        "chunk_dcde21c58b34d6124694bf13"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_65964c3e66102411099b72de",
+      "chunk_9f7507ed412bba151ff44e0d",
+      "chunk_3feeeca5dea024be3c19d829",
+      "chunk_68d8c6226bf6a385e017260b",
+      "chunk_05f106c78f1c9bddcaeec0d9",
+      "chunk_29037a65d09c3468f73a4266",
+      "chunk_1ffa5453cad15e2759359877",
+      "chunk_9cc1ae6e0a107fd93b5e9c6f",
+      "chunk_580ef0ee9c1adafd2168199f",
+      "chunk_bd2cc0d35dc24f3a1f30a57e"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_007",
+    "question": "Where can staff find guidance on Casual Leave \u2014 Operational Guidance?",
+    "reference_answer": "Leave and Time Off Casual Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to casual leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to casual leave. Current employee records, applicable approvals, and the latest published policy should be considered before a request i",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        11
+      ],
+      "chunks": [
+        "chunk_1be0b6a8f732808234ea5316"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_29037a65d09c3468f73a4266",
+      "chunk_a0c311581cc1a83a2842a41d",
+      "chunk_7a6c9dec519a33f127c17ebd",
+      "chunk_c70277d25e2754651aa50363",
+      "chunk_34d193225971cd933f868449",
+      "chunk_56d471922c8f1ab1ad44e948",
+      "chunk_4455d2595969ca6f6e4a119d",
+      "chunk_f3c9054368818985886f00fd",
+      "chunk_856716246c98a2120fb7d9dd",
+      "chunk_2c6eb0ae7fa7e74730be73bd"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_008",
+    "question": "Explain the company's approach to Medical Leave \u2014 Operational Guidance.",
+    "reference_answer": "Leave and Time Off Medical Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to medical leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to medical leave. Current employee records, applicable approvals, and the latest published policy should be considered before a reques",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        12
+      ],
+      "chunks": [
+        "chunk_163929e7577f16045c2f5541"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Employee_Policies.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_05f106c78f1c9bddcaeec0d9",
+      "chunk_f71ee7da0f66da918fa2569c",
+      "chunk_a523a6e9a44f79767d3ddc41",
+      "chunk_8c483d6ce61290b2e4ebab57",
+      "chunk_7c3e8c9a2404a446b8b58377",
+      "chunk_df4fa68fc8ebc8b0b403e695",
+      "chunk_fb84e434c77152ba0c8d37f4",
+      "chunk_b333df0a658af4564af3b9fc",
+      "chunk_65964c3e66102411099b72de",
+      "chunk_9f7507ed412bba151ff44e0d"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  },
+  {
+    "id": "xyz_employee_policies_009",
+    "question": "In practical terms, how is Special Leave \u2014 Operational Guidance addressed?",
+    "reference_answer": "Leave and Time Off Special Leave \u2014 Operational Guidance This section defines the XYZ Technologies approach to special leave within the area of leave and time off. The purpose is to provide employees with a consistent reference when using the employee assistant or the workforce platform. Employees should provide accurate information when requesting support related to special leave. Current employee records, applicable approvals, and the latest published policy should be considered before a reques",
+    "expected_evidence": {
+      "documents": [
+        "XYZ_Employee_Policies.pdf"
+      ],
+      "pages": [
+        13
+      ],
+      "chunks": [
+        "chunk_f621c3672128b6917a57088f"
+      ]
+    },
+    "retrieved_documents": [
+      "XYZ_Employee_Policies.pdf",
+      "XYZ_Leave_Attendance_Policy.pdf",
+      "XYZ_Workforce_Management_Handbook.pdf"
+    ],
+    "retrieved_chunk_ids": [
+      "chunk_77d4ea44f64c8b7a242aa020",
+      "chunk_9f7507ed412bba151ff44e0d",
+      "chunk_05f106c78f1c9bddcaeec0d9",
+      "chunk_29037a65d09c3468f73a4266",
+      "chunk_65964c3e66102411099b72de",
+      "chunk_a0c311581cc1a83a2842a41d",
+      "chunk_f71ee7da0f66da918fa2569c",
+      "chunk_9cc1ae6e0a107fd93b5e9c6f",
+      "chunk_ce8e24ccd2ec58697723db07",
+      "chunk_bd2cc0d35dc24f3a1f30a57e"
+    ],
+    "automatic_retrieval_metrics": {
+      "recall": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "precision": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "hit": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "rr": 0.0,
+      "ap": 0.0
+    },
+    "generated_answer": null,
+    "citations": [],
+    "human_review": {
+      "correct": null,
+      "grounded": null,
+      "citation_correct": null,
+      "reviewer_notes": ""
+    }
+  }
+]

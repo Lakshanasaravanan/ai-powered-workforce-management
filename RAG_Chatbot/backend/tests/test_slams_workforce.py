@@ -3,9 +3,11 @@ from __future__ import annotations
 import httpx
 import jwt
 import pytest
+import json
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from datetime import date, time
 from app.schemas.workforce import AttendancePeriod
 from app.services.slams import DelegationTokenSigner, SLAMSClient, SLAMSWorkforceProvider
 from app.services.workforce import (
@@ -135,3 +137,39 @@ def test_date_filtered_periods_are_rejected_without_making_a_fabricated_request(
     provider = make_provider(lambda request: pytest.fail("HTTP request should not occur"), signer)
     with pytest.raises(WorkforceBusinessError):
         provider.get_attendance_summary("EMP001", period)
+
+def test_attendance_records_mapping_delegation_and_contract_errors(signer):
+    observed = {}
+    def handler(request):
+        observed.update(path=request.url.path, auth=request.headers.get("Authorization"), request_id=request.headers.get("X-Request-ID"))
+        return httpx.Response(200, json=[{"id": 9, "date": "2026-10-01", "checkInTime": "09:00:00", "checkOutTime": "17:00:00", "status": "PRESENT", "workingHours": 8.0}])
+    records = make_provider(handler, signer).get_attendance_records("EMP001", "rid")
+    assert records[0].attendance_id == 9 and records[0].attendance_date == date(2026, 10, 1) and records[0].check_in_time == time(9)
+    assert observed == {"path": "/api/attendance/my", "auth": observed["auth"], "request_id": "rid"} and observed["auth"].startswith("Bearer ")
+    with pytest.raises(WorkforceContractError):
+        make_provider(lambda _: httpx.Response(200, json=[{"id": "bad"}]), signer).get_attendance_records("EMP001")
+
+def test_mutation_posts_headers_body_mapping_and_retry_rules(signer):
+    requests = []
+    def handler(request):
+        requests.append(request)
+        if len(requests) == 1: return httpx.Response(503)
+        if request.url.path == "/api/leaves/apply": return httpx.Response(200, json={"leaveRequestId": 1, "status": "PENDING", "leaveType": "CASUAL", "startDate": "2026-10-01", "endDate": "2026-10-02", "appliedAt": "2026-10-01T10:00:00Z", "idempotentReplay": False})
+        return httpx.Response(200, json={"regularizationRequestId": 2, "attendanceId": 9, "requestedInTime": "09:00:00", "requestedOutTime": "17:00:00", "status": "PENDING", "requestedAt": "2026-10-01T10:00:00Z", "idempotentReplay": False})
+    provider = make_provider(handler, signer)
+    result = provider.request_leave("EMP001", "fixed-key", "CASUAL", date(2026,10,1), date(2026,10,2), "private", "rid")
+    assert result.leave_request_id == 1 and len(requests) == 2
+    assert all(r.headers["Idempotency-Key"] == "fixed-key" and r.headers["X-Request-ID"] == "rid" and r.headers["Authorization"].startswith("Bearer ") for r in requests)
+    assert json.loads(requests[-1].content) == {"leaveType":"CASUAL", "startDate":"2026-10-01", "endDate":"2026-10-02", "reason":"private"}
+    regularization = provider.regularize_attendance("EMP001", "regular-key", 9, time(9), time(17), "private")
+    assert regularization.regularization_request_id == 2 and requests[-1].url.path == "/api/attendance/regularize"
+    for status, error in [(400, WorkforceBusinessError), (401, WorkforceUnauthorized), (403, WorkforceForbidden), (404, WorkforceNotFound), (409, WorkforceBusinessError)]:
+        attempts = 0
+        def failure(_request, status=status):
+            nonlocal attempts; attempts += 1; return httpx.Response(status)
+        with pytest.raises(error): make_provider(failure, signer).request_leave("EMP001", "key", "CASUAL", date(2026,10,1), date(2026,10,1), "private")
+        assert attempts == 1
+
+def test_malformed_mutation_success_is_contract_error(signer):
+    with pytest.raises(WorkforceContractError):
+        make_provider(lambda _: httpx.Response(200, json={"leaveRequestId": 1}), signer).request_leave("EMP001", "key", "CASUAL", date(2026,10,1), date(2026,10,1), "private")

@@ -2,6 +2,7 @@ package com.slams.controller;
 
 import com.slams.dto.LeaveApplyRequest;
 import com.slams.dto.LeaveBalanceResponse;
+import com.slams.dto.LeaveApplicationResponse;
 import com.slams.dto.LeaveRequestResponse;
 import com.slams.model.LeaveStatus;
 import com.slams.service.LeaveService;
@@ -23,10 +24,9 @@ public class LeaveController {
 
     @PostMapping("/apply")
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<?> applyLeave(@Valid @RequestBody LeaveApplyRequest request, Principal principal) {
-        leaveService.applyLeave(
-                principal.getName(), request.getLeaveType(), request.getStartDate(), request.getEndDate(), request.getReason());
-        return ResponseEntity.ok().body(java.util.Map.of("message", "Leave applied successfully"));
+    public ResponseEntity<LeaveApplicationResponse> applyLeave(@RequestHeader(value = "Idempotency-Key", required = false) String key,
+            @Valid @RequestBody LeaveApplyRequest request, Principal principal) {
+        return ResponseEntity.ok(leaveService.applyLeave(principal.getName(), key, request));
     }
 
     @PutMapping("/{id}/status")

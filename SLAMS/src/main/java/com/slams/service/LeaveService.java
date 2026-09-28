@@ -2,10 +2,13 @@ package com.slams.service;
 
 import com.slams.model.*;
 import com.slams.exception.BusinessRuleConflictException;
+import com.slams.exception.MutationRequestValidationException;
 import com.slams.exception.ResourceNotFoundException;
 import com.slams.repository.LeaveBalanceRepository;
 import com.slams.repository.LeaveRequestRepository;
 import com.slams.repository.UserRepository;
+import com.slams.dto.LeaveApplyRequest;
+import com.slams.dto.LeaveApplicationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,8 @@ public class LeaveService {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private IdempotencyService idempotencyService;
 
     public int calculateWorkingDays(LocalDate start, LocalDate end) {
         int workingDays = 0;
@@ -44,29 +49,42 @@ public class LeaveService {
     }
 
     @Transactional
-    public LeaveRequest applyLeave(String username, LeaveType leaveType, LocalDate startDate, LocalDate endDate, String reason) {
+    public LeaveApplicationResponse applyLeave(String username, String idempotencyKey, LeaveApplyRequest input) {
+        validateIdempotencyKey(idempotencyKey);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Employee is unavailable"));
+        String hash = PayloadHasher.sha256(input.getLeaveType().name() + "|" + input.getStartDate() + "|" + input.getEndDate() + "|" + input.getReason());
+        var result = idempotencyService.execute(idempotencyKey, user, "LEAVE_APPLY", hash, LeaveApplicationResponse.class,
+                () -> LeaveApplicationResponse.from(createLeave(user, input.getLeaveType(), input.getStartDate(), input.getEndDate(), input.getReason()), false));
+        LeaveApplicationResponse response = result.body();
+        return new LeaveApplicationResponse(response.leaveRequestId(), response.status(), response.leaveType(), response.startDate(),
+                response.endDate(), response.appliedAt(), result.replay());
+    }
+
+    private LeaveRequest createLeave(User user, LeaveType leaveType, LocalDate startDate, LocalDate endDate, String reason) {
         if (startDate.isAfter(endDate)) {
-            throw new BusinessRuleConflictException("Start date cannot be after end date.");
+            throw new BusinessRuleConflictException("INVALID_LEAVE_DATE_RANGE", "Start date cannot be after end date.");
         }
         if (startDate.isBefore(LocalDate.now())) {
-            throw new BusinessRuleConflictException("Cannot apply leave for past dates.");
+            throw new BusinessRuleConflictException("INVALID_LEAVE_DATE_RANGE", "Cannot apply leave for past dates.");
         }
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee is unavailable"));
 
         int duration = calculateWorkingDays(startDate, endDate);
         if (duration == 0) {
-            throw new BusinessRuleConflictException("Cannot apply leave for weekends only.");
+            throw new BusinessRuleConflictException("LEAVE_WEEKEND_ONLY", "Cannot apply leave for weekends only.");
         }
 
         LeaveBalance balance = leaveBalanceRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Leave balance is unavailable"));
 
+        if (leaveRequestRepository.existsByUserIdAndStatusInAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                user.getId(), List.of(LeaveStatus.PENDING, LeaveStatus.APPROVED), endDate, startDate)) {
+            throw new BusinessRuleConflictException("LEAVE_OVERLAP", "An overlapping leave request already exists");
+        }
+
         // Validate leave balance
         int currentBalance = getBalanceForType(balance, leaveType);
         if (currentBalance < duration) {
-            throw new BusinessRuleConflictException("Insufficient leave balance");
+            throw new BusinessRuleConflictException("INSUFFICIENT_LEAVE_BALANCE", "Insufficient leave balance");
         }
 
         LeaveRequest request = LeaveRequest.builder()
@@ -82,13 +100,18 @@ public class LeaveService {
         return leaveRequestRepository.save(request);
     }
 
+    private static void validateIdempotencyKey(String key) {
+        if (key == null || key.length() > 64) throw new MutationRequestValidationException("IDEMPOTENCY_KEY_REQUIRED", "Idempotency-Key is required");
+        try { java.util.UUID.fromString(key); } catch (IllegalArgumentException exception) { throw new MutationRequestValidationException("IDEMPOTENCY_KEY_REQUIRED", "Idempotency-Key must be a UUID"); }
+    }
+
     @Transactional
     public LeaveRequest updateStatus(Long requestId, LeaveStatus status, String managerUsername, String rejectionReason) {
         LeaveRequest request = leaveRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("Leave request is unavailable"));
 
         if (request.getStatus() != LeaveStatus.PENDING) {
-            throw new BusinessRuleConflictException("Only pending leave requests can be updated");
+            throw new BusinessRuleConflictException("INVALID_ACTION_STATE", "Only pending leave requests can be updated");
         }
 
         User manager = userRepository.findByUsername(managerUsername)
@@ -98,11 +121,14 @@ public class LeaveService {
         request.setApprovedBy(manager.getFullName());
         
         if (status == LeaveStatus.APPROVED) {
-            int duration = calculateWorkingDays(request.getStartDate(), request.getEndDate());
             LeaveBalance balance = leaveBalanceRepository.findByUserId(request.getUser().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Leave balance is unavailable"));
 
-            // Deduct the leaves from the balance
+            int duration = calculateWorkingDays(request.getStartDate(), request.getEndDate());
+            if (getBalanceForType(balance, request.getLeaveType()) < duration) {
+                throw new BusinessRuleConflictException("INSUFFICIENT_LEAVE_BALANCE", "Insufficient leave balance at approval time");
+            }
+            // Pessimistically locked balance row is rechecked before deduction.
             deductLeaves(balance, request.getLeaveType(), duration);
             leaveBalanceRepository.save(balance);
         } else if (status == LeaveStatus.REJECTED) {

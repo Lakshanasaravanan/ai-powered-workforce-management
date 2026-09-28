@@ -5,6 +5,8 @@ import com.slams.model.AttendanceStatus;
 import com.slams.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -13,6 +15,8 @@ import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Attendance> findWithLockById(Long id);
 
     Optional<Attendance> findByUserIdAndDate(Long userId, LocalDate date);
 

@@ -2,6 +2,7 @@ package com.slams.controller;
 
 import com.slams.dto.AttendanceAnalyticsResponse;
 import com.slams.dto.AttendanceResponse;
+import com.slams.dto.AttendanceRegularizationResponse;
 import com.slams.model.Attendance;
 import com.slams.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,12 +64,10 @@ public class AttendanceController {
 
     @PostMapping("/regularize")
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<?> requestRegularization(Principal principal, @RequestBody com.slams.dto.RegularizationRequest request) {
-        try {
-            return ResponseEntity.ok(attendanceService.requestRegularization(principal.getName(), request));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<AttendanceRegularizationResponse> requestRegularization(Principal principal,
+            @RequestHeader(value = "Idempotency-Key", required = false) String key,
+            @jakarta.validation.Valid @RequestBody com.slams.dto.RegularizationRequest request) {
+        return ResponseEntity.ok(attendanceService.requestRegularization(principal.getName(), key, request));
     }
 
     @GetMapping("/regularize/pending")

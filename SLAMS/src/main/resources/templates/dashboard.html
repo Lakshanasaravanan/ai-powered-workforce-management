@@ -820,6 +820,12 @@
     </div>
 </main>
 
+<section th:if="${currentUser.role.name() == 'ROLE_EMPLOYEE'}" class="fixed bottom-5 right-5 z-40 w-[min(92vw,430px)] bg-surface border border-line shadow-soft rounded-3xl overflow-hidden" aria-label="AI Assistant">
+ <div class="p-4 bg-brand text-white flex justify-between"><strong><i class="fa-solid fa-sparkles mr-2"></i>AI Assistant</strong><button id="assistantClear" class="text-xs underline" type="button">New conversation</button></div>
+ <div id="assistantMessages" class="p-4 h-72 overflow-y-auto space-y-3" aria-live="polite"><p class="text-sm text-textMuted">Ask about policy, leave balance, or attendance.</p></div>
+ <form id="assistantForm" class="p-3 border-t border-line flex gap-2"><label class="sr-only" for="assistantInput">Message</label><textarea id="assistantInput" rows="2" class="input-focus flex-1 border border-line rounded-xl p-2 text-sm" placeholder="Ask your assistant"></textarea><button id="assistantSend" type="submit" class="bg-brand text-white rounded-xl px-4 text-sm">Send</button></form>
+</section>
+
 <!-- Reject Leave Modal -->
 <div id="rejectModal" class="hidden fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-surface border border-line w-full max-w-sm rounded-3xl shadow-soft overflow-hidden p-6 relative">
@@ -1414,6 +1420,16 @@
             loadAdminDepartments();
         }
     });
+</script>
+
+<script th:if="${currentUser.role.name() == 'ROLE_EMPLOYEE'}">
+(() => { const box=document.getElementById('assistantMessages'), form=document.getElementById('assistantForm'), input=document.getElementById('assistantInput'), send=document.getElementById('assistantSend'); let conversation=sessionStorage.getItem('assistantConversation')||null;
+ const add=(text,who='assistant')=>{const item=document.createElement('div');item.className=who==='user'?'text-right text-sm':'text-left text-sm';const bubble=document.createElement('span');bubble.className='inline-block rounded-xl p-2 '+(who==='user'?'bg-brand text-white':'bg-slate-100 text-textMain');bubble.textContent=text;item.appendChild(bubble);box.appendChild(item);box.scrollTop=box.scrollHeight;return item;};
+ const post=async(path,payload)=>{const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});if(!response.ok)throw new Error(response.status===429?'Please wait before trying again.':response.status===401?'Please sign in again.':'Assistant is temporarily unavailable.');return response.json();};
+ const confirm=(action)=>{const button=document.createElement('button');button.type='button';button.className='mt-2 bg-brand text-white rounded-lg px-3 py-1 text-xs';button.textContent='Confirm';button.onclick=async()=>{button.disabled=true;try{const r=await post('/api/assistant/confirm',{action_id:action.action_id,conversation_id:conversation});add(r.answer);}catch(e){add(e.message);}};const dismiss=document.createElement('button');dismiss.type='button';dismiss.className='ml-2 text-xs underline';dismiss.textContent='Dismiss';dismiss.onclick=()=>button.parentElement.remove();const card=add('This action will only be submitted after you confirm.');card.append(button,dismiss);};
+ form.addEventListener('submit',async e=>{e.preventDefault();const message=input.value.trim();if(!message)return;add(message,'user');input.value='';send.disabled=true;try{const r=await post('/api/assistant/chat',{message,...(conversation?{conversation_id:conversation}:{})});conversation=r.conversation_id||conversation;if(conversation)sessionStorage.setItem('assistantConversation',conversation);add(r.answer);if(r.sources?.length)add('Sources: '+r.sources.map(s=>`${s.document} — page ${s.page}`).join('; '));if(r.status==='confirmation_required'&&r.pending_action)confirm(r.pending_action);}catch(e){add(e.message);}finally{send.disabled=false;input.focus();}});
+ document.getElementById('assistantClear').onclick=()=>{conversation=null;sessionStorage.removeItem('assistantConversation');box.textContent='';add('New conversation started.');};
+})();
 </script>
 
 </body>

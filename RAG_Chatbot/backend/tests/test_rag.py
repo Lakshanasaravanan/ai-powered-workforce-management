@@ -58,6 +58,7 @@ def test_ingestion_preserves_metadata_and_skips_bad_pages(monkeypatch, tmp_path:
     assert pages[0].page == 1
     assert pages[0].document_id.startswith("doc_")
     assert pages[0].content_hash
+    assert pages[0].file_path == "example.pdf"
 
 
 def test_cleaning_removes_repeated_margins_and_keeps_paragraphs():
@@ -94,7 +95,7 @@ def test_embedding_service_batches_and_normalizes_without_real_model():
             calls.append((texts, kwargs))
             return np.array([[0.6, 0.8] for _ in texts])
 
-    service = EmbeddingService("fake", batch_size=7, model_factory=lambda _: Model())
+    service = EmbeddingService("fake", batch_size=7, device="cpu", model_factory=lambda _, **__: Model())
     vectors = service.encode(["one", "two"])
     assert vectors.shape == (2, 2)
     assert np.allclose(np.linalg.norm(vectors, axis=1), 1)
@@ -138,9 +139,9 @@ def test_retriever_context_and_duplicate_removal(tmp_path: Path):
 def test_grounded_generation_and_rag_service_flow():
     class Provider(LLMProvider):
         def __init__(self): self.calls = []
-        def generate(self, system_prompt, user_prompt):
+        def generate(self, system_prompt, user_prompt, response_schema=None):
             self.calls.append((system_prompt, user_prompt))
-            return "Medical leave is available. [policy.pdf, p. 1]"
+            return '{"answer":"Medical leave is available.","evidence_ids":["E1"],"insufficient_evidence":false}'
 
     class Retriever:
         def retrieve(self, question): return [RetrievedChunk(**chunk("Medical leave is available.").model_dump(), score=0.9)]

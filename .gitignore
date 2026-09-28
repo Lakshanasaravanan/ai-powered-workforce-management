@@ -6,11 +6,31 @@ SLAMS/target/
 
 # Java compiled files
 *.class
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.tsbuildinfo
+apps/web/src/*.js
+apps/web/src/**/*.js
+*.log
+*.sqlite
+*.sqlite3
+*.db
 
 # IDE files
 .vscode/
 .idea/
 *.iml
+.DS_Store
+Thumbs.db
 
 # Environment / secrets
 .env
+.env.*
+!.env.example

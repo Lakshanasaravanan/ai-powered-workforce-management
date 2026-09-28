@@ -43,7 +43,7 @@ class ContextAssembler:
                 continue
             seen_content.add(fingerprint)
             labels = [
-                f"[Source {rank}]",
+                f"[E{rank}]",
                 f"Document: {chunk.metadata.source}",
                 f"Page: {chunk.metadata.page}",
             ]

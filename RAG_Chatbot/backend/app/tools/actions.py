@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, time
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -14,9 +15,10 @@ from app.tools.base import Tool, ToolSpec
 
 class LeaveRequestInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    leave_type: "LeaveType"
     start_date: date
     end_date: date
-    reason: str | None = Field(default=None, max_length=500)
+    reason: str = Field(min_length=1, max_length=500)
 
     @model_validator(mode="after")
     def validate_range(self) -> "LeaveRequestInput":
@@ -25,11 +27,18 @@ class LeaveRequestInput(BaseModel):
         return self
 
 
+class LeaveType(StrEnum): CASUAL = "CASUAL"; SICK = "SICK"; EARNED = "EARNED"
+
 class AttendanceRegularizationInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    attendance_date: date
-    requested_status: str = Field(min_length=1, max_length=40)
-    reason: str | None = Field(default=None, max_length=500)
+    attendance_id: int = Field(gt=0)
+    requested_in_time: time
+    requested_out_time: time | None = None
+    reason: str = Field(min_length=1, max_length=500)
+    @model_validator(mode="after")
+    def valid_times(self):
+        if self.requested_out_time is not None and self.requested_out_time <= self.requested_in_time: raise ValueError("requested_out_time must be after requested_in_time")
+        return self
 
 
 class ActionProposalResult(BaseModel):
@@ -43,8 +52,9 @@ class _ProposalTool(Tool):
     def _propose(self, context: ExecutionContext, tool_input: BaseModel) -> ActionProposalResult:
         # Free-text reasons are deliberately not retained in Phase 4's temporary proposal store.
         # JSON-mode serialization stores only validated, non-sensitive action details; nothing is executed.
+        execution = tool_input.model_dump(mode="json")
         sanitized = tool_input.model_dump(mode="json", exclude={"reason"})
-        action = self.store.create(context, self.spec.name, sanitized)
+        action = self.store.create(context, self.spec.name, execution, sanitized)
         return ActionProposalResult(pending_action=to_public(action))
 
 

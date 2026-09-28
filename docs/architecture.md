@@ -1,0 +1,162 @@
+# InfoTech Workspace architecture
+
+```text
+React Workspace -> EMS API -> PostgreSQL / Redis
+                -> Agentic RAG service (future) -> Qdrant / OpenRouter (future)
+```
+
+## Phase 2 identity and access boundary
+
+The EMS API is the authority for identity and authorization. An access token is
+issued only after an employee authenticates with `employee_code` and a password;
+`company_email` is a distinct company identity and is not a login identifier.
+The authenticated employee is always resolved from the JWT subject on the
+server. No API endpoint accepts a frontend-supplied role or employee identity as
+an authorization authority.
+
+Roles (`ADMIN`, `MANAGER`, and `EMPLOYEE`) control backend authority. Job
+designation is independent: for example, the `Team Lead` designation does not
+automatically grant the `MANAGER` role. Frontend route and button visibility is
+only a user-experience aid; backend dependency checks enforce ADMIN and MANAGER
+authorization.
+
+Employee and Manager development identities use
+`employee_code@infotech.local`. The Admin seed identity remains a separate
+administrative identity. These local addresses are placeholders: a later Admin
+provisioning integration may create managed Google Workspace accounts, but EMS
+must never store Google passwords. Employee and Manager account local-parts
+should continue to use the employee code.
+
+## Authentication lifecycle
+
+New accounts activate through a one-time first-login flow:
+
+```text
+Employee ID + Temporary Password + New Password + Confirmation
+        -> activate account -> invalidate temporary credential
+        -> later login: Employee ID + own password
+```
+
+Passwords are encoded with Argon2id; plaintext credentials are never stored.
+A successful activation clears the temporary credential. An inactive account
+cannot log in, activate with a temporary credential, or use an already-issued
+JWT. A rejected inactive first-login attempt leaves its onboarding state and
+temporary credential unchanged. An Admin can reactivate an account.
+
+The current React client keeps its access token in `sessionStorage` for the
+browser session. This limits persistence but remains exposed to XSS. A future
+production hardening phase should evaluate an HttpOnly cookie/session strategy
+appropriate to the deployment.
+
+## Reporting hierarchy
+
+Employees and Managers may have a `manager_id`; managers can report to other
+managers and a top-level manager can have no manager. Server-side validation
+rejects self-management and all cyclic reporting relationships, while allowing
+valid multi-level hierarchies. Employee code and company email are unique.
+
+## Future agent privacy invariant
+
+The future agent never writes the database directly: user -> agent -> typed EMS
+API tool -> authorization and business validation -> database -> confirmed
+result. ADMIN authority must not grant access to private employee chat content
+merely because of the ADMIN role.
+
+## Phase 3 leave management
+
+Leave requests are date-based records with explicit full-day or half-day duration. Casual, Emergency, and Day Off requests begin as `PENDING` and need a decision from the employee's direct Manager. Day Off is explicitly a half-day with a Morning or Afternoon period. Medical/Sick leave is automatically `APPROVED`, has `approval_required=false`, no fabricated approver, and records `AUTOMATIC_POLICY` as its decision source.
+
+The only manager decision transitions are `PENDING -> APPROVED` and `PENDING -> REJECTED`; both are terminal. The backend uses the JWT-derived employee and persisted direct-manager relationship. ADMIN is not a leave approval authority, and a higher-level Manager cannot bypass the direct Manager. A Manager may decide another Manager's request only when that Manager directly reports to them. A conditional pending-state update provides atomic compare-and-set protection.
+
+Leave entitlement policy is intentionally unresolved. The system does not implement accrual, carry-forward, annual quota, monthly or half-year reset, or balance enforcement.
+
+## Recipient-private notifications
+
+Notifications are informational, recipient-private inbox records with `LEAVE`, `CHAT`, `CALENDAR`, and `SYSTEM` categories. Leave is the only current event source. Submission and successful decision notifications are written in the same database transaction as the corresponding leave operation. A notification record never authorizes a leave action.
+
+Employees can list only their own notifications, retrieve an unread count, mark an owned notification read, and mark their own inbox read. Neither ADMIN nor a Manager may inspect another employee's inbox. The React workspace provides My Leave, Apply Leave, Manager Team Leave, direct Manager Approve/Reject controls, and an Inbox with an unread badge.
+
+## Phase 4 policy assistant
+
+Phase 4 adds a separate policy-QA boundary; it does not grant the agent EMS mutation authority.
+
+```text
+React InfoTech Workspace /agent
+        | existing EMS JWT bearer token
+        v
+RAG POST /api/v1/agent/query
+        |-- validate HS256 JWT (expiry + UUID subject)
+        |-- EMS GET /api/v1/auth/me (active identity confirmation)
+        |-- dense BGE retrieval: FAISS default or Qdrant collection option
+        |-- bounded context assembly -> OpenRouter structured generation
+        `-- evidence-ID validation -> grounded answer + citations
+```
+
+The request accepts only `message` and optional `conversation_id`; frontend employee, role, and manager fields are rejected. The RAG service has no direct EMS PostgreSQL access and this endpoint cannot reach SLAMS, leave, attendance, or arbitrary action tools.
+
+An explicit offline index build creates a manifest that binds PDF hashes, embedding model/dimension, chunk configuration, FAISS records, and BM25 artifacts. Startup validates but never rebuilds indexes; stale artifacts fail closed. Dense FAISS remains the default. Hybrid/RRF and reranking remain disabled, and no cosine evidence threshold is used because calibration distributions overlapped. Instead the server validates evidence IDs before mapping citations.
+
+The browser reuses its sessionStorage EMS token, stores no RAG credential, renders model output as text, and uses server-returned citation metadata.
+
+## Phase 5 confirmed workforce actions
+
+Phase 5 adds a deliberately narrow action boundary to the authenticated
+assistant. Grounded policy RAG remains available alongside deterministic intent
+routing and read-only EMS tools. The supported typed actions are `APPLY_LEAVE`,
+`APPROVE_LEAVE`, and `REJECT_LEAVE`; the latter two are available only to the
+requester's direct Manager. Agent-visible pending team leaves use opaque `LR-*`
+references rather than database identifiers.
+
+```text
+Browser Agent card -> typed proposal -> explicit Confirm/Cancel
+                     -> Redis pending action (immutable server arguments)
+                     -> typed EMS endpoint -> EMS RBAC/business validation
+                     -> PostgreSQL leave, idempotency, audit, notification
+```
+
+The browser never reconstructs mutation arguments. The server stores the
+proposal arguments and actor/conversation binding, and confirmation can only
+claim that stored action. Redis provides the pending-action lifecycle; EMS owns
+the durable idempotency record and persisted `AuditEvent`. The RAG service has
+no direct PostgreSQL write path and exposes no arbitrary mutation HTTP tool.
+
+EMS remains the final authority for authorization and leave business rules.
+Employee and Admin roles cannot make Manager leave decisions. Existing Medical
+leave semantics remain unchanged: they are automatically approved by policy and
+are not converted into Manager decision actions.
+
+## Phase 6 real-time chat
+
+Chat is an EMS-owned PostgreSQL feature using `ChatConversation`,
+`ChatParticipant`, and `ChatMessage`. Direct conversations use a canonical
+participant key to prevent duplicates; group conversations explicitly include
+their creator and selected active employees. Employee directory search is
+reused to start conversations.
+
+Conversation and message access is membership-based. ADMIN has no global
+private-chat access. REST is the only message mutation path: it resolves the
+JWT-derived sender, persists the message and recipient CHAT notifications, then
+emits a safe `message.created` event after commit. Unread state is per
+participant via `last_read_at`.
+
+The browser connects to `/api/v1/chat/ws` with its existing session token as a
+local-development query parameter; it is not persisted or logged. The in-process
+connection manager is suitable for one EMS instance. Horizontal scaling needs
+Redis Pub/Sub or an equivalent fan-out layer. This is authorization-based
+privacy, not end-to-end encryption, and has no Gmail or Google Chat dependency.
+
+## Phase 7 built-in workplace calendar
+
+The built-in Calendar is an EMS feature. `CalendarEvent` records are persisted
+in PostgreSQL for company events, while `LeaveRequest` remains the authoritative
+source for leave. The calendar feed projects only approved leave into an
+authorized viewer's feed; it never creates a duplicate `CalendarEvent` row for
+leave.
+
+Calendar identity comes from the JWT on the server. Company-event mutations are
+authorized by the EMS API, not by browser controls. Private leave projection is
+limited to the employee and their direct Manager; an ADMIN role does not gain a
+private-leave visibility bypass. The React month view derives Today and the
+displayed month from the runtime date, and date-only all-day leave is rendered
+without a UTC date shift. Google Calendar, Google Meet, and OAuth integration
+are explicitly outside Phase 7.

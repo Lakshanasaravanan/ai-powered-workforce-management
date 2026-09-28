@@ -43,6 +43,18 @@ class VectorStore(ABC):
     def health_check(self) -> bool: ...
 
 
+def create_vector_store(settings, directory: Path) -> VectorStore:
+    """Select an explicit local FAISS or shared Qdrant backend."""
+    if settings.vector_store_backend == "faiss":
+        return FaissVectorStore(directory)
+    if settings.vector_store_backend == "qdrant":
+        if settings.qdrant_url is None:
+            raise VectorStoreError("QDRANT_URL is required when VECTOR_STORE_BACKEND=qdrant")
+        from app.services.qdrant_vector_store import QdrantVectorStore
+        return QdrantVectorStore(str(settings.qdrant_url), settings.qdrant_collection, settings.qdrant_api_key.get_secret_value() if settings.qdrant_api_key else None)
+    raise VectorStoreError("Configured vector store backend is unsupported")
+
+
 class FaissVectorStore(VectorStore):
     """Persistent cosine-similarity baseline; replaceable by Qdrant in Phase 3."""
 

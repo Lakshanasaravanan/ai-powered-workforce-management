@@ -1,0 +1,2504 @@
+{
+  "generated_at": "2026-09-28T11:14:29.794773+00:00",
+  "identity_audit": {
+    "total_labeled_references": 65,
+    "resolved": 65,
+    "unresolved": 0,
+    "duplicate_ids": 0,
+    "page_mismatches": 0,
+    "document_mismatches": 0
+  },
+  "semantic_audit": {
+    "correct_document_wrong_exact_chunk": 57,
+    "counts": {
+      "ALTERNATE_VALID_EVIDENCE": 56,
+      "TRUE_RETRIEVAL_MISS": 1
+    },
+    "entries": [
+      {
+        "benchmark_id": "xyz_code_of_conduct_002",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_c85f6556fe9fe7110971f654"
+        ],
+        "retrieved_top5": [
+          "chunk_f558d31a475e1a699c990b03",
+          "chunk_b03334a091d47cda33a44a7b",
+          "chunk_5e3d5ac1bcc95887be2a22ad",
+          "chunk_2db3145facb0484df572d414",
+          "chunk_09791052db7b6ae7d562ead6"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          2
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_003",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_e3ff498fef2027c726155439"
+        ],
+        "retrieved_top5": [
+          "chunk_18b85a2e97c9784832e4c984",
+          "chunk_7673853158db1442f0300f4f",
+          "chunk_86288c4f5964eef751001cb1",
+          "chunk_f558d31a475e1a699c990b03",
+          "chunk_5e3d5ac1bcc95887be2a22ad"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          3
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_004",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_b8142ee0036454bf66459267"
+        ],
+        "retrieved_top5": [
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_0e868b743da2f6161c72f696",
+          "chunk_2678ed027016e64052cece90",
+          "chunk_da1f501dc38c0164f379e2e6"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          4
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_005",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_da4ee663e277921944685263"
+        ],
+        "retrieved_top5": [
+          "chunk_5e3d5ac1bcc95887be2a22ad",
+          "chunk_407dd674fc1cae83ebf59b18",
+          "chunk_43d5ccffd2c188155d318a12",
+          "chunk_9bb90db4f2c8108917a914ac",
+          "chunk_829b42fa19324eeb0cad03d3"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          5
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_006",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_56749db3aa7c4773b460af9f"
+        ],
+        "retrieved_top5": [
+          "chunk_2db3145facb0484df572d414",
+          "chunk_7f66ea7ae9318387ee7d9f50",
+          "chunk_06af02f5aea4b5bacad55d36",
+          "chunk_0dce1bc6f807f4cc1003f626",
+          "chunk_5e3d5ac1bcc95887be2a22ad"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          10
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_007",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_8ba2f7138529daa988e962a2"
+        ],
+        "retrieved_top5": [
+          "chunk_829b42fa19324eeb0cad03d3",
+          "chunk_00896c4769be466717be1ab7",
+          "chunk_2db3145facb0484df572d414",
+          "chunk_0dce1bc6f807f4cc1003f626",
+          "chunk_4d32830807493654f2fc362a"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          11
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_008",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_db6fe4cf3d4347a53108a4e5"
+        ],
+        "retrieved_top5": [
+          "chunk_6ce5ccf413c0d37e9878fe97",
+          "chunk_c71da494f03e363902ab018b",
+          "chunk_7d3353d4f7b15c25fd545be6",
+          "chunk_1e13469e36f53598866a5736",
+          "chunk_ee2aae6c98adb430fecef2df"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          12
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_009",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_43c070c99f0b4e88cb2bf485"
+        ],
+        "retrieved_top5": [
+          "chunk_7673853158db1442f0300f4f",
+          "chunk_18b85a2e97c9784832e4c984",
+          "chunk_86288c4f5964eef751001cb1",
+          "chunk_d6f07ea45375126407b70164",
+          "chunk_f558d31a475e1a699c990b03"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          13
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_010",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_f65ca3dc135f9dcd24331fe2"
+        ],
+        "retrieved_top5": [
+          "chunk_7f6ded7c889966df009e26c3",
+          "chunk_30ec508b6e6073b6767e5473",
+          "chunk_2f6f29fc129e05d67b44c82a",
+          "chunk_6b1bb2360c590a961b0ab3fc",
+          "chunk_65964c3e66102411099b72de"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          18
+        ]
+      },
+      {
+        "benchmark_id": "xyz_code_of_conduct_011",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_6872afdc469ea7740f5cbb36"
+        ],
+        "retrieved_top5": [
+          "chunk_8c2baa9432d3ebc044cd99f1",
+          "chunk_b876eaddedfd6bc6e6b554bf",
+          "chunk_2db3145facb0484df572d414",
+          "chunk_e46659fdc52ca64dd0bc153d",
+          "chunk_eec88bd08b377a4ad262e90c"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          19
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_002",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_7250b0a500ff91192ffcf69a"
+        ],
+        "retrieved_top5": [
+          "chunk_fcb57abd724e00cc255d3824",
+          "chunk_40b5ab759fa752d29ae0061c",
+          "chunk_e008c9561870b90c130a717c",
+          "chunk_1f7280f4a9412b672fd3235c",
+          "chunk_84cb5f911fb5e0b0a5654162"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          2
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_003",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_98029c496ec25bcf0627609a"
+        ],
+        "retrieved_top5": [
+          "chunk_9027775fa22079be2c852e17",
+          "chunk_d675d8e04993155e80443eb6",
+          "chunk_2b1acc15faa32f3e225f5632",
+          "chunk_8c483d6ce61290b2e4ebab57",
+          "chunk_2db3145facb0484df572d414"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          3
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_004",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_4b08045caf1c0a940d50130d"
+        ],
+        "retrieved_top5": [
+          "chunk_1286348344e8d71da8dbf05b",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_2678ed027016e64052cece90",
+          "chunk_b2f30190264b85af8c338816"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          4
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_005",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_19b186ab5206b563e30e9ebf"
+        ],
+        "retrieved_top5": [
+          "chunk_86288c4f5964eef751001cb1",
+          "chunk_18b85a2e97c9784832e4c984",
+          "chunk_4df841a57a21f26c3b89fed2",
+          "chunk_31327326c2aad069074b8a5e",
+          "chunk_7673853158db1442f0300f4f"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          5
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_006",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_dcde21c58b34d6124694bf13"
+        ],
+        "retrieved_top5": [
+          "chunk_65964c3e66102411099b72de",
+          "chunk_9f7507ed412bba151ff44e0d",
+          "chunk_3feeeca5dea024be3c19d829",
+          "chunk_68d8c6226bf6a385e017260b",
+          "chunk_05f106c78f1c9bddcaeec0d9"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          10
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_007",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_1be0b6a8f732808234ea5316"
+        ],
+        "retrieved_top5": [
+          "chunk_29037a65d09c3468f73a4266",
+          "chunk_a0c311581cc1a83a2842a41d",
+          "chunk_7a6c9dec519a33f127c17ebd",
+          "chunk_c70277d25e2754651aa50363",
+          "chunk_34d193225971cd933f868449"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          11
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_008",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_163929e7577f16045c2f5541"
+        ],
+        "retrieved_top5": [
+          "chunk_05f106c78f1c9bddcaeec0d9",
+          "chunk_f71ee7da0f66da918fa2569c",
+          "chunk_a523a6e9a44f79767d3ddc41",
+          "chunk_8c483d6ce61290b2e4ebab57",
+          "chunk_7c3e8c9a2404a446b8b58377"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          12
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_009",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_f621c3672128b6917a57088f"
+        ],
+        "retrieved_top5": [
+          "chunk_77d4ea44f64c8b7a242aa020",
+          "chunk_9f7507ed412bba151ff44e0d",
+          "chunk_05f106c78f1c9bddcaeec0d9",
+          "chunk_29037a65d09c3468f73a4266",
+          "chunk_65964c3e66102411099b72de"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          13
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_010",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_806305e6f85b0b246ebf7730"
+        ],
+        "retrieved_top5": [
+          "chunk_cafc8312e4f03513f449ebd8",
+          "chunk_fbda39fc4ac3536651f760e2",
+          "chunk_4f79d3ccc80cc86a6ab2395f",
+          "chunk_0efdf4b852e62b397ef875de",
+          "chunk_9ca071e3dccb323d5a270084"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          18
+        ]
+      },
+      {
+        "benchmark_id": "xyz_employee_policies_011",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_2cf1b9c464cef684a1d26136"
+        ],
+        "retrieved_top5": [
+          "chunk_27c594b69e5818cc0714e409",
+          "chunk_56d471922c8f1ab1ad44e948",
+          "chunk_8e28b237f991e3c830e5923b",
+          "chunk_6b521faf4bf7305142bf43d6",
+          "chunk_f3c9054368818985886f00fd"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          19
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_001",
+        "classification": "TRUE_RETRIEVAL_MISS",
+        "reason": "correct document retrieved without labeled heading or adjacent evidence chunk",
+        "old_relevant_chunk_ids": [
+          "chunk_8a6c18db40f1e15c2469c0d4"
+        ],
+        "retrieved_top5": [
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_1ace19d4f1bf419f969c288b",
+          "chunk_273ed0f5466ba05c88174dba",
+          "chunk_c69ebd3992c5beda8c7df73f"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          1
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_002",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_3b5bfbc1fcab1e5fa3a41ae8"
+        ],
+        "retrieved_top5": [
+          "chunk_808bbe66e8c35901fa72d151",
+          "chunk_071175e8482d9f762ee71416",
+          "chunk_940ab8a252ef7b90074346e4",
+          "chunk_33c368b1c038cc72ed08313e",
+          "chunk_273ed0f5466ba05c88174dba"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          2
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_003",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_a3af9361e325f3492aac93b8"
+        ],
+        "retrieved_top5": [
+          "chunk_e0e6f6d6ce2ba037de70166c",
+          "chunk_06af02f5aea4b5bacad55d36",
+          "chunk_0cac40bbc2cd13c5c2c07761",
+          "chunk_0dce1bc6f807f4cc1003f626",
+          "chunk_2db3145facb0484df572d414"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          3
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_004",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_02e7a78316ff6a0a519c58fb"
+        ],
+        "retrieved_top5": [
+          "chunk_ab911fc771a454b90acb37e7",
+          "chunk_bb869416a8e5e6fee4ef6432",
+          "chunk_c69ebd3992c5beda8c7df73f",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_f5267fb86f5f2ae9a5620cb0"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          4
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_005",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_5235b2e8f38a07ec8e3baa79"
+        ],
+        "retrieved_top5": [
+          "chunk_af7c8cd1c84a158d856784b6",
+          "chunk_940ab8a252ef7b90074346e4",
+          "chunk_808bbe66e8c35901fa72d151",
+          "chunk_e0e6f6d6ce2ba037de70166c",
+          "chunk_11fd97496f29ac8721442c71"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          5
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_006",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_daacf2edabc31fae4388ad9d"
+        ],
+        "retrieved_top5": [
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_1ace19d4f1bf419f969c288b",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_1e13469e36f53598866a5736",
+          "chunk_12d870b80f97fe11f10b4fcb"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          10
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_007",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_6799a9d81c69394b4cfa8d62"
+        ],
+        "retrieved_top5": [
+          "chunk_b4c8c641ec8a45fe289c7db6",
+          "chunk_d720eec32c8f72e419f7b163",
+          "chunk_2b1acc15faa32f3e225f5632",
+          "chunk_33c368b1c038cc72ed08313e",
+          "chunk_f5267fb86f5f2ae9a5620cb0"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          11
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_008",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_8f767bfacd4ed3e51538c7af"
+        ],
+        "retrieved_top5": [
+          "chunk_33c368b1c038cc72ed08313e",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_216e821a6b2621ad020ce0bb",
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_273ed0f5466ba05c88174dba"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          12
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_009",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_ff634a8dacbecc22b20556cd"
+        ],
+        "retrieved_top5": [
+          "chunk_19a86988f723a160e63e129d",
+          "chunk_1f0b91873de34a7ce88acd36",
+          "chunk_81f7ee99166682a87eb9f490",
+          "chunk_39c2c4f31d9c1c69772e4b51",
+          "chunk_f5267fb86f5f2ae9a5620cb0"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          13
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_010",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_0343521f9070b1502590428d"
+        ],
+        "retrieved_top5": [
+          "chunk_69da19f6c87b5da952008de7",
+          "chunk_9c7fd645c8c2efc70a283f02",
+          "chunk_ba2232dbdc7f71ff80aacd93",
+          "chunk_34d193225971cd933f868449",
+          "chunk_9027775fa22079be2c852e17"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          18
+        ]
+      },
+      {
+        "benchmark_id": "xyz_it_security_policy_011",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_d212d1b97ec0913986b44bc8"
+        ],
+        "retrieved_top5": [
+          "chunk_b7d1445e67e00b490307c4d7",
+          "chunk_e27a9b570316678c1d789a10",
+          "chunk_b5e1a1a9d0f4ff276b80c668",
+          "chunk_758ea4a02fbc8b696bc917b5",
+          "chunk_e75f630cb4ef869454d8e278"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          19
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_002",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_8e33f345d6c5fe0f77fafbf7"
+        ],
+        "retrieved_top5": [
+          "chunk_65964c3e66102411099b72de",
+          "chunk_9f7507ed412bba151ff44e0d",
+          "chunk_46f2a235313bde754758cc1e",
+          "chunk_f1cf510d46739482273cb460",
+          "chunk_3feeeca5dea024be3c19d829"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          2
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_003",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_03cbe252d19f5f91a4f09de5"
+        ],
+        "retrieved_top5": [
+          "chunk_29037a65d09c3468f73a4266",
+          "chunk_a0c311581cc1a83a2842a41d",
+          "chunk_c70277d25e2754651aa50363",
+          "chunk_7a6c9dec519a33f127c17ebd",
+          "chunk_2c6eb0ae7fa7e74730be73bd"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          3
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_004",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_082dbeb90514bfeecd3be1f6"
+        ],
+        "retrieved_top5": [
+          "chunk_05f106c78f1c9bddcaeec0d9",
+          "chunk_f71ee7da0f66da918fa2569c",
+          "chunk_a523a6e9a44f79767d3ddc41",
+          "chunk_c2b312b668a70c2c04d13a83",
+          "chunk_649fa9ec5f5667e3ea024fba"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          4
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_005",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_30fc305f19b1643a22d51598"
+        ],
+        "retrieved_top5": [
+          "chunk_9cc1ae6e0a107fd93b5e9c6f",
+          "chunk_75922bfe656c4906eb62e7c0",
+          "chunk_649fa9ec5f5667e3ea024fba",
+          "chunk_05f106c78f1c9bddcaeec0d9",
+          "chunk_c2b312b668a70c2c04d13a83"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          5
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_006",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_bb5199a1715483fb0c423c1e"
+        ],
+        "retrieved_top5": [
+          "chunk_c9031063aa3a0deb7ba2a8f5",
+          "chunk_06af02f5aea4b5bacad55d36",
+          "chunk_0fcfbe2e49ad167c136c65e7",
+          "chunk_0dce1bc6f807f4cc1003f626",
+          "chunk_5e3d5ac1bcc95887be2a22ad"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          10
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_007",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_8760f84be8979f9f7e9cf2a0"
+        ],
+        "retrieved_top5": [
+          "chunk_2f6f29fc129e05d67b44c82a",
+          "chunk_0dce1bc6f807f4cc1003f626",
+          "chunk_56d471922c8f1ab1ad44e948",
+          "chunk_30ec508b6e6073b6767e5473",
+          "chunk_136e11c12dec9d527ea058ab"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          11
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_008",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_c69298a7af4c10190a6cf637"
+        ],
+        "retrieved_top5": [
+          "chunk_b65d21babc19e6eb651bf431",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_ee2aae6c98adb430fecef2df",
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_12d870b80f97fe11f10b4fcb"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          12
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_009",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_9906c183a0c6f1fb4ca71943"
+        ],
+        "retrieved_top5": [
+          "chunk_cc4962493646e962c5b91008",
+          "chunk_e86ec5395fe0aa73b2604dd7",
+          "chunk_b65d21babc19e6eb651bf431",
+          "chunk_2f6f29fc129e05d67b44c82a",
+          "chunk_c9031063aa3a0deb7ba2a8f5"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          13
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_010",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_cd60029392492cac2b96d0c7"
+        ],
+        "retrieved_top5": [
+          "chunk_f3c9054368818985886f00fd",
+          "chunk_8e28b237f991e3c830e5923b",
+          "chunk_27c594b69e5818cc0714e409",
+          "chunk_2f6f29fc129e05d67b44c82a",
+          "chunk_4ff87138d1fc62f06bfbd1d2"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          18
+        ]
+      },
+      {
+        "benchmark_id": "xyz_leave_attendance_policy_011",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_d77a2d86732dbd56c0412e0d"
+        ],
+        "retrieved_top5": [
+          "chunk_3b2d2342e3e4b74de7cc4178",
+          "chunk_45a93e77fc1e5439b7cdbb5b",
+          "chunk_f3c9054368818985886f00fd",
+          "chunk_36d6cdb7eb8c1e3e72dc1f30",
+          "chunk_d78ca2271613d6688f99d356"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          19
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_001",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_f9409e28fd0027853b74d661"
+        ],
+        "retrieved_top5": [
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_fcb7688c1fe2f08ddaa49596",
+          "chunk_1e13469e36f53598866a5736",
+          "chunk_12d870b80f97fe11f10b4fcb"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          1
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_002",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_7f0a53d9bb1864300b001621"
+        ],
+        "retrieved_top5": [
+          "chunk_fa80e88dc4aaeda2358ee0bd",
+          "chunk_81aceb326679e9d6a12d4f71",
+          "chunk_d84440f67ab822fe3e61fb5b",
+          "chunk_51ce6d21c29cef367115c0b6",
+          "chunk_1af65f952cdfe2e87194920a"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          2
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_003",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_c3edc974df60d1b753a5b4ca"
+        ],
+        "retrieved_top5": [
+          "chunk_79cd2d25f958f4a54682e17b",
+          "chunk_d675d8e04993155e80443eb6",
+          "chunk_06af02f5aea4b5bacad55d36",
+          "chunk_8c483d6ce61290b2e4ebab57",
+          "chunk_0cac40bbc2cd13c5c2c07761"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          3
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_004",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_119692a7c85fca1dd6a8c7ed"
+        ],
+        "retrieved_top5": [
+          "chunk_0dce1bc6f807f4cc1003f626",
+          "chunk_f5267fb86f5f2ae9a5620cb0",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_12d870b80f97fe11f10b4fcb",
+          "chunk_2678ed027016e64052cece90"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          4
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_005",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_d447a63a905dd7dd2e289cc8"
+        ],
+        "retrieved_top5": [
+          "chunk_37c9ee135a7ac92efc250113",
+          "chunk_ff8921c75a91e6c322853885",
+          "chunk_3b5f645e0ff6202c0622bdfe",
+          "chunk_1187e0b5b85aa31511064eec",
+          "chunk_afaef708daf8df950a770d82"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          5
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_006",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_8f5d35d9d0e1b82e3fcee7ec"
+        ],
+        "retrieved_top5": [
+          "chunk_cc85b83109f5b88dfde895d0",
+          "chunk_9900fc6185df80a3038984f4",
+          "chunk_e8863cb965e8544020f80671",
+          "chunk_26e012cda0b27ec879df5ee3",
+          "chunk_7a2835d0e9d64d847b6c100a"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          10
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_007",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_101262a08f61324d38c64f8b"
+        ],
+        "retrieved_top5": [
+          "chunk_ab13cf603cddd0b834237555",
+          "chunk_bd93d9633632f4024cb3be46",
+          "chunk_d0bb55d51beb0372e19cf21c",
+          "chunk_0fcfbe2e49ad167c136c65e7",
+          "chunk_b79b4c1cf6890a825b9aa288"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          11
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_008",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_1e05cd1b442751e71e1b5f26"
+        ],
+        "retrieved_top5": [
+          "chunk_7a2835d0e9d64d847b6c100a",
+          "chunk_42f67a0091e39455d91953a1",
+          "chunk_7d3353d4f7b15c25fd545be6",
+          "chunk_4ace4fae7d3536cce51d64f1",
+          "chunk_12d870b80f97fe11f10b4fcb"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          12
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_009",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_7f366c63bfa2ce572b9ecb6a"
+        ],
+        "retrieved_top5": [
+          "chunk_b214b56bdd724727825f5f1c",
+          "chunk_2b1acc15faa32f3e225f5632",
+          "chunk_77da3467a6ee6a038d9149d6",
+          "chunk_3b4b89d52ca2d1fcfabcf3c4",
+          "chunk_f7411d076a088792f902e71e"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          13
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_010",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_a76960972c34862e4338da06"
+        ],
+        "retrieved_top5": [
+          "chunk_81aceb326679e9d6a12d4f71",
+          "chunk_3feeeca5dea024be3c19d829",
+          "chunk_25251e8b7378518308a04de7",
+          "chunk_77da3467a6ee6a038d9149d6",
+          "chunk_2f6f29fc129e05d67b44c82a"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          18
+        ]
+      },
+      {
+        "benchmark_id": "xyz_workforce_management_handbook_011",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_6bfeb254738fb5df636ddcd8"
+        ],
+        "retrieved_top5": [
+          "chunk_045131b67c31c069cceccddc",
+          "chunk_d84440f67ab822fe3e61fb5b",
+          "chunk_4d32830807493654f2fc362a",
+          "chunk_a523a6e9a44f79767d3ddc41",
+          "chunk_86288c4f5964eef751001cb1"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          19
+        ]
+      },
+      {
+        "benchmark_id": "multi_document_001",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_98f42de8da2a0d9d6e1aae99",
+          "chunk_3fab8bdea127fd5a6ce5795c"
+        ],
+        "retrieved_top5": [
+          "chunk_ceac2a8117ff0ece9dd0bfa6",
+          "chunk_52af4edfc27dcc56b1a8f0e9",
+          "chunk_874f7a039a85c0b60080734d",
+          "chunk_56a1823079db7cf54ba7fabb",
+          "chunk_dec0cbdb771d9ca89f3177f3"
+        ],
+        "document": [
+          "XYZ_Code_of_Conduct.pdf",
+          "XYZ_Employee_Policies.pdf"
+        ],
+        "pages": [
+          20,
+          20
+        ]
+      },
+      {
+        "benchmark_id": "multi_document_002",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_3fab8bdea127fd5a6ce5795c",
+          "chunk_27ab73124820a39f0e726370"
+        ],
+        "retrieved_top5": [
+          "chunk_b5e1a1a9d0f4ff276b80c668",
+          "chunk_874f7a039a85c0b60080734d",
+          "chunk_56a1823079db7cf54ba7fabb",
+          "chunk_03fce06f59934d911ee9ce0c",
+          "chunk_2d063167a4a3533e5f308367"
+        ],
+        "document": [
+          "XYZ_Employee_Policies.pdf",
+          "XYZ_IT_Security_Policy.pdf"
+        ],
+        "pages": [
+          20,
+          20
+        ]
+      },
+      {
+        "benchmark_id": "multi_document_003",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_27ab73124820a39f0e726370",
+          "chunk_8a9585cf77adfd165e017dcc"
+        ],
+        "retrieved_top5": [
+          "chunk_77da3467a6ee6a038d9149d6",
+          "chunk_b5e1a1a9d0f4ff276b80c668",
+          "chunk_11fd97496f29ac8721442c71",
+          "chunk_03fce06f59934d911ee9ce0c",
+          "chunk_2d063167a4a3533e5f308367"
+        ],
+        "document": [
+          "XYZ_IT_Security_Policy.pdf",
+          "XYZ_Leave_Attendance_Policy.pdf"
+        ],
+        "pages": [
+          20,
+          20
+        ]
+      },
+      {
+        "benchmark_id": "multi_document_004",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_8a9585cf77adfd165e017dcc",
+          "chunk_9626d322092c0e4e684908d5"
+        ],
+        "retrieved_top5": [
+          "chunk_77da3467a6ee6a038d9149d6",
+          "chunk_51ce6d21c29cef367115c0b6",
+          "chunk_11fd97496f29ac8721442c71",
+          "chunk_81aceb326679e9d6a12d4f71",
+          "chunk_1af65f952cdfe2e87194920a"
+        ],
+        "document": [
+          "XYZ_Leave_Attendance_Policy.pdf",
+          "XYZ_Workforce_Management_Handbook.pdf"
+        ],
+        "pages": [
+          20,
+          20
+        ]
+      },
+      {
+        "benchmark_id": "multi_document_005",
+        "classification": "ALTERNATE_VALID_EVIDENCE",
+        "reason": "retrieved static chunk repeats independently labeled heading",
+        "old_relevant_chunk_ids": [
+          "chunk_9626d322092c0e4e684908d5",
+          "chunk_98f42de8da2a0d9d6e1aae99"
+        ],
+        "retrieved_top5": [
+          "chunk_51ce6d21c29cef367115c0b6",
+          "chunk_1af65f952cdfe2e87194920a",
+          "chunk_ceac2a8117ff0ece9dd0bfa6",
+          "chunk_81aceb326679e9d6a12d4f71",
+          "chunk_dec0cbdb771d9ca89f3177f3"
+        ],
+        "document": [
+          "XYZ_Workforce_Management_Handbook.pdf",
+          "XYZ_Code_of_Conduct.pdf"
+        ],
+        "pages": [
+          20,
+          20
+        ]
+      }
+    ]
+  },
+  "ground_truth_changes": [
+    {
+      "benchmark_id": "xyz_code_of_conduct_002",
+      "old_relevant_chunk_ids": [
+        "chunk_c85f6556fe9fe7110971f654"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_c85f6556fe9fe7110971f654",
+        "chunk_f558d31a475e1a699c990b03"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 2
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 6
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_003",
+      "old_relevant_chunk_ids": [
+        "chunk_e3ff498fef2027c726155439"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_18b85a2e97c9784832e4c984",
+        "chunk_e3ff498fef2027c726155439"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 7
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 3
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_004",
+      "old_relevant_chunk_ids": [
+        "chunk_b8142ee0036454bf66459267"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_0e868b743da2f6161c72f696",
+        "chunk_b8142ee0036454bf66459267"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 8
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 4
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_005",
+      "old_relevant_chunk_ids": [
+        "chunk_da4ee663e277921944685263"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_5e3d5ac1bcc95887be2a22ad",
+        "chunk_da4ee663e277921944685263"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 9
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 5
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_006",
+      "old_relevant_chunk_ids": [
+        "chunk_56749db3aa7c4773b460af9f"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_2db3145facb0484df572d414",
+        "chunk_56749db3aa7c4773b460af9f"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 14
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 10
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_007",
+      "old_relevant_chunk_ids": [
+        "chunk_8ba2f7138529daa988e962a2"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_829b42fa19324eeb0cad03d3",
+        "chunk_8ba2f7138529daa988e962a2"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 15
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 11
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_008",
+      "old_relevant_chunk_ids": [
+        "chunk_db6fe4cf3d4347a53108a4e5"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_6ce5ccf413c0d37e9878fe97",
+        "chunk_db6fe4cf3d4347a53108a4e5"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 16
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 12
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_009",
+      "old_relevant_chunk_ids": [
+        "chunk_43c070c99f0b4e88cb2bf485"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_43c070c99f0b4e88cb2bf485",
+        "chunk_7673853158db1442f0300f4f"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 13
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 17
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_010",
+      "old_relevant_chunk_ids": [
+        "chunk_f65ca3dc135f9dcd24331fe2"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_7f6ded7c889966df009e26c3",
+        "chunk_f65ca3dc135f9dcd24331fe2"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 22
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 18
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_code_of_conduct_011",
+      "old_relevant_chunk_ids": [
+        "chunk_6872afdc469ea7740f5cbb36"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_6872afdc469ea7740f5cbb36",
+        "chunk_8c2baa9432d3ebc044cd99f1"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 19
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 23
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_002",
+      "old_relevant_chunk_ids": [
+        "chunk_7250b0a500ff91192ffcf69a"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_7250b0a500ff91192ffcf69a",
+        "chunk_fcb57abd724e00cc255d3824"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 2
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 6
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_003",
+      "old_relevant_chunk_ids": [
+        "chunk_98029c496ec25bcf0627609a"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_9027775fa22079be2c852e17",
+        "chunk_98029c496ec25bcf0627609a"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 7
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 3
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_004",
+      "old_relevant_chunk_ids": [
+        "chunk_4b08045caf1c0a940d50130d"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_1286348344e8d71da8dbf05b",
+        "chunk_4b08045caf1c0a940d50130d"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 8
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 4
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_005",
+      "old_relevant_chunk_ids": [
+        "chunk_19b186ab5206b563e30e9ebf"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_19b186ab5206b563e30e9ebf",
+        "chunk_86288c4f5964eef751001cb1"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 5
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 9
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_006",
+      "old_relevant_chunk_ids": [
+        "chunk_dcde21c58b34d6124694bf13"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_65964c3e66102411099b72de",
+        "chunk_dcde21c58b34d6124694bf13"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 14
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 10
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_007",
+      "old_relevant_chunk_ids": [
+        "chunk_1be0b6a8f732808234ea5316"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_1be0b6a8f732808234ea5316",
+        "chunk_a0c311581cc1a83a2842a41d"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 11
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 15
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_008",
+      "old_relevant_chunk_ids": [
+        "chunk_163929e7577f16045c2f5541"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_163929e7577f16045c2f5541",
+        "chunk_f71ee7da0f66da918fa2569c"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 12
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 16
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_009",
+      "old_relevant_chunk_ids": [
+        "chunk_f621c3672128b6917a57088f"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_77d4ea44f64c8b7a242aa020",
+        "chunk_f621c3672128b6917a57088f"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 17
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 13
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_010",
+      "old_relevant_chunk_ids": [
+        "chunk_806305e6f85b0b246ebf7730"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_806305e6f85b0b246ebf7730",
+        "chunk_cafc8312e4f03513f449ebd8"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 18
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 22
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_employee_policies_011",
+      "old_relevant_chunk_ids": [
+        "chunk_2cf1b9c464cef684a1d26136"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_27c594b69e5818cc0714e409",
+        "chunk_2cf1b9c464cef684a1d26136"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 23
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 19
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_002",
+      "old_relevant_chunk_ids": [
+        "chunk_3b5bfbc1fcab1e5fa3a41ae8"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_3b5bfbc1fcab1e5fa3a41ae8",
+        "chunk_808bbe66e8c35901fa72d151"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 2
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 6
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_003",
+      "old_relevant_chunk_ids": [
+        "chunk_a3af9361e325f3492aac93b8"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_a3af9361e325f3492aac93b8",
+        "chunk_e0e6f6d6ce2ba037de70166c"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 3
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 7
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_004",
+      "old_relevant_chunk_ids": [
+        "chunk_02e7a78316ff6a0a519c58fb"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_02e7a78316ff6a0a519c58fb",
+        "chunk_ab911fc771a454b90acb37e7"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 4
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 8
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_005",
+      "old_relevant_chunk_ids": [
+        "chunk_5235b2e8f38a07ec8e3baa79"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_5235b2e8f38a07ec8e3baa79",
+        "chunk_af7c8cd1c84a158d856784b6"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 5
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 9
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_006",
+      "old_relevant_chunk_ids": [
+        "chunk_daacf2edabc31fae4388ad9d"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_daacf2edabc31fae4388ad9d",
+        "chunk_f5267fb86f5f2ae9a5620cb0"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 10
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 14
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_007",
+      "old_relevant_chunk_ids": [
+        "chunk_6799a9d81c69394b4cfa8d62"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_6799a9d81c69394b4cfa8d62",
+        "chunk_b4c8c641ec8a45fe289c7db6"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 11
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 15
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_008",
+      "old_relevant_chunk_ids": [
+        "chunk_8f767bfacd4ed3e51538c7af"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_33c368b1c038cc72ed08313e",
+        "chunk_8f767bfacd4ed3e51538c7af"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 16
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 12
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_009",
+      "old_relevant_chunk_ids": [
+        "chunk_ff634a8dacbecc22b20556cd"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_19a86988f723a160e63e129d",
+        "chunk_ff634a8dacbecc22b20556cd"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 17
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 13
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_010",
+      "old_relevant_chunk_ids": [
+        "chunk_0343521f9070b1502590428d"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_0343521f9070b1502590428d",
+        "chunk_69da19f6c87b5da952008de7"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 18
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 22
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_it_security_policy_011",
+      "old_relevant_chunk_ids": [
+        "chunk_d212d1b97ec0913986b44bc8"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_b7d1445e67e00b490307c4d7",
+        "chunk_d212d1b97ec0913986b44bc8"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 23
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 19
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_002",
+      "old_relevant_chunk_ids": [
+        "chunk_8e33f345d6c5fe0f77fafbf7"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_8e33f345d6c5fe0f77fafbf7",
+        "chunk_9f7507ed412bba151ff44e0d"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 2
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 6
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_003",
+      "old_relevant_chunk_ids": [
+        "chunk_03cbe252d19f5f91a4f09de5"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_03cbe252d19f5f91a4f09de5",
+        "chunk_29037a65d09c3468f73a4266"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 3
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 7
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_004",
+      "old_relevant_chunk_ids": [
+        "chunk_082dbeb90514bfeecd3be1f6"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_05f106c78f1c9bddcaeec0d9",
+        "chunk_082dbeb90514bfeecd3be1f6"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 8
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 4
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_005",
+      "old_relevant_chunk_ids": [
+        "chunk_30fc305f19b1643a22d51598"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_30fc305f19b1643a22d51598",
+        "chunk_9cc1ae6e0a107fd93b5e9c6f"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 5
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 9
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_006",
+      "old_relevant_chunk_ids": [
+        "chunk_bb5199a1715483fb0c423c1e"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_bb5199a1715483fb0c423c1e",
+        "chunk_c9031063aa3a0deb7ba2a8f5"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 10
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 14
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_007",
+      "old_relevant_chunk_ids": [
+        "chunk_8760f84be8979f9f7e9cf2a0"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_2f6f29fc129e05d67b44c82a",
+        "chunk_8760f84be8979f9f7e9cf2a0"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 15
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 11
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_008",
+      "old_relevant_chunk_ids": [
+        "chunk_c69298a7af4c10190a6cf637"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_b65d21babc19e6eb651bf431",
+        "chunk_c69298a7af4c10190a6cf637"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 16
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 12
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_009",
+      "old_relevant_chunk_ids": [
+        "chunk_9906c183a0c6f1fb4ca71943"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_9906c183a0c6f1fb4ca71943",
+        "chunk_cc4962493646e962c5b91008"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 13
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 17
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_010",
+      "old_relevant_chunk_ids": [
+        "chunk_cd60029392492cac2b96d0c7"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_8e28b237f991e3c830e5923b",
+        "chunk_cd60029392492cac2b96d0c7"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 22
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 18
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_leave_attendance_policy_011",
+      "old_relevant_chunk_ids": [
+        "chunk_d77a2d86732dbd56c0412e0d"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_3b2d2342e3e4b74de7cc4178",
+        "chunk_d77a2d86732dbd56c0412e0d"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 23
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 19
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_002",
+      "old_relevant_chunk_ids": [
+        "chunk_7f0a53d9bb1864300b001621"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_7f0a53d9bb1864300b001621",
+        "chunk_fa80e88dc4aaeda2358ee0bd"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 2
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 6
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_003",
+      "old_relevant_chunk_ids": [
+        "chunk_c3edc974df60d1b753a5b4ca"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_79cd2d25f958f4a54682e17b",
+        "chunk_c3edc974df60d1b753a5b4ca"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 7
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 3
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_004",
+      "old_relevant_chunk_ids": [
+        "chunk_119692a7c85fca1dd6a8c7ed"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_0dce1bc6f807f4cc1003f626",
+        "chunk_119692a7c85fca1dd6a8c7ed"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 8
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 4
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_005",
+      "old_relevant_chunk_ids": [
+        "chunk_d447a63a905dd7dd2e289cc8"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_d447a63a905dd7dd2e289cc8",
+        "chunk_ff8921c75a91e6c322853885"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 5
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 9
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_006",
+      "old_relevant_chunk_ids": [
+        "chunk_8f5d35d9d0e1b82e3fcee7ec"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_8f5d35d9d0e1b82e3fcee7ec",
+        "chunk_cc85b83109f5b88dfde895d0"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 10
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 14
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_007",
+      "old_relevant_chunk_ids": [
+        "chunk_101262a08f61324d38c64f8b"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_101262a08f61324d38c64f8b",
+        "chunk_ab13cf603cddd0b834237555"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 11
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 15
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_008",
+      "old_relevant_chunk_ids": [
+        "chunk_1e05cd1b442751e71e1b5f26"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_1e05cd1b442751e71e1b5f26",
+        "chunk_7a2835d0e9d64d847b6c100a"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 12
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 16
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_009",
+      "old_relevant_chunk_ids": [
+        "chunk_7f366c63bfa2ce572b9ecb6a"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_7f366c63bfa2ce572b9ecb6a",
+        "chunk_b214b56bdd724727825f5f1c"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 13
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 17
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_010",
+      "old_relevant_chunk_ids": [
+        "chunk_a76960972c34862e4338da06"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_81aceb326679e9d6a12d4f71",
+        "chunk_a76960972c34862e4338da06"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 22
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 18
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "xyz_workforce_management_handbook_011",
+      "old_relevant_chunk_ids": [
+        "chunk_6bfeb254738fb5df636ddcd8"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_6bfeb254738fb5df636ddcd8",
+        "chunk_d84440f67ab822fe3e61fb5b"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 19
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 23
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "multi_document_001",
+      "old_relevant_chunk_ids": [
+        "chunk_98f42de8da2a0d9d6e1aae99",
+        "chunk_3fab8bdea127fd5a6ce5795c"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_3fab8bdea127fd5a6ce5795c",
+        "chunk_874f7a039a85c0b60080734d",
+        "chunk_98f42de8da2a0d9d6e1aae99",
+        "chunk_ceac2a8117ff0ece9dd0bfa6"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 24
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 24
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "multi_document_002",
+      "old_relevant_chunk_ids": [
+        "chunk_3fab8bdea127fd5a6ce5795c",
+        "chunk_27ab73124820a39f0e726370"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_27ab73124820a39f0e726370",
+        "chunk_3fab8bdea127fd5a6ce5795c",
+        "chunk_874f7a039a85c0b60080734d",
+        "chunk_b5e1a1a9d0f4ff276b80c668"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Employee_Policies.pdf",
+          "page": 24
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 24
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "multi_document_003",
+      "old_relevant_chunk_ids": [
+        "chunk_27ab73124820a39f0e726370",
+        "chunk_8a9585cf77adfd165e017dcc"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_27ab73124820a39f0e726370",
+        "chunk_77da3467a6ee6a038d9149d6",
+        "chunk_8a9585cf77adfd165e017dcc",
+        "chunk_b5e1a1a9d0f4ff276b80c668"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 24
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_IT_Security_Policy.pdf",
+          "page": 24
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "multi_document_004",
+      "old_relevant_chunk_ids": [
+        "chunk_8a9585cf77adfd165e017dcc",
+        "chunk_9626d322092c0e4e684908d5"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_51ce6d21c29cef367115c0b6",
+        "chunk_77da3467a6ee6a038d9149d6",
+        "chunk_8a9585cf77adfd165e017dcc",
+        "chunk_9626d322092c0e4e684908d5"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 24
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 24
+        },
+        {
+          "document": "XYZ_Leave_Attendance_Policy.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 20
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    },
+    {
+      "benchmark_id": "multi_document_005",
+      "old_relevant_chunk_ids": [
+        "chunk_9626d322092c0e4e684908d5",
+        "chunk_98f42de8da2a0d9d6e1aae99"
+      ],
+      "new_relevant_chunk_ids": [
+        "chunk_51ce6d21c29cef367115c0b6",
+        "chunk_9626d322092c0e4e684908d5",
+        "chunk_98f42de8da2a0d9d6e1aae99",
+        "chunk_ceac2a8117ff0ece9dd0bfa6"
+      ],
+      "reason": "same source and independently recorded section/subsection heading in static PDF-derived corpus",
+      "evidence": [
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 24
+        },
+        {
+          "document": "XYZ_Workforce_Management_Handbook.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 20
+        },
+        {
+          "document": "XYZ_Code_of_Conduct.pdf",
+          "page": 24
+        }
+      ],
+      "classification": "ALTERNATE_VALID_EVIDENCE"
+    }
+  ],
+  "neighbor_rule": "same document, chunk_index adjacent to an independently labeled chunk, and recorded only as diagnostic; labels are unchanged unless retrieved text independently repeats the labeled heading",
+  "multi_document_coverage": {
+    "5": 1.0,
+    "10": 1.0
+  }
+}
