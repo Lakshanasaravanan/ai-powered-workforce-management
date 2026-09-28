@@ -1,6 +1,6 @@
 from calendar import monthrange
 from collections import defaultdict
-from datetime import date, time
+from datetime import date, datetime, time
 from decimal import Decimal, ROUND_HALF_UP
 
 from fastapi import HTTPException
@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.models.attendance import AttendanceRecord, AttendanceStatus, OvertimeSession
 from app.models.employee import CompensationConfiguration, Employee, Role
+from app.models.payroll import PayrollSnapshot
 from app.services.holidays import is_working_day
 
 
@@ -121,3 +122,15 @@ def payroll_preview(db: Session, employee: Employee, year: int, month: int) -> d
         raise HTTPException(422, "No compensation configuration covers this payroll month")
     regular_after_absence = monthly_foundation - amounts["absence"]
     return {"employee_id": str(employee.id), "employee_code": employee.employee_code, "employee_name": employee.full_name, "year": year, "month": month, "working_days": len(days), "present_days": counts["present"], "paid_leave_days": counts["paid_leave"], "explicit_absent_days": counts["absent"], "missing_attendance_days": counts["missing"], "regular_worked_minutes": minutes["regular"], "regular_records_without_completed_checkout": counts["incomplete_regular"], "raw_overtime_minutes": minutes["raw_ot"], "open_overtime_sessions": open_ot, "monthly_salary": money(monthly_foundation), "derived_daily_rate": money(monthly_foundation / count) if count else Decimal("0.00"), "overtime_hourly_rate": money(Decimal(latest.overtime_hourly_rate)), "late_deduction_amount": money(Decimal(latest.late_deduction_amount)), "compensation_periods": periods, "total_regular_qualifying_minutes": minutes["regular"], "total_regular_deficit_minutes": minutes["deficit"], "total_deficit_recovery_minutes": minutes["recovery"], "total_unrecovered_deficit_minutes": minutes["unrecovered"], "total_raw_overtime_minutes": minutes["raw_ot"], "total_paid_overtime_minutes": minutes["paid_ot"], "late_deduction_days": counts["late_days"], "total_late_deduction": money(amounts["late"]), "absence_deduction_days": counts["absence_days"], "total_absence_deduction": money(amounts["absence"]), "total_overtime_pay": money(amounts["overtime"]), "regular_salary_after_absence": money(regular_after_absence), "payable_salary_preview": money(regular_after_absence + amounts["overtime"] - amounts["late"]), "daily_breakdown": breakdown}
+
+
+def _json_value(value):
+    if isinstance(value, Decimal): return format(value, ".2f")
+    if isinstance(value, (date, datetime)): return value.isoformat()
+    if isinstance(value, list): return [_json_value(item) for item in value]
+    if isinstance(value, dict): return {key: _json_value(item) for key, item in value.items()}
+    return value
+
+
+def snapshot_dict(snapshot: PayrollSnapshot) -> dict:
+    return {"id": str(snapshot.id), "employee_id": str(snapshot.employee_id), "payroll_year": snapshot.payroll_year, "payroll_month": snapshot.payroll_month, "finalized_at": snapshot.finalized_at.isoformat(), "finalized_by_admin_id": str(snapshot.finalized_by_admin_id), "working_days": snapshot.working_days, "present_days": snapshot.present_days, "paid_leave_days": snapshot.paid_leave_days, "explicit_absent_days": snapshot.explicit_absent_days, "missing_attendance_days": snapshot.missing_attendance_days, "total_regular_qualifying_minutes": snapshot.total_regular_qualifying_minutes, "total_regular_deficit_minutes": snapshot.total_regular_deficit_minutes, "total_deficit_recovery_minutes": snapshot.total_deficit_recovery_minutes, "total_unrecovered_deficit_minutes": snapshot.total_unrecovered_deficit_minutes, "total_raw_overtime_minutes": snapshot.total_raw_overtime_minutes, "total_paid_overtime_minutes": snapshot.total_paid_overtime_minutes, "late_deduction_days": snapshot.late_deduction_days, "absence_deduction_days": snapshot.absence_deduction_days, "total_late_deduction": snapshot.total_late_deduction, "total_absence_deduction": snapshot.total_absence_deduction, "total_overtime_pay": snapshot.total_overtime_pay, "regular_salary_after_absence": snapshot.regular_salary_after_absence, "payable_salary": snapshot.payable_salary, "compensation_breakdown": snapshot.compensation_breakdown, "daily_breakdown": snapshot.daily_breakdown}

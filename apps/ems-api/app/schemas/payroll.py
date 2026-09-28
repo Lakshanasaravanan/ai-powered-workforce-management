@@ -65,3 +65,32 @@ class PayrollPreview(BaseModel):
     regular_salary_after_absence: Decimal
     payable_salary_preview: Decimal
     daily_breakdown: list[PayrollDay]
+
+
+class PayrollSnapshotRead(BaseModel):
+    id: str
+    employee_id: str
+    payroll_year: int
+    payroll_month: int
+    finalized_at: str
+    finalized_by_admin_id: str
+    working_days: int
+    present_days: int
+    paid_leave_days: int
+    explicit_absent_days: int
+    missing_attendance_days: int
+    total_regular_qualifying_minutes: int
+    total_regular_deficit_minutes: int
+    total_deficit_recovery_minutes: int
+    total_unrecovered_deficit_minutes: int
+    total_raw_overtime_minutes: int
+    total_paid_overtime_minutes: int
+    late_deduction_days: int
+    absence_deduction_days: int
+    total_late_deduction: Decimal
+    total_absence_deduction: Decimal
+    total_overtime_pay: Decimal
+    regular_salary_after_absence: Decimal
+    payable_salary: Decimal
+    compensation_breakdown: list[dict]
+    daily_breakdown: list[dict]
