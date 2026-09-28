@@ -55,6 +55,10 @@ class Settings(BaseSettings):
     rag_min_chunk_tokens: int = Field(default=24, ge=1, le=1024)
     rag_retrieval_top_k: int = Field(default=5, ge=1, le=50)
     rag_retrieval_candidate_k: int = Field(default=30, ge=1, le=200)
+    # Phase 22 selected the explicit local sparse path using the audited,
+    # held-out benchmark. ``rag_hybrid_enabled`` remains for compatibility
+    # with prior configuration, but new deployments should use this mode.
+    rag_retrieval_mode: Literal["dense", "sparse", "hybrid"] = "sparse"
     rag_hybrid_enabled: bool = False
     rag_rrf_k: int = Field(default=60, ge=1, le=500)
     rag_rerank_enabled: bool = False

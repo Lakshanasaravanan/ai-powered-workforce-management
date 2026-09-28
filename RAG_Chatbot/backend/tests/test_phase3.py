@@ -67,10 +67,11 @@ def test_evaluation_metrics():
     assert metrics["aggregate"]["mrr"] == 1.0
 
 
-def test_default_service_does_not_construct_optional_retrievers(monkeypatch, tmp_path):
-    """Dense-only defaults must not initialize BM25 or a cross-encoder."""
+def test_explicit_dense_service_does_not_construct_optional_retrievers(monkeypatch, tmp_path):
+    """Explicit dense mode must not initialize BM25 or a cross-encoder."""
     import app.rag.service as service_module
 
+    monkeypatch.setenv("RAG_RETRIEVAL_MODE", "dense")
     settings = Settings(_env_file=None)
 
     class FakeStore:

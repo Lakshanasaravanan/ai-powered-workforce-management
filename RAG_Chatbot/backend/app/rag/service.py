@@ -5,7 +5,7 @@ from app.rag.context import ContextAssembler
 from app.rag.embeddings import EmbeddingService
 from app.rag.generator import GroundedGenerator
 from app.rag.retriever import DenseRetriever
-from app.rag.hybrid import HybridRetriever
+from app.rag.hybrid import HybridRetriever, SparseOnlyRetriever
 from app.rag.reranker import CrossEncoderReranker, DisabledReranker
 from app.rag.sparse import BM25SparseRetriever, SparseIndexError
 from app.schemas.rag import RAGAnswer
@@ -65,18 +65,26 @@ def create_rag_service(settings: Settings, vector_directory) -> RAGService:
     embeddings = EmbeddingService(settings.embedding_model, device=settings.embedding_device, **embedding_options)
     dense = DenseRetriever(store, embeddings, settings.rag_retrieval_candidate_k)
     sparse = None
-    if settings.rag_hybrid_enabled:
+    mode = settings.rag_retrieval_mode
+    if mode in {"sparse", "hybrid"}:
         try:
             sparse = BM25SparseRetriever.from_artifact(SPARSE_INDEX_PATH, store)
         except SparseIndexError:
+            if mode == "sparse":
+                raise
             sparse = None
     rerank_options: dict[str, object] = {}
     if settings.rerank_cache_dir:
         rerank_options["cache_dir"] = str(settings.rerank_cache_dir)
     if settings.rerank_local_files_only:
         rerank_options["local_files_only"] = True
-    reranker = CrossEncoderReranker(settings.rag_rerank_model, **rerank_options) if settings.rag_rerank_enabled else DisabledReranker()
-    retriever = HybridRetriever(dense, sparse, reranker, settings.rag_retrieval_candidate_k, settings.rag_retrieval_top_k, settings.rag_rrf_k, settings.rag_hybrid_enabled, settings.rag_rerank_enabled and sparse is not None)
+    reranker = CrossEncoderReranker(settings.rag_rerank_model, **rerank_options) if settings.rag_rerank_enabled and mode == "hybrid" else DisabledReranker()
+    if mode == "sparse":
+        if sparse is None:  # Defensive: explicit sparse mode must never fall back silently.
+            raise SparseIndexError("Sparse retrieval is configured but the local sparse artifact is unavailable")
+        retriever = SparseOnlyRetriever(sparse, settings.rag_retrieval_top_k)
+    else:
+        retriever = HybridRetriever(dense, sparse, reranker, settings.rag_retrieval_candidate_k, settings.rag_retrieval_top_k, settings.rag_rrf_k, mode == "hybrid", settings.rag_rerank_enabled and mode == "hybrid" and sparse is not None)
     return RAGService(
         retriever,
         ContextAssembler(settings.rag_max_context_tokens),
